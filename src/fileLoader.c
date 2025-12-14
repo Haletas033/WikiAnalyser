@@ -8,7 +8,7 @@
 
 #include "../include/fileLoader.h"
 
-PCSTRDATA GetData(PCSTRFILEPATH szFilePath) {
+PSTRDATA GetData(PCSTRFILEPATH szFilePath) {
     FILE* pFile = fopen(szFilePath, "r");
     if (!pFile) HANDLE_FILE_ERROR(NULL);
 
@@ -32,4 +32,19 @@ PCSTRDATA GetData(PCSTRFILEPATH szFilePath) {
     szBuffer[iFileSize] = '\0';
 
     return szBuffer;
+}
+void ModifyUnwanted(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char cNewCharacter) {
+
+}
+
+void ModifyUnwanted(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szNewString) {
+
+}
+
+void ModifyUnwanted(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szNewHead, char* szNewTail) {
+
+}
+
+void CleanUpData(PSTRDATA szData, UNWANTED unwanted) {
+
 }

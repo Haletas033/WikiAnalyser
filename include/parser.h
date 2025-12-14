@@ -6,6 +6,7 @@
 #define PARSER_H
 
 typedef const char* PCSTRDATA;
+typedef char* PSTRDATA;
 
 typedef struct Parser {
     PCSTRDATA m_szData;
