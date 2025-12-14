@@ -32,9 +32,9 @@ typedef enum UNWANTED_MODIFIER {
     CLEAR
 } UNWANTED_MODIFIER;
 
-void ModifyUnwanted(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char cNewCharacter);
-void ModifyUnwanted(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szNewString);
-void ModifyUnwanted(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szNewHead, char* szNewTail);
+void ModifyUnwanted_CHAR(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char cNewCharacter);
+void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szNewString);
+void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szNewHead, char* szNewTail);
 
 PSTRDATA GetData(PCSTRFILEPATH szFilePath);
 void CleanUpData(PCSTRDATA* szData, UNWANTED unwanted);
