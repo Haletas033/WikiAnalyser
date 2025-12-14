@@ -5,15 +5,13 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-typedef const char* data;
+typedef const char* PCSTRDATA;
 
-class Parser {
-private:
-    data data_;
-public:
-    explicit Parser(data d);
-};
+typedef struct Parser {
+    PCSTRDATA m_szData;
+} Parser;
 
+void InitParser(Parser* pParser, PCSTRDATA szData);
 
 
 #endif //PARSER_H

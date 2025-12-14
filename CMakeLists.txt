@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.31)
 project(WikiAnalyser)
 
-set(CMAKE_CXX_STANDARD 98)
+set(CMAKE_C_STANDARD 90)
 
-add_executable(WikiAnalyser main.cpp
-        include/parser.h)
+add_executable(WikiAnalyser
+        src/main.c
+        src/parser.c
+        src/article.c
+        include/parser.h
+        include/article.h
+)
