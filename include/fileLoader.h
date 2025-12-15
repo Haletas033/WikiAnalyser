@@ -18,19 +18,19 @@ typedef const char* PCSTRFILEPATH;
 typedef const char* PARRAYCSTR_UNWANTED_CHARACTERS;
 typedef unsigned short USHORT_UNWANTED_CHARACTERS_COUNT;
 
-typedef const char** PARRAYCSTR_UNWANTED_STRINGS;
+typedef char** PARRAYSTR_UNWANTED_STRINGS;
 typedef unsigned short USHORT_UNWANTED_STRINGS_COUNT;
 
 typedef struct UNWANTED_CONTAINERS {
-    PARRAYCSTR_UNWANTED_STRINGS m_paUnwantedHeads;
-    PARRAYCSTR_UNWANTED_STRINGS m_paUnwantedTails;
+    PARRAYSTR_UNWANTED_STRINGS m_paUnwantedHeads;
+    PARRAYSTR_UNWANTED_STRINGS m_paUnwantedTails;
 } UNWANTED_CONTAINERS;
 
 typedef struct UNWANTED {
     PARRAYCSTR_UNWANTED_CHARACTERS m_paUnwantedCharacters;
     USHORT_UNWANTED_CHARACTERS_COUNT m_ushortUnwantedCharactersSize;
 
-    PARRAYCSTR_UNWANTED_STRINGS m_paUnwantedStrings;
+    PARRAYSTR_UNWANTED_STRINGS m_paUnwantedStrings;
     USHORT_UNWANTED_STRINGS_COUNT m_ushortUnwantedStringsSize;
 
     UNWANTED_CONTAINERS m_unwantedContainers;
@@ -43,7 +43,7 @@ typedef enum UNWANTED_MODIFIER {
 } UNWANTED_MODIFIER;
 
 void ModifyUnwanted_CHAR(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const char caNewCharacters[]);
-void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szaNewStrings[]);
+void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const char* szaNewStrings[], unsigned short count);
 void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szaNewHeads[], char* szaNewTails[]);
 
 PSTRDATA GetData(PCSTRFILEPATH szFilePath);

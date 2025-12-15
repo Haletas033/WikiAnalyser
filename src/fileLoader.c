@@ -50,8 +50,35 @@ void ModifyUnwanted_CHAR(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const 
     unwanted->m_ushortUnwantedCharactersSize = uSize;
 }
 
-void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szaNewStrings[]) {
+void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const char* szaNewStrings[], const unsigned short count) {
+    if (count == 0) return;
 
+    const unsigned short uOldSize = unwanted->m_ushortUnwantedStringsSize;
+    const unsigned short uSize = uOldSize + count;
+
+    char** buffer = malloc(uSize * sizeof(char*));
+    if (!buffer) return;
+
+    unsigned short i;
+    for (i = 0; i < uOldSize; i++) {
+        buffer[i] = unwanted->m_paUnwantedStrings[i];
+    }
+
+
+    for (i = 0; i < count; i++) {
+        buffer[uOldSize + i] = malloc(strlen(szaNewStrings[i]) + 1);
+        if (!buffer[uOldSize + i]) {
+            unsigned short j;
+            for (j = uOldSize; j < uOldSize + i; j++) free(buffer[j]);
+            free(buffer);
+            return;
+        }
+        strcpy(buffer[uOldSize + i], szaNewStrings[i]);
+    }
+
+    free(unwanted->m_paUnwantedStrings);
+    unwanted->m_paUnwantedStrings = buffer;
+    unwanted->m_ushortUnwantedStringsSize = uSize;
 }
 
 void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szaNewHeads[], char* szaNewTails[]) {
