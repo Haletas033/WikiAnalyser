@@ -10,8 +10,11 @@
 #include <string.h>
 #include "parser.h"
 #include <stdbool.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdlib.h>
 
-#define HANDLE_FILE_ERROR(f) do { if (f) fclose(f); return NULL; } while(0)
+#define MEGA_BYTES(m) m*1024*1024
 
 typedef const char* PCSTRFILEPATH;
 
@@ -46,7 +49,6 @@ void ModifyUnwanted_CHAR(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const 
 void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const char* szaNewStrings[], unsigned short count);
 void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szaNewHeads[], char* szaNewTails[]);
 
-PSTRDATA GetData(PCSTRFILEPATH szFilePath);
-void CleanUpData(PSTRDATA szData, UNWANTED unwanted);
+int CleanUpData(PCSTRFILEPATH szFilePath, UNWANTED unwanted);
 
 #endif //FILELOADER_H

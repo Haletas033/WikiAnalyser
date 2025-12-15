@@ -8,32 +8,6 @@
 
 #include "../include/fileLoader.h"
 
-PSTRDATA GetData(PCSTRFILEPATH szFilePath) {
-    FILE* pFile = fopen(szFilePath, "r");
-    if (!pFile) HANDLE_FILE_ERROR(NULL);
-
-    if (fseek(pFile, 0, SEEK_END) != 0) HANDLE_FILE_ERROR(pFile);
-
-    const long iFileSize = ftell(pFile);
-    if (iFileSize < 0) HANDLE_FILE_ERROR(pFile);
-
-    rewind(pFile);
-
-    char* szBuffer = malloc(iFileSize + 1);
-    if (!szBuffer) HANDLE_FILE_ERROR(pFile);
-
-    const size_t uBytes = fread(szBuffer, 1, iFileSize, pFile);
-    if (uBytes != (size_t)iFileSize) {
-        free(szBuffer);
-        return NULL;
-    }
-
-    fclose(pFile);
-    szBuffer[iFileSize] = '\0';
-
-    return szBuffer;
-}
-
 void ModifyUnwanted_CHAR(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const char caNewCharacters[]) {
     const unsigned short uOldSize = unwanted->m_ushortUnwantedCharactersSize;
     const unsigned short uNewSize = strlen(caNewCharacters) + 1;
@@ -85,26 +59,61 @@ void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, c
 
 }
 
-void CleanUpData(PSTRDATA szData, const UNWANTED unwanted) {
-    const char* src = szData;
-    char* dst = szData;
+int CleanUpData(PCSTRFILEPATH szFilePath, const UNWANTED unwanted) {
+    int iFileDir = open(szFilePath, O_RDWR);
+    if (iFileDir < 0) return -1;
 
-    while (*src != '\0') {
-        bool isUnwanted = false;
+    unsigned char* uszBuffer = malloc(MEGA_BYTES(32));
+    if (!uszBuffer) {
+        close(iFileDir);
+        return -1;
+    }
 
-        int c;
-        for (c = 0; c < unwanted.m_ushortUnwantedCharactersSize; c++) {
-            if (*src == unwanted.m_paUnwantedCharacters[c]) {
-                isUnwanted = true;
-                break;
+    off_t lWritePos = 0;
+    off_t lReadPos = 0;
+
+
+    while (true) {
+        if (lseek(iFileDir, lReadPos, SEEK_SET) == (off_t)-1) break;
+
+        ssize_t llReadOffset = read(iFileDir, uszBuffer, MEGA_BYTES(32));
+        if (llReadOffset <= 0) break;
+
+        size_t ullWriteOffset = 0;
+
+
+        ssize_t i;
+        for (i = 0; i < llReadOffset; i++) {
+            bool isUnwanted = false;
+
+            int c;
+            for (c = 0; c < unwanted.m_ushortUnwantedCharactersSize; c++) {
+                if (uszBuffer[i] == unwanted.m_paUnwantedCharacters[c]) {
+                    isUnwanted = true;
+                    break;
+                }
+            }
+
+            if (!isUnwanted) {
+                uszBuffer[ullWriteOffset++] = uszBuffer[i];
             }
         }
 
-        if (!isUnwanted) {
-            *dst = *src;
-            dst++;
-        }
-        src++;
+        if (lseek(iFileDir, lWritePos, SEEK_SET) == (off_t)-1) break;
+
+        if (write(iFileDir, uszBuffer, ullWriteOffset) != (ssize_t)ullWriteOffset) break;
+
+        lReadPos += llReadOffset;
+        lWritePos += ullWriteOffset;
     }
-    *dst = '\0';
+
+    if (ftruncate(iFileDir, lWritePos) != 0) {
+        close(iFileDir);
+        free(uszBuffer);
+        return -1;
+    }
+
+    close(iFileDir);
+    free(uszBuffer);
+    return 0;
 }
