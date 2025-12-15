@@ -33,18 +33,51 @@ PSTRDATA GetData(PCSTRFILEPATH szFilePath) {
 
     return szBuffer;
 }
-void ModifyUnwanted_CHAR(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char cNewCharacter) {
+
+void ModifyUnwanted_CHAR(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const char caNewCharacters[]) {
+    const unsigned short uOldSize = unwanted->m_ushortUnwantedCharactersSize;
+    const unsigned short uNewSize = strlen(caNewCharacters) + 1;
+    const unsigned short uSize = uOldSize + uNewSize;
+
+    char* buffer = malloc(uSize * sizeof(char));
+    if (!buffer) return;
+
+    memcpy(buffer, unwanted->m_paUnwantedCharacters, uOldSize);
+    memcpy(buffer + uOldSize, caNewCharacters, uNewSize);
+
+    free((char*)unwanted->m_paUnwantedCharacters);
+    unwanted->m_paUnwantedCharacters = buffer;
+    unwanted->m_ushortUnwantedCharactersSize = uSize;
+}
+
+void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szaNewStrings[]) {
 
 }
 
-void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szNewString) {
+void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szaNewHeads[], char* szaNewTails[]) {
 
 }
 
-void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szNewHead, char* szNewTail) {
+void CleanUpData(PSTRDATA szData, const UNWANTED unwanted) {
+    const char* src = szData;
+    char* dst = szData;
 
-}
+    while (*src != '\0') {
+        bool isUnwanted = false;
 
-void CleanUpData(PSTRDATA szData, UNWANTED unwanted) {
+        int c;
+        for (c = 0; c < unwanted.m_ushortUnwantedCharactersSize; c++) {
+            if (*src == unwanted.m_paUnwantedCharacters[c]) {
+                isUnwanted = true;
+                break;
+            }
+        }
 
+        if (!isUnwanted) {
+            *dst = *src;
+            dst++;
+        }
+        src++;
+    }
+    *dst = '\0';
 }
