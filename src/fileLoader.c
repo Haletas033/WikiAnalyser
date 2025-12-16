@@ -59,6 +59,30 @@ void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, c
 
 }
 
+void CleanUpCharacters(const UNWANTED* unwanted, bool* isUnwanted, const unsigned char* uszBuffer, ssize_t i) {
+    int c;
+    for (c = 0; c < unwanted->m_ushortUnwantedCharactersSize; c++) {
+        if (uszBuffer[i] == unwanted->m_paUnwantedCharacters[c]) {
+            *isUnwanted = true;
+            break;
+        }
+    }
+}
+
+void CleanUpStrings(const UNWANTED* unwanted, bool* isUnwanted, const unsigned char* uszBuffer, ssize_t* i) {
+    int sz;
+    for (sz = 0; sz < unwanted->m_ushortUnwantedStringsSize; sz++) {
+        const char* s = unwanted->m_paUnwantedStrings[sz];
+        size_t ullLen = strlen(unwanted->m_paUnwantedStrings[sz]);
+
+        if (strncmp((const char*)(uszBuffer + *i), s, ullLen) == 0) {
+            *isUnwanted = true;
+            *i+=ullLen;
+            break;
+        }
+    }
+}
+
 int CleanUpData(PCSTRFILEPATH szFilePath, const UNWANTED unwanted) {
     int iFileDir = open(szFilePath, O_RDWR);
     if (iFileDir < 0) return -1;
@@ -86,13 +110,8 @@ int CleanUpData(PCSTRFILEPATH szFilePath, const UNWANTED unwanted) {
         for (i = 0; i < llReadOffset; i++) {
             bool isUnwanted = false;
 
-            int c;
-            for (c = 0; c < unwanted.m_ushortUnwantedCharactersSize; c++) {
-                if (uszBuffer[i] == unwanted.m_paUnwantedCharacters[c]) {
-                    isUnwanted = true;
-                    break;
-                }
-            }
+            CleanUpStrings(&unwanted, &isUnwanted, uszBuffer, &i);
+            CleanUpCharacters(&unwanted, &isUnwanted, uszBuffer, i);
 
             if (!isUnwanted) {
                 uszBuffer[ullWriteOffset++] = uszBuffer[i];

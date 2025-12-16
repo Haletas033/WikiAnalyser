@@ -4,7 +4,7 @@ int main() {
     UNWANTED unwanted = {0};
     ModifyUnwanted_CHAR(&unwanted, ADD, "ABCDEFGHIJKLMNOPQRSTUVWXYZacbedfghijklmnopqrstuvwxyz\n ");
 
-    ModifyUnwanted_STRING(&unwanted, ADD, (const char*[]){"&lt", "&gt", "lf", "rt"}, 4);
+    ModifyUnwanted_STRING(&unwanted, ADD, (const char*[]){"&lt", "&gt", "lf", "rt", "&amp"}, 5);
 
     printf(unwanted.m_paUnwantedStrings[0]);
 
