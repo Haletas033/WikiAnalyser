@@ -26,7 +26,10 @@ typedef unsigned short USHORT_UNWANTED_STRINGS_COUNT;
 
 typedef struct UNWANTED_CONTAINERS {
     PARRAYSTR_UNWANTED_STRINGS m_paUnwantedHeads;
+    USHORT_UNWANTED_STRINGS_COUNT m_ushortUnwantedHeadsSize;
+
     PARRAYSTR_UNWANTED_STRINGS m_paUnwantedTails;
+    USHORT_UNWANTED_STRINGS_COUNT m_ushortUnwantedTailsSize;
 } UNWANTED_CONTAINERS;
 
 typedef struct UNWANTED {
@@ -46,8 +49,8 @@ typedef enum UNWANTED_MODIFIER {
 } UNWANTED_MODIFIER;
 
 void ModifyUnwanted_CHAR(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const char caNewCharacters[]);
-void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const char* szaNewStrings[], unsigned short count);
-void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szaNewHeads[], char* szaNewTails[]);
+void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szaNewStrings[], unsigned short count);
+void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szaNewHeads[], char* szaNewTails[], unsigned short ushortHeadCount,const unsigned short ushortTailCount);
 
 void CleanUpCharacters(const UNWANTED* unwanted, bool* isUnwanted, const unsigned char* uszBuffer, ssize_t i);
 void CleanUpStrings(const UNWANTED* unwanted, bool* isUnwanted, const unsigned char* uszBuffer, ssize_t* i);

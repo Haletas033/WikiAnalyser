@@ -24,10 +24,9 @@ void ModifyUnwanted_CHAR(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const 
     unwanted->m_ushortUnwantedCharactersSize = uSize;
 }
 
-void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const char* szaNewStrings[], const unsigned short count) {
-    if (count == 0) return;
-
-    const unsigned short uOldSize = unwanted->m_ushortUnwantedStringsSize;
+//Handles string logic not unwantedStrings only
+void Modify_STRING(unsigned short* stringsSize, char** szaStrings[], char* szaNewStrings[], unsigned short count) {
+    const unsigned short uOldSize = *stringsSize;
     const unsigned short uSize = uOldSize + count;
 
     char** buffer = malloc(uSize * sizeof(char*));
@@ -35,7 +34,13 @@ void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, cons
 
     unsigned short i;
     for (i = 0; i < uOldSize; i++) {
-        buffer[i] = unwanted->m_paUnwantedStrings[i];
+        buffer[i] = strdup((*szaStrings)[i]);
+        if (!buffer[i]) {
+            unsigned short j;
+            for (j = 0; j < i; j++) free(buffer[j]);
+            free(buffer);
+            return;
+        }
     }
 
 
@@ -50,13 +55,39 @@ void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, cons
         strcpy(buffer[uOldSize + i], szaNewStrings[i]);
     }
 
-    free(unwanted->m_paUnwantedStrings);
-    unwanted->m_paUnwantedStrings = buffer;
-    unwanted->m_ushortUnwantedStringsSize = uSize;
+    for (i = 0; i < uOldSize; i++) free((*szaStrings)[i]);
+    free(*szaStrings);
+
+    *szaStrings = buffer;
+    *stringsSize = uSize;
 }
 
-void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szaNewHeads[], char* szaNewTails[]) {
+//Purely for unwantedStrings
+void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szaNewStrings[], unsigned short count) {
+    if (count == 0) return;
 
+    Modify_STRING(&unwanted->m_ushortUnwantedStringsSize, &unwanted->m_paUnwantedStrings , szaNewStrings, count);
+}
+
+void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier,
+    char* szaNewHeads[], char* szaNewTails[],
+    const unsigned short ushortHeadCount,const unsigned short ushortTailCount)
+{
+    if (ushortHeadCount == 0 || ushortTailCount == 0) return;
+
+    //Handle heads
+    Modify_STRING(
+        &unwanted->m_unwantedContainers.m_ushortUnwantedHeadsSize,
+        &unwanted->m_unwantedContainers.m_paUnwantedHeads,
+        szaNewHeads, ushortHeadCount
+    );
+
+    //Handle tails
+    Modify_STRING(
+        &unwanted->m_unwantedContainers.m_ushortUnwantedTailsSize,
+        &unwanted->m_unwantedContainers.m_paUnwantedTails,
+        szaNewTails, ushortTailCount
+    );
 }
 
 void CleanUpCharacters(const UNWANTED* unwanted, bool* isUnwanted, const unsigned char* uszBuffer, ssize_t i) {
