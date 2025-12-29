@@ -8,20 +8,21 @@
 
 #include "../include/fileLoader.h"
 
-void ModifyUnwanted_CHAR(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const char caNewCharacters[]) {
-    const unsigned short uOldSize = unwanted->m_ushortUnwantedCharactersSize;
+//Handles character logic not unwantedCharacters only
+void Modify_CHAR(unsigned short* charactersSize, char* caCharacters[], const char caNewCharacters[]) {
+    const unsigned short uOldSize = *charactersSize;
     const unsigned short uNewSize = strlen(caNewCharacters) + 1;
     const unsigned short uSize = uOldSize + uNewSize;
 
     char* buffer = malloc(uSize * sizeof(char));
     if (!buffer) return;
 
-    memcpy(buffer, unwanted->m_paUnwantedCharacters, uOldSize);
+    memcpy(buffer, *caCharacters, uOldSize);
     memcpy(buffer + uOldSize, caNewCharacters, uNewSize);
 
-    free((char*)unwanted->m_paUnwantedCharacters);
-    unwanted->m_paUnwantedCharacters = buffer;
-    unwanted->m_ushortUnwantedCharactersSize = uSize;
+    free((char*)*caCharacters);
+    *caCharacters = buffer;
+    *charactersSize = uSize;
 }
 
 //Handles string logic not unwantedStrings only
@@ -62,32 +63,79 @@ void Modify_STRING(unsigned short* stringsSize, char** szaStrings[], char* szaNe
     *stringsSize = uSize;
 }
 
+void ModifyUnwanted_CHAR(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const char caNewCharacters[]) {
+    switch (iModifier) {
+        case ADD: {
+            Modify_CHAR(&unwanted->m_ushortUnwantedCharactersSize, &unwanted->m_paUnwantedCharacters, caNewCharacters);
+            break;
+        }
+        case CLEAR: {
+            unwanted->m_ushortUnwantedCharactersSize = 0;
+            free(unwanted->m_paUnwantedCharacters);
+            unwanted->m_paUnwantedCharacters = NULL;
+            break;
+        }
+        default: break;
+    }
+}
+
 //Purely for unwantedStrings
 void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szaNewStrings[], unsigned short count) {
-    if (count == 0) return;
+    if (count == 0 && iModifier != CLEAR) return;
 
-    Modify_STRING(&unwanted->m_ushortUnwantedStringsSize, &unwanted->m_paUnwantedStrings , szaNewStrings, count);
+    switch (iModifier) {
+        case ADD: {
+            Modify_STRING(&unwanted->m_ushortUnwantedStringsSize, &unwanted->m_paUnwantedStrings , szaNewStrings, count);
+            break;
+        }
+        case CLEAR: {
+            unwanted->m_ushortUnwantedStringsSize = 0;
+            free(unwanted->m_paUnwantedStrings);
+            unwanted->m_paUnwantedStrings = NULL;
+            break;
+        }
+        default: break;
+    }
+
 }
 
 void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier,
     char* szaNewHeads[], char* szaNewTails[],
     const unsigned short ushortHeadCount,const unsigned short ushortTailCount)
 {
-    if (ushortHeadCount == 0 || ushortTailCount == 0) return;
+    if (ushortHeadCount == 0 || ushortTailCount == 0 && iModifier != CLEAR) return;
 
-    //Handle heads
-    Modify_STRING(
-        &unwanted->m_unwantedContainers.m_ushortUnwantedHeadsSize,
-        &unwanted->m_unwantedContainers.m_paUnwantedHeads,
-        szaNewHeads, ushortHeadCount
-    );
+    switch (iModifier) {
+        case ADD: {
+            //Handle heads
+            Modify_STRING(
+                &unwanted->m_unwantedContainers.m_ushortUnwantedHeadsSize,
+                &unwanted->m_unwantedContainers.m_paUnwantedHeads,
+                szaNewHeads, ushortHeadCount
+            );
 
-    //Handle tails
-    Modify_STRING(
-        &unwanted->m_unwantedContainers.m_ushortUnwantedTailsSize,
-        &unwanted->m_unwantedContainers.m_paUnwantedTails,
-        szaNewTails, ushortTailCount
-    );
+            //Handle tails
+            Modify_STRING(
+                &unwanted->m_unwantedContainers.m_ushortUnwantedTailsSize,
+                &unwanted->m_unwantedContainers.m_paUnwantedTails,
+                szaNewTails, ushortTailCount
+            );
+            break;
+        }
+        case CLEAR: {
+            //Clear heads
+            unwanted->m_unwantedContainers.m_ushortUnwantedHeadsSize = 0;
+            free(unwanted->m_unwantedContainers.m_paUnwantedHeads);
+            unwanted->m_unwantedContainers.m_paUnwantedHeads = NULL;
+
+            //Clear tails
+            unwanted->m_unwantedContainers.m_ushortUnwantedTailsSize = 0;
+            free(unwanted->m_unwantedContainers.m_paUnwantedTails);
+            unwanted->m_unwantedContainers.m_paUnwantedTails = NULL;
+            break;
+        }
+        default: break;
+    }
 }
 
 void CleanUpCharacters(const UNWANTED* unwanted, bool* isUnwanted, const unsigned char* uszBuffer, ssize_t i) {

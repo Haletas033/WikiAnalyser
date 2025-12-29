@@ -13,6 +13,7 @@ int main() {
     );
 
     printf(unwanted.m_paUnwantedStrings[0]);
+
     printf(unwanted.m_unwantedContainers.m_paUnwantedTails[0]);
 
     CleanUpData("C:\\Users\\halet\\PycharmProjects\\NCEA\\mini.xml", unwanted);
