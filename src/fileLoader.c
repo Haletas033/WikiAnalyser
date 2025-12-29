@@ -114,6 +114,38 @@ void CleanUpStrings(const UNWANTED* unwanted, bool* isUnwanted, const unsigned c
     }
 }
 
+void CleanUpContainers(const UNWANTED* unwanted, bool* isUnwanted, const unsigned char* uszBuffer, ssize_t* i) {
+    int sz;
+
+    //Check if we are on a head
+    size_t ullLen = 0;
+    for (sz = 0; sz < unwanted->m_unwantedContainers.m_ushortUnwantedHeadsSize; sz++) {
+        const char* s = unwanted->m_unwantedContainers.m_paUnwantedHeads[sz];
+         ullLen = strlen(unwanted->m_unwantedContainers.m_paUnwantedHeads[sz]);
+
+        if (strncmp((const char*)(uszBuffer + *i), s, ullLen) == 0) {
+            *isUnwanted = true;
+            *i+=ullLen;
+            break;
+        }
+    }
+
+    //Scan until corresponding tail is found
+
+    //Run if a head is found
+    if (sz != unwanted->m_unwantedContainers.m_ushortUnwantedHeadsSize) {
+        while (strncmp((const char*)(uszBuffer + *i), unwanted->m_unwantedContainers.m_paUnwantedTails[sz], ullLen) != 0) {
+            (*i)++;
+
+            //Stop after 32mb to prevent crashes if tail isn't found
+            if (*i + ullLen > MEGA_BYTES(32)) {
+                return;
+            }
+        }
+    }
+    *i+=ullLen;
+}
+
 int CleanUpData(PCSTRFILEPATH szFilePath, const UNWANTED unwanted) {
     int iFileDir = open(szFilePath, O_RDWR);
     if (iFileDir < 0) return -1;
@@ -141,6 +173,7 @@ int CleanUpData(PCSTRFILEPATH szFilePath, const UNWANTED unwanted) {
         for (i = 0; i < llReadOffset; i++) {
             bool isUnwanted = false;
 
+            CleanUpContainers(&unwanted, &isUnwanted, uszBuffer, &i);
             CleanUpStrings(&unwanted, &isUnwanted, uszBuffer, &i);
             CleanUpCharacters(&unwanted, &isUnwanted, uszBuffer, i);
 
