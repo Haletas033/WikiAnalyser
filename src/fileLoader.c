@@ -2,10 +2,6 @@
 // Created by halet on 12/15/2025.
 //
 
-//
-// Created by halet on 12/14/2025.
-//
-
 #include "../include/fileLoader.h"
 
 //Handles character logic not unwantedCharacters only
@@ -184,6 +180,8 @@ void CleanUpContainers(const UNWANTED* unwanted, bool* isUnwanted, const unsigne
 
     //Run if a head is found
     if (sz != unwanted->m_unwantedContainers.m_ushortUnwantedContainersSize) {
+        //Switch ullLen to the tail length
+        ullLen = strlen(unwanted->m_unwantedContainers.m_paUnwantedTails[sz]);
         while (strncmp((const char*)(uszBuffer + *i), unwanted->m_unwantedContainers.m_paUnwantedTails[sz], ullLen) != 0) {
             (*i)++;
 
