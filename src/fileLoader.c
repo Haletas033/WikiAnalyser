@@ -101,37 +101,39 @@ void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char
 
 void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier,
     char* szaNewHeads[], char* szaNewTails[],
-    const unsigned short ushortHeadCount,const unsigned short ushortTailCount)
+    const unsigned short ushortContainerCount)
 {
-    if (ushortHeadCount == 0 || ushortTailCount == 0 && iModifier != CLEAR) return;
+    if (ushortContainerCount == 0 && iModifier != CLEAR) return;
 
     switch (iModifier) {
         case ADD: {
+            unsigned short fakeSize = unwanted->m_unwantedContainers.m_ushortUnwantedContainersSize;
+
             //Handle heads
             Modify_STRING(
-                &unwanted->m_unwantedContainers.m_ushortUnwantedHeadsSize,
+                &unwanted->m_unwantedContainers.m_ushortUnwantedContainersSize,
                 &unwanted->m_unwantedContainers.m_paUnwantedHeads,
-                szaNewHeads, ushortHeadCount
+                szaNewHeads, ushortContainerCount
             );
 
             //Handle tails
             Modify_STRING(
-                &unwanted->m_unwantedContainers.m_ushortUnwantedTailsSize,
+                &fakeSize /* prevent containerSize from changing twice by using fakeSize */,
                 &unwanted->m_unwantedContainers.m_paUnwantedTails,
-                szaNewTails, ushortTailCount
+                szaNewTails, ushortContainerCount
             );
             break;
         }
         case CLEAR: {
             //Clear heads
-            unwanted->m_unwantedContainers.m_ushortUnwantedHeadsSize = 0;
             free(unwanted->m_unwantedContainers.m_paUnwantedHeads);
             unwanted->m_unwantedContainers.m_paUnwantedHeads = NULL;
 
             //Clear tails
-            unwanted->m_unwantedContainers.m_ushortUnwantedTailsSize = 0;
             free(unwanted->m_unwantedContainers.m_paUnwantedTails);
             unwanted->m_unwantedContainers.m_paUnwantedTails = NULL;
+
+            unwanted->m_unwantedContainers.m_ushortUnwantedContainersSize = 0;
             break;
         }
         default: break;
@@ -167,7 +169,7 @@ void CleanUpContainers(const UNWANTED* unwanted, bool* isUnwanted, const unsigne
 
     //Check if we are on a head
     size_t ullLen = 0;
-    for (sz = 0; sz < unwanted->m_unwantedContainers.m_ushortUnwantedHeadsSize; sz++) {
+    for (sz = 0; sz < unwanted->m_unwantedContainers.m_ushortUnwantedContainersSize; sz++) {
         const char* s = unwanted->m_unwantedContainers.m_paUnwantedHeads[sz];
          ullLen = strlen(unwanted->m_unwantedContainers.m_paUnwantedHeads[sz]);
 
@@ -181,7 +183,7 @@ void CleanUpContainers(const UNWANTED* unwanted, bool* isUnwanted, const unsigne
     //Scan until corresponding tail is found
 
     //Run if a head is found
-    if (sz != unwanted->m_unwantedContainers.m_ushortUnwantedHeadsSize) {
+    if (sz != unwanted->m_unwantedContainers.m_ushortUnwantedContainersSize) {
         while (strncmp((const char*)(uszBuffer + *i), unwanted->m_unwantedContainers.m_paUnwantedTails[sz], ullLen) != 0) {
             (*i)++;
 

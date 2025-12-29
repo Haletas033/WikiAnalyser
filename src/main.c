@@ -9,7 +9,7 @@ int main() {
     ModifyUnwanted_CONTAINER(
         &unwanted, ADD,
         (char*[]){"<<"},(char*[]){">>"},
-        1, 1
+        1
     );
 
     printf(unwanted.m_paUnwantedStrings[0]);
