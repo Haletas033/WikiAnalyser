@@ -1,9 +1,10 @@
 //
-// Created by halet on 12/15/2025.
+// Created by halet on 12/31/2025.
 //
 
-#ifndef FILELOADER_H
-#define FILELOADER_H
+#ifndef UNWANTED_H
+#define UNWANTED_H
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,8 +14,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
-
-#define MEGA_BYTES(m) m*1024*1024
 
 typedef const char* PCSTRFILEPATH;
 
@@ -54,9 +53,4 @@ void ModifyUnwanted_CHAR(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const 
 void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szaNewStrings[], unsigned short count);
 void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szaNewHeads[], char* szaNewTails[], unsigned short ushortContainerCount);
 
-void CleanUpCharacters(const UNWANTED* unwanted, bool* isUnwanted, const unsigned char* uszBuffer, ssize_t i);
-void CleanUpStrings(const UNWANTED* unwanted, bool* isUnwanted, const unsigned char* uszBuffer, ssize_t* i);
-void CleanUpContainers(const UNWANTED* unwanted, bool* isUnwanted, const unsigned char* uszBuffer, ssize_t* i);
-int CleanUpData(PCSTRFILEPATH szFilePath, UNWANTED unwanted);
-
-#endif //FILELOADER_H
+#endif //UNWANTED_H

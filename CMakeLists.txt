@@ -9,6 +9,8 @@ add_executable(WikiAnalyser
         src/article.c
         include/parser.h
         include/article.h
-        include/fileLoader.h
-        src/fileLoader.c
+        include/cleanup.h
+        src/cleanup.c
+        include/unwanted.h
+        src/unwanted.c
 )

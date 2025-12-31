@@ -1,11 +1,12 @@
-#include "../include/fileLoader.h"
+#include "../include/unwanted.h"
+#include "../include/cleanup.h"
 
 int main() {
     UNWANTED unwanted = {0};
-    ModifyUnwanted_CHAR(&unwanted, ADD, "Ajvfriopqw");
-    ModifyUnwanted_CHAR(&unwanted, DELETE, "A");
+    ModifyUnwanted_CHAR(&unwanted, ADD, "!@#$%^&*()l1234567890\n");
+    ModifyUnwanted_CHAR(&unwanted, DELETE, "l");
 
-    ModifyUnwanted_STRING(&unwanted, ADD, (char*[]){"&lt", "&gt", "lf", "rt", "&amp", "ab"}, 6);
+    ModifyUnwanted_STRING(&unwanted, ADD, (char*[]){"foo", "bar", "ab"}, 3);
     ModifyUnwanted_STRING(&unwanted, DELETE, (char*[]){"ab"}, 1);
 
     ModifyUnwanted_CONTAINER(
@@ -16,12 +17,11 @@ int main() {
 
     ModifyUnwanted_CONTAINER(
         &unwanted, DELETE,
-        (char*[]){"{{"},(char*[]){"}}"},
+        (char*[]){"aa"},(char*[]){"aa"},
         1
     );
 
     CleanUpData("C:\\Users\\halet\\PycharmProjects\\NCEA\\mini.xml", unwanted);
-
 
     return 0;
 }
