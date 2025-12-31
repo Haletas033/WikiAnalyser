@@ -5,7 +5,7 @@
 #include "../include/fileLoader.h"
 
 //Handles character logic not unwantedCharacters only
-void Modify_CHAR(unsigned short* charactersSize, char* caCharacters[], const char caNewCharacters[]) {
+void Add_CHAR(unsigned short* charactersSize, char* caCharacters[], const char caNewCharacters[]) {
     const unsigned short uOldSize = *charactersSize;
     const unsigned short uNewSize = strlen(caNewCharacters) + 1;
     const unsigned short uSize = uOldSize + uNewSize;
@@ -22,7 +22,7 @@ void Modify_CHAR(unsigned short* charactersSize, char* caCharacters[], const cha
 }
 
 //Handles string logic not unwantedStrings only
-void Modify_STRING(unsigned short* stringsSize, char** szaStrings[], char* szaNewStrings[], unsigned short count) {
+void Add_STRING(unsigned short* stringsSize, char** szaStrings[], char* szaNewStrings[], unsigned short count) {
     const unsigned short uOldSize = *stringsSize;
     const unsigned short uSize = uOldSize + count;
 
@@ -59,10 +59,123 @@ void Modify_STRING(unsigned short* stringsSize, char** szaStrings[], char* szaNe
     *stringsSize = uSize;
 }
 
+void Delete_CHAR(unsigned short* charactersSize, char* caCharacters[], const char caNewCharacters[]) {
+    char *newArray = NULL;
+
+    int currNewArrayPos = 0;
+
+    bool found = false;
+
+    int i;
+    for (i = 0; i < *charactersSize; i++) {
+        found = false;
+        int c;
+        for (c = 0; c < strlen(caNewCharacters); c++) {
+            if ((*caCharacters)[i] == caNewCharacters[c]) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            char *tmp = realloc(newArray, currNewArrayPos + 1);
+            if (!tmp) {
+                free(newArray);
+                return;
+            }
+            newArray = tmp;
+            newArray[currNewArrayPos++] = (*caCharacters)[i];
+        }
+    }
+    free(*caCharacters);
+    *caCharacters = newArray;
+    *charactersSize = currNewArrayPos;
+}
+
+void Delete_STRING(unsigned short* stringsSize, char** szaStrings[], char* szaNewStrings[], unsigned short count) {
+    char **newArray = NULL;
+
+    int currNewArrayPos = 0;
+
+    bool found = false;
+
+    int i;
+    for (i = 0; i < *stringsSize; i++) {
+        found = false;
+        int c;
+        for (c = 0; c < count; c++) {
+            if (strcmp((*szaStrings)[i], szaNewStrings[c]) == 0) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            char **tmp = realloc(newArray, (currNewArrayPos + 1) * sizeof(char*));
+            if (!tmp) {
+                free(newArray);
+                return;
+            }
+            newArray = tmp;
+            newArray[currNewArrayPos++] = (*szaStrings)[i];
+        }
+    }
+    free(*szaStrings);
+    *szaStrings = newArray;
+    *stringsSize = currNewArrayPos;
+}
+
+void Delete_CONTAINER(unsigned short* stringsSize, char** szaHeads[], char** szaTails[], char* szaNewHeads[], unsigned short count) {
+    char **newHeads = NULL;
+    char **newTails = NULL;
+
+    int currNewArrayPos = 0;
+
+    bool found = false;
+
+    int i;
+    for (i = 0; i < *stringsSize; i++) {
+        found = false;
+        int c;
+        for (c = 0; c < count; c++) {
+            if (strcmp((*szaHeads)[i], szaNewHeads[c]) == 0) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            char **tmpHeads = realloc(newHeads, (currNewArrayPos + 1) * sizeof(char*));
+            char **tmpTails = realloc(newTails, (currNewArrayPos + 1) * sizeof(char*));
+            if (!tmpHeads) {
+                free(newHeads);
+                return;
+            }
+            if (!tmpTails) {
+                free(newTails);
+                return;
+            }
+            newHeads = tmpHeads;
+            newTails = tmpTails;
+            newHeads[currNewArrayPos] = (*szaHeads)[i];
+            newTails[currNewArrayPos] = (*szaTails)[i];
+            currNewArrayPos++;
+        }
+    }
+    free(*szaHeads);
+    free(*szaTails);
+
+    *szaHeads = newHeads;
+    *szaTails = newTails;
+
+    *stringsSize = currNewArrayPos;
+}
+
 void ModifyUnwanted_CHAR(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const char caNewCharacters[]) {
     switch (iModifier) {
         case ADD: {
-            Modify_CHAR(&unwanted->m_ushortUnwantedCharactersSize, &unwanted->m_paUnwantedCharacters, caNewCharacters);
+            Add_CHAR(&unwanted->m_ushortUnwantedCharactersSize, &unwanted->m_paUnwantedCharacters, caNewCharacters);
+            break;
+        }
+        case DELETE: {
+            Delete_CHAR(&unwanted->m_ushortUnwantedCharactersSize, &unwanted->m_paUnwantedCharacters, caNewCharacters);
             break;
         }
         case CLEAR: {
@@ -81,7 +194,11 @@ void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char
 
     switch (iModifier) {
         case ADD: {
-            Modify_STRING(&unwanted->m_ushortUnwantedStringsSize, &unwanted->m_paUnwantedStrings , szaNewStrings, count);
+            Add_STRING(&unwanted->m_ushortUnwantedStringsSize, &unwanted->m_paUnwantedStrings , szaNewStrings, count);
+            break;
+        }
+        case DELETE: {
+            Delete_STRING(&unwanted->m_ushortUnwantedStringsSize, &unwanted->m_paUnwantedStrings , szaNewStrings, count);
             break;
         }
         case CLEAR: {
@@ -106,17 +223,27 @@ void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier,
             unsigned short fakeSize = unwanted->m_unwantedContainers.m_ushortUnwantedContainersSize;
 
             //Handle heads
-            Modify_STRING(
+            Add_STRING(
                 &unwanted->m_unwantedContainers.m_ushortUnwantedContainersSize,
                 &unwanted->m_unwantedContainers.m_paUnwantedHeads,
                 szaNewHeads, ushortContainerCount
             );
 
             //Handle tails
-            Modify_STRING(
+            Add_STRING(
                 &fakeSize /* prevent containerSize from changing twice by using fakeSize */,
                 &unwanted->m_unwantedContainers.m_paUnwantedTails,
                 szaNewTails, ushortContainerCount
+            );
+            break;
+        }
+        case DELETE: {
+            Delete_CONTAINER(
+                &unwanted->m_unwantedContainers.m_ushortUnwantedContainersSize,
+                &unwanted->m_unwantedContainers.m_paUnwantedHeads,
+                &unwanted->m_unwantedContainers.m_paUnwantedTails,
+                szaNewHeads,
+                ushortContainerCount
             );
             break;
         }
@@ -190,8 +317,9 @@ void CleanUpContainers(const UNWANTED* unwanted, bool* isUnwanted, const unsigne
                 return;
             }
         }
+        *i+=ullLen;
     }
-    *i+=ullLen;
+
 }
 
 int CleanUpData(PCSTRFILEPATH szFilePath, const UNWANTED unwanted) {

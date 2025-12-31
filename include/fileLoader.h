@@ -47,8 +47,8 @@ typedef enum UNWANTED_MODIFIER {
     CLEAR
 } UNWANTED_MODIFIER;
 
-void Modify_CHAR(unsigned short* charactersSize, char* caCharacters[], const char caNewCharacters[]);
-void Modify_STRING(unsigned short* stringsSize, char** szaStrings[], char* szaNewStrings[], unsigned short count);
+void Add_CHAR(unsigned short* charactersSize, char* caCharacters[], const char caNewCharacters[]);
+void Add_STRING(unsigned short* stringsSize, char** szaStrings[], char* szaNewStrings[], unsigned short count);
 
 void ModifyUnwanted_CHAR(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const char caNewCharacters[]);
 void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szaNewStrings[], unsigned short count);
