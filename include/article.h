@@ -44,5 +44,8 @@ typedef struct Article {
 void AddName(Article *article, enum Type type, const char* name);
 void AddField(Article *article, enum Type type, const char* name);
 
+//Zig functions ahead
+void zigPrintTest(const char* text);
+
 
 #endif //ARTICLE_H

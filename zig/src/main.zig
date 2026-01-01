@@ -1,6 +1,6 @@
 const std = @import("std");
 const Io = std.Io;
 
-pub fn main() !void {
-    std.debug.print("Hello, World!\n", .{});
+pub export fn zigPrintTest(text: [*:0]const u8) callconv(.c) void{
+    std.debug.print("{s}\n", .{text});
 }

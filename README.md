@@ -12,6 +12,8 @@ All in under 100kb (excluding the 110gb Wikipedia dump) (:
 ### Cleanup Features:
 * Set what containers, strings, and characters you want removed
 * Single-pass efficient clean up algorithm for large files
+* Define your own struct for every article
+* * Zig integration
 * Memory safe
 
 ## Upcoming Features:
@@ -21,7 +23,6 @@ All in under 100kb (excluding the 110gb Wikipedia dump) (:
 * GPU acceleration
 * Option to clone cleaned file into new file
 ### Parsing Features:
-* Define your own struct for every article
 * Write functions to explain how to fill these fields
 * Save data onto disk
 ### Analysis Feature:

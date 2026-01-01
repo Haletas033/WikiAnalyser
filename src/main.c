@@ -38,6 +38,7 @@ int main() {
     printf("\"%s\"\n", article.stringFields[0]);
     printf("%s\n", article.stringFieldNames[0]);
 
+    zigPrintTest("Hello, World!");
 
     CleanUpData("C:\\Users\\halet\\PycharmProjects\\NCEA\\mini.xml", unwanted);
 
