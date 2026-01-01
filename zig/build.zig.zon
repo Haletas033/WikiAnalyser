@@ -1,0 +1,13 @@
+.{
+    .name = .WikiAnalyser,
+    .version = "0.0.0",
+    .fingerprint = 0x86bd10bc2c48941e,
+    .minimum_zig_version = "0.16.0-dev.1878+2a02c7a0d",
+    .dependencies = .{
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
