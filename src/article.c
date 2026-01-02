@@ -87,3 +87,4 @@ void AddField(Article *article, enum Type type, const char* name) {
 
     (*fieldSize)++;
 }
+

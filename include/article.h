@@ -45,7 +45,7 @@ void AddName(Article *article, enum Type type, const char* name);
 void AddField(Article *article, enum Type type, const char* name);
 
 //Zig functions ahead
-void zigPrintTest(const char* text);
+void zigPrintTest(Article *article);
 
 
 #endif //ARTICLE_H

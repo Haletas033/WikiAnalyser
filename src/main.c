@@ -29,16 +29,7 @@ int main() {
     AddField(&article, BOOL, "Bool Test");
     AddField(&article, STRING, "String Test");
 
-    printf("%d\n", article.intFields[0]);
-    printf("%s\n", article.intFieldNames[0]);
-    printf("%f\n", article.floatFields[0]);
-    printf("%s\n", article.floatFieldNames[0]);
-    printf("%d\n", article.boolFields[0]);
-    printf("%s\n", article.boolFieldNames[0]);
-    printf("\"%s\"\n", article.stringFields[0]);
-    printf("%s\n", article.stringFieldNames[0]);
-
-    zigPrintTest("Hello, World!");
+    zigPrintTest(&article);
 
     CleanUpData("C:\\Users\\halet\\PycharmProjects\\NCEA\\mini.xml", unwanted);
 
