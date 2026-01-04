@@ -1,6 +1,7 @@
 #include "../include/unwanted.h"
 #include "../include/cleanup.h"
 #include "../include/article.h"
+#include "../include/parser.h"
 
 int main() {
     UNWANTED unwanted = {0};
@@ -29,9 +30,11 @@ int main() {
     AddField(&article, BOOL, "Bool Test");
     AddField(&article, STRING, "String Test");
 
-    zigPrintTest(&article);
-
     CleanUpData("C:\\Users\\halet\\PycharmProjects\\NCEA\\mini.xml", unwanted);
+
+    ParseArticles("C:\\Users\\halet\\PycharmProjects\\NCEA\\mini.xml", article);
+
+    zigPrintTest(&article);
 
     return 0;
 }
