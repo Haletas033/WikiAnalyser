@@ -43,6 +43,7 @@ typedef struct Article {
 
 void AddName(Article *article, enum Type type, const char* name);
 void AddField(Article *article, enum Type type, const char* name);
+void CopyFields(const Article *article, Article *newArticle);
 
 //Zig functions ahead
 void zigPrintTest(Article *article);

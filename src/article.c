@@ -88,3 +88,11 @@ void AddField(Article *article, enum Type type, const char* name) {
     (*fieldSize)++;
 }
 
+void CopyFields(const Article *article, Article *newArticle) {
+    int i;
+    for (i = 0; i < article->intFieldsSize; i++) AddField(newArticle, INT, article->intFieldNames[i]);
+    for (i = 0; i < article->floatFieldsSize; i++) AddField(newArticle, FLOAT, article->floatFieldNames[i]);
+    for (i = 0; i < article->boolFieldsSize; i++) AddField(newArticle, BOOL, article->boolFieldNames[i]);
+    for (i = 0; i < article->stringFieldsSize; i++) AddField(newArticle, STRING, article->stringFieldNames[i]);
+}
+

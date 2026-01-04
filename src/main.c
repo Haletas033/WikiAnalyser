@@ -25,16 +25,20 @@ int main() {
 
     Article article = {0};
 
-    AddField(&article, INT, "Int Test");
+    AddField(&article, INT, "e_Count");
     AddField(&article, FLOAT, "Float Test");
     AddField(&article, BOOL, "Bool Test");
     AddField(&article, STRING, "String Test");
 
+    Article newArticle = {0};
+
+    CopyFields(&article, &newArticle);
+
     CleanUpData("C:\\Users\\halet\\PycharmProjects\\NCEA\\mini.xml", unwanted);
 
-    ParseArticles("C:\\Users\\halet\\PycharmProjects\\NCEA\\mini.xml", article);
+    ParseArticles("C:\\Users\\halet\\PycharmProjects\\NCEA\\mini.xml", newArticle);
 
-    zigPrintTest(&article);
+    zigPrintTest(&newArticle);
 
     return 0;
 }
