@@ -15,10 +15,17 @@ add_custom_target(ZigTarget ALL
 
 # Add the Zig library built by ZigTarget
 add_library(Zig SHARED IMPORTED GLOBAL)
-set_target_properties(Zig PROPERTIES
-        IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/libmain.so
-        INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_BINARY_DIR}
-)
+IF(WIN32)
+    set_target_properties(Zig PROPERTIES
+            IMPORTED_LOCATION_DEBUG ${CMAKE_BINARY_DIR}/main.dll
+            IMPORTED_IMPLIB_DEBUG ${CMAKE_BINARY_DIR}/main.lib
+    )
+ELSE()
+    set_target_properties(Zig PROPERTIES
+            IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/libmain.so
+            INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_BINARY_DIR}
+    )
+ENDIF()
 
 # Your main C executable
 add_executable(WikiAnalyser

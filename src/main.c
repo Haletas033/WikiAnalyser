@@ -38,7 +38,7 @@ int main() {
 
     CleanUpData("C:/Users/halet/Dev/wikianalyserTest.xml", unwanted);
 
-    ParseArticles("C:/Users/halet/Dev/wikianalyserTest.xml", &articles, &article, &articleCount));
+    ParseArticles("C:/Users/halet/Dev/wikianalyserTest.xml", &articles, &article, &articleCount);
 
     #endif
 
