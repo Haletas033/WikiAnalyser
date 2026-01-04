@@ -15,5 +15,5 @@ pub export fn zigPrintTest(article: *root.Article) callconv(.c) void {
     std.debug.print("e_Count: {}\n", .{root.Field(c_int, "e_Count", article).*});
     std.debug.print("Float Test: {}\n", .{root.Field(f32, "Float Test", article).*});
     std.debug.print("Bool Test: {}\n", .{root.Field(u8, "Bool Test", article).*});
-    std.debug.print("String: {s}\n", .{root.toString(root.Field([*]c_char, "String Test", article).*)});
+    std.debug.print("String: {s}\n\n", .{root.toString(root.Field([*]c_char, "String Test", article).*)});
 }

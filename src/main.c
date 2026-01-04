@@ -23,6 +23,9 @@ int main() {
         1
     );
 
+    Article *articles;
+    unsigned int articleCount = 0;
+
     Article article = {0};
 
     AddField(&article, INT, "e_Count");
@@ -30,15 +33,14 @@ int main() {
     AddField(&article, BOOL, "Bool Test");
     AddField(&article, STRING, "String Test");
 
-    Article newArticle = {0};
-
-    CopyFields(&article, &newArticle);
-
     CleanUpData("C:\\Users\\halet\\PycharmProjects\\NCEA\\mini.xml", unwanted);
 
-    ParseArticles("C:\\Users\\halet\\PycharmProjects\\NCEA\\mini.xml", newArticle);
+    ParseArticles("C:\\Users\\halet\\PycharmProjects\\NCEA\\mini.xml",  &articles, &article, &articleCount);
 
-    zigPrintTest(&newArticle);
+    int i;
+    for (i = 0; i < articleCount; i++) {
+        zigPrintTest(&articles[i]);
+    }
 
     return 0;
 }
