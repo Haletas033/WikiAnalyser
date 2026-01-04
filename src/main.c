@@ -33,9 +33,22 @@ int main() {
     AddField(&article, BOOL, "Bool Test");
     AddField(&article, STRING, "String Test");
 
-    CleanUpData("C:\\Users\\halet\\PycharmProjects\\NCEA\\mini.xml", unwanted);
+    //Ignore (for testing on both linux and windows)
+    #ifdef __WIN32__
 
-    ParseArticles("C:\\Users\\halet\\PycharmProjects\\NCEA\\mini.xml",  &articles, &article, &articleCount);
+    CleanUpData("C:/Users/halet/Dev/wikianalyserTest.xml", unwanted);
+
+    ParseArticles("C:/Users/halet/Dev/wikianalyserTest.xml", &articles, &article, &articleCount));
+
+    #endif
+
+    #ifdef __linux__
+
+    CleanUpData("/home/haletas/Dev/wikianalyserTest.xml", unwanted);
+
+    ParseArticles("/home/haletas/Dev/wikianalyserTest.xml", &articles, &article, &articleCount);
+
+    #endif
 
     int i;
     for (i = 0; i < articleCount; i++) {

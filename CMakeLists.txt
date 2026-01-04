@@ -3,23 +3,24 @@ project(WikiAnalyser C)
 
 set(CMAKE_C_STANDARD 90)
 
+# Zig source
 set(ZIG_SRC ${CMAKE_CURRENT_SOURCE_DIR}/zig/src/main.zig)
-set(ZIG_DLL ${CMAKE_BINARY_DIR}/main.dll)
-set(ZIG_LIB ${CMAKE_BINARY_DIR}/main.lib)
 
+# Custom target to build Zig as shared library
 add_custom_target(ZigTarget ALL
         COMMAND zig build-lib ${ZIG_SRC} -dynamic -O ReleaseSmall -femit-h
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Building Zig"
 )
 
+# Add the Zig library built by ZigTarget
 add_library(Zig SHARED IMPORTED GLOBAL)
 set_target_properties(Zig PROPERTIES
-        IMPORTED_IMPLIB ${ZIG_LIB}
-        IMPORTED_LOCATION ${ZIG_DLL}
+        IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/libmain.so
         INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_BINARY_DIR}
 )
 
+# Your main C executable
 add_executable(WikiAnalyser
         src/main.c
         src/parser.c
@@ -32,12 +33,8 @@ add_executable(WikiAnalyser
         include/unwanted.h
 )
 
+# Make sure C executable depends on Zig build
 add_dependencies(WikiAnalyser ZigTarget)
 
+# Link the Zig library
 target_link_libraries(WikiAnalyser PRIVATE Zig)
-
-add_custom_command(TARGET WikiAnalyser POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${CMAKE_BINARY_DIR}/main.dll
-        $<TARGET_FILE_DIR:WikiAnalyser>
-)
