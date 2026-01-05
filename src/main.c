@@ -13,7 +13,7 @@ int main() {
 
     ModifyUnwanted_CONTAINER(
         &unwanted, ADD,
-        (char*[]){"<<", "{{", "aa"},(char*[]){">>", "}}", "aa"},
+        (char*[]){"<siteinfo>", "{{", "aa"},(char*[]){"</siteinfo>", "}}", "aa"},
         3
     );
 

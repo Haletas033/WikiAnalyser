@@ -24,7 +24,7 @@ void CleanUpStrings(const UNWANTED* unwanted, bool* isUnwanted, const unsigned c
 
         if (strncmp((const char*)(uszBuffer + *i), s, ullLen) == 0) {
             *isUnwanted = true;
-            *i+=ullLen;
+            *i+=ullLen-1;
             break;
         }
     }
@@ -41,7 +41,7 @@ void CleanUpContainers(const UNWANTED* unwanted, bool* isUnwanted, const unsigne
 
         if (strncmp((const char*)(uszBuffer + *i), s, ullLen) == 0) {
             *isUnwanted = true;
-            *i+=ullLen;
+            *i+=ullLen-1;
             break;
         }
     }
@@ -60,7 +60,7 @@ void CleanUpContainers(const UNWANTED* unwanted, bool* isUnwanted, const unsigne
                 return;
             }
         }
-        *i+=ullLen;
+        *i+=ullLen-1;
     }
 
 }
