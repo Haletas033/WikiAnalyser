@@ -21,8 +21,9 @@ int ParseArticles(PCSTRFILEPATH szFilePath, Article **articles, Article *baseArt
 
         ssize_t i;
         for (i = 0; i < llReadOffset; i++) {
+            //Get new page
             if (strncmp((const char*)uszBuffer + i, "<page>", strlen("<page>")) == 0) {
-                i+=6;
+                i+=strlen("<page>");
                 nextPos++;
                 (*articleCount)++;
                 Article newArticle = {0};
@@ -37,9 +38,34 @@ int ParseArticles(PCSTRFILEPATH szFilePath, Article **articles, Article *baseArt
                 *articles = tmp;
 
                 (*articles)[nextPos] = newArticle;
-                //Create new article increment a next pos of some sorts
             }
-            OnArticle(&uszBuffer[i], (*articles)[nextPos]);
+
+            //Switch article on new page
+            if (nextPos != -1) {
+                OnArticle(&uszBuffer[i], (*articles)[nextPos]);
+            }
+
+            //Fill in title field
+            if (strncmp((const char*)uszBuffer + i, "<title>", strlen("<title>")) == 0) {
+                i+=strlen("<title>");
+                //Read until </title>
+                const int iStartIndex = i;
+                const size_t llBufferLen = strlen((const char*)uszBuffer);
+                while (i < llBufferLen && strncmp((const char*)uszBuffer + i, "</title>", strlen("</title>")) != 0) {
+                    i++;
+                }
+
+                const int iTitleLen = i - iStartIndex;
+                char* slice = malloc(iTitleLen + 1);
+
+                if (!slice) {
+                    break;
+                }
+
+                strncpy(slice, (const char*)uszBuffer + iStartIndex, iTitleLen);
+                slice[iTitleLen] = '\0';
+                (*articles)[nextPos].stringFields[0] = slice;
+            }
         }
     }
 

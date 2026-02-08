@@ -5,7 +5,7 @@
 
 int main() {
     UNWANTED unwanted = {0};
-    ModifyUnwanted_CHAR(&unwanted, ADD, "!@#$%^&*()l1234567890\n");
+    ModifyUnwanted_CHAR(&unwanted, ADD, "!@#$%^&*()l1234567890 \n");
     ModifyUnwanted_CHAR(&unwanted, DELETE, "l");
 
     ModifyUnwanted_STRING(&unwanted, ADD, (char*[]){"foo", "bar", "ab"}, 3);

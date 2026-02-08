@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef char* STRTITLE;
+
 typedef unsigned int UINTFIELDSIZE;
 typedef char** PARRAYSTRFIELDNAMES;
 
@@ -39,6 +41,8 @@ typedef struct Article {
     PARRAYSTRFIELDNAMES floatFieldNames;
     PARRAYSTRFIELDNAMES boolFieldNames;
     PARRAYSTRFIELDNAMES stringFieldNames;
+
+
 } Article;
 
 void AddName(Article *article, enum Type type, const char* name);
