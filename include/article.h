@@ -27,6 +27,10 @@ enum Type {
 };
 
 typedef struct Article {
+    //Automatic fields
+    STRTITLE title;
+
+    //Custom fields
     PARRAYINTFIELDS intFields;
     PARRAYFLOATFIELDS floatFields;
     PARRAYBOOLFIELDS boolFields;

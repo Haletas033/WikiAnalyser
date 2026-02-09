@@ -23,11 +23,10 @@ int main() {
         1
     );
 
-    Article *articles;
+    Article *articles = NULL;
     unsigned int articleCount = 0;
 
     Article article = {0};
-
     AddField(&article, INT, "e_Count");
     AddField(&article, FLOAT, "Float Test");
     AddField(&article, BOOL, "Bool Test");

@@ -64,7 +64,7 @@ int ParseArticles(PCSTRFILEPATH szFilePath, Article **articles, Article *baseArt
 
                 strncpy(slice, (const char*)uszBuffer + iStartIndex, iTitleLen);
                 slice[iTitleLen] = '\0';
-                (*articles)[nextPos].stringFields[0] = slice;
+                (*articles)[nextPos].title = slice;
             }
         }
     }

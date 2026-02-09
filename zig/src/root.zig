@@ -2,6 +2,8 @@ const std = @import("std");
 const Io = std.Io;
 
 pub const Article = extern struct {
+    title: [*]c_char,
+
     intFields: [*]c_int,
     floatFields: [*]f32,
     boolFields: [*]u8,
@@ -22,6 +24,10 @@ pub const Article = extern struct {
 pub fn toString(text: ?[*]c_char) [*:0]const u8 {
     if (text != null) return @ptrCast(text);
     return "";
+}
+
+pub fn Title(article: *Article) [*]c_char{
+    return article.title;
 }
 
 //Get a field by name and type
