@@ -2,7 +2,7 @@
 // Created by halet on 12/31/2025.
 //
 
-#include "../include/unwanted.h"
+#include "../include/core/unwanted.h"
 
 //Handles character logic not unwantedCharacters only
 void Add_CHAR(unsigned short* charactersSize, char* caCharacters[], const char caNewCharacters[]) {

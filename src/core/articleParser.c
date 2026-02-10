@@ -2,7 +2,7 @@
 // Created by halet on 12/14/2025.
 //
 
-#include "../include/parser.h"
+#include "../include/core/articleParser.h"
 
 char* getAutomaticField(const unsigned char* uszBuffer, ssize_t* i, const char* fieldStart, const char* fieldEnd) {
     if (strncmp((const char*)uszBuffer + *i, fieldStart, strlen(fieldStart)) == 0) {

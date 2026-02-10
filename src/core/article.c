@@ -1,4 +1,4 @@
-#include "../include/article.h"
+#include "../include/core/article.h"
 
 void AddName(Article *article, enum Type type, const char* name) {
     char*** fieldNameType = NULL;

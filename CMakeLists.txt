@@ -25,14 +25,14 @@ add_custom_target(ZigTarget ALL
 
 add_executable(WikiAnalyser
         src/main.c
-        src/parser.c
-        src/article.c
-        src/cleanup.c
-        src/unwanted.c
-        include/parser.h
-        include/article.h
-        include/cleanup.h
-        include/unwanted.h
+        src/core/articleParser.c
+        src/core/article.c
+        src/core/cleanup.c
+        src/core/unwanted.c
+        include/core/articleParser.h
+        include/core/article.h
+        include/core/cleanup.h
+        include/core/unwanted.h
 )
 
 add_dependencies(WikiAnalyser ZigTarget)

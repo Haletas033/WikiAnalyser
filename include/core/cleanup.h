@@ -8,13 +8,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "parser.h"
+#include "articleParser.h"
 #include <stdbool.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
 
-#include "../include/unwanted.h"
+#include "unwanted.h"
 
 #define MEGA_BYTES(m) m*1024*1024
 

@@ -1,7 +1,7 @@
-#include "../include/unwanted.h"
-#include "../include/cleanup.h"
-#include "../include/article.h"
-#include "../include/parser.h"
+#include "../include/core/unwanted.h"
+#include "../include/core/cleanup.h"
+#include "../include/core/article.h"
+#include "../include/core/articleParser.h"
 
 int main() {
     UNWANTED unwanted = {0};

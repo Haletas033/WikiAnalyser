@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-#include "../include/article.h"
+#include "article.h"
 
 #ifndef PARSER_H
 #define PARSER_H
