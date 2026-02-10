@@ -170,15 +170,15 @@ void Delete_CONTAINER(unsigned short* stringsSize, char** szaHeads[], char** sza
 
 void ModifyUnwanted_CHAR(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const char caNewCharacters[]) {
     switch (iModifier) {
-        case ADD: {
+        case UNWANTED_ADD: {
             Add_CHAR(&unwanted->m_ushortUnwantedCharactersSize, &unwanted->m_paUnwantedCharacters, caNewCharacters);
             break;
         }
-        case DELETE: {
+        case UNWANTED_DELETE: {
             Delete_CHAR(&unwanted->m_ushortUnwantedCharactersSize, &unwanted->m_paUnwantedCharacters, caNewCharacters);
             break;
         }
-        case CLEAR: {
+        case UNWANTED_CLEAR: {
             unwanted->m_ushortUnwantedCharactersSize = 0;
             free(unwanted->m_paUnwantedCharacters);
             unwanted->m_paUnwantedCharacters = NULL;
@@ -190,18 +190,18 @@ void ModifyUnwanted_CHAR(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, const 
 
 //Purely for unwantedStrings
 void ModifyUnwanted_STRING(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier, char* szaNewStrings[], unsigned short count) {
-    if (count == 0 && iModifier != CLEAR) return;
+    if (count == 0 && iModifier != UNWANTED_CLEAR) return;
 
     switch (iModifier) {
-        case ADD: {
+        case UNWANTED_ADD: {
             Add_STRING(&unwanted->m_ushortUnwantedStringsSize, &unwanted->m_paUnwantedStrings , szaNewStrings, count);
             break;
         }
-        case DELETE: {
+        case UNWANTED_DELETE: {
             Delete_STRING(&unwanted->m_ushortUnwantedStringsSize, &unwanted->m_paUnwantedStrings , szaNewStrings, count);
             break;
         }
-        case CLEAR: {
+        case UNWANTED_CLEAR: {
             unwanted->m_ushortUnwantedStringsSize = 0;
             free(unwanted->m_paUnwantedStrings);
             unwanted->m_paUnwantedStrings = NULL;
@@ -216,10 +216,10 @@ void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier,
     char* szaNewHeads[], char* szaNewTails[],
     const unsigned short ushortContainerCount)
 {
-    if (ushortContainerCount == 0 && iModifier != CLEAR) return;
+    if (ushortContainerCount == 0 && iModifier != UNWANTED_CLEAR) return;
 
     switch (iModifier) {
-        case ADD: {
+        case UNWANTED_ADD: {
             unsigned short fakeSize = unwanted->m_unwantedContainers.m_ushortUnwantedContainersSize;
 
             //Handle heads
@@ -237,7 +237,7 @@ void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier,
             );
             break;
         }
-        case DELETE: {
+        case UNWANTED_DELETE: {
             Delete_CONTAINER(
                 &unwanted->m_unwantedContainers.m_ushortUnwantedContainersSize,
                 &unwanted->m_unwantedContainers.m_paUnwantedHeads,
@@ -247,7 +247,7 @@ void ModifyUnwanted_CONTAINER(UNWANTED* unwanted, UNWANTED_MODIFIER iModifier,
             );
             break;
         }
-        case CLEAR: {
+        case UNWANTED_CLEAR: {
             //Clear heads
             free(unwanted->m_unwantedContainers.m_paUnwantedHeads);
             unwanted->m_unwantedContainers.m_paUnwantedHeads = NULL;

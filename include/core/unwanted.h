@@ -41,9 +41,9 @@ typedef struct UNWANTED {
 } UNWANTED;
 
 typedef enum UNWANTED_MODIFIER {
-    ADD,
-    DELETE,
-    CLEAR
+    UNWANTED_ADD,
+    UNWANTED_DELETE,
+    UNWANTED_CLEAR
 } UNWANTED_MODIFIER;
 
 void Add_CHAR(unsigned short* charactersSize, char* caCharacters[], const char caNewCharacters[]);

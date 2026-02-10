@@ -1,3 +1,4 @@
+#include "../include/WINGUI.h"
 #include "../include/core/unwanted.h"
 #include "../include/core/cleanup.h"
 #include "../include/core/article.h"
@@ -5,14 +6,14 @@
 
 int main() {
     UNWANTED unwanted = {0};
-    ModifyUnwanted_CHAR(&unwanted, ADD, "!@#$%^&*()l1234567890 \n");
+    ModifyUnwanted_CHAR(&unwanted, UNWANTED_ADD, "!@#$%^&*()l1234567890 \n");
     ModifyUnwanted_CHAR(&unwanted, DELETE, "l");
 
-    ModifyUnwanted_STRING(&unwanted, ADD, (char*[]){"foo", "bar", "ab"}, 3);
+    ModifyUnwanted_STRING(&unwanted, UNWANTED_ADD, (char*[]){"foo", "bar", "ab"}, 3);
     ModifyUnwanted_STRING(&unwanted, DELETE, (char*[]){"ab"}, 1);
 
     ModifyUnwanted_CONTAINER(
-        &unwanted, ADD,
+        &unwanted, UNWANTED_ADD,
         (char*[]){"<siteinfo>", "{{", "aa"},(char*[]){"</siteinfo>", "}}", "aa"},
         3
     );
@@ -27,10 +28,10 @@ int main() {
     unsigned int articleCount = 0;
 
     Article article = {0};
-    AddField(&article, INT, "e_Count");
-    AddField(&article, FLOAT, "Float Test");
-    AddField(&article, BOOL, "Bool Test");
-    AddField(&article, STRING, "String Test");
+    AddField(&article, FIELD_INT, "e_Count");
+    AddField(&article, FIELD_FLOAT, "Float Test");
+    AddField(&article, FIELD_BOOL, "Bool Test");
+    AddField(&article, FIELD_STRING, "String Test");
 
     //Ignore (for testing on both linux and windows)
     #ifdef __WIN32__
@@ -54,5 +55,9 @@ int main() {
         zigPrintTest(&articles[i]);
     }
 
+    OSCreateWindowClass();
+    OSCreateWindow();
+    OSMessageLoop();
     return 0;
 }
+

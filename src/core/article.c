@@ -5,22 +5,22 @@ void AddName(Article *article, enum Type type, const char* name) {
     unsigned int* fieldSize = 0;
 
     switch (type) {
-        case INT: {
+        case FIELD_INT: {
             fieldNameType = &article->intFieldNames;
             fieldSize = &article->intFieldsSize;
             break;
         }
-        case FLOAT: {
+        case FIELD_FLOAT: {
             fieldNameType = &article->floatFieldNames;
             fieldSize = &article->floatFieldsSize;
             break;
         }
-        case BOOL: {
+        case FIELD_BOOL: {
             fieldNameType = &article->boolFieldNames;
             fieldSize = &article->boolFieldsSize;
             break;
         }
-        case STRING: {
+        case FIELD_STRING: {
             fieldNameType = &article->stringFieldNames;
             fieldSize = &article->stringFieldsSize;
             break;
@@ -43,25 +43,25 @@ void AddField(Article *article, enum Type type, const char* name) {
     ssize_t elementSize = 0;
 
     switch (type) {
-        case INT: {
+        case FIELD_INT: {
             fieldType = (void**)&article->intFields;
             fieldSize = &article->intFieldsSize;
             elementSize = sizeof(int);
             break;
         }
-        case FLOAT: {
+        case FIELD_FLOAT: {
             fieldType = (void**)&article->floatFields;
             fieldSize = &article->floatFieldsSize;
             elementSize = sizeof(float);
             break;
         }
-        case BOOL: {
+        case FIELD_BOOL: {
             fieldType = (void**)&article->boolFields;
             fieldSize = &article->boolFieldsSize;
             elementSize = sizeof(bool);
             break;
         }
-        case STRING: {
+        case FIELD_STRING: {
             fieldType = (void**)&article->stringFields;
             fieldSize = &article->stringFieldsSize;
             elementSize = sizeof(char*);
@@ -76,7 +76,7 @@ void AddField(Article *article, enum Type type, const char* name) {
 
     *fieldType = tmp;
 
-    if (type == STRING) {
+    if (type == FIELD_STRING) {
         ((char**)*fieldType)[*fieldSize] = NULL;
     } else {
         memset((char*)*fieldType + (*fieldSize * elementSize), 0, elementSize);
@@ -90,9 +90,9 @@ void AddField(Article *article, enum Type type, const char* name) {
 
 void CopyFields(const Article *article, Article *newArticle) {
     int i;
-    for (i = 0; i < article->intFieldsSize; i++) AddField(newArticle, INT, article->intFieldNames[i]);
-    for (i = 0; i < article->floatFieldsSize; i++) AddField(newArticle, FLOAT, article->floatFieldNames[i]);
-    for (i = 0; i < article->boolFieldsSize; i++) AddField(newArticle, BOOL, article->boolFieldNames[i]);
-    for (i = 0; i < article->stringFieldsSize; i++) AddField(newArticle, STRING, article->stringFieldNames[i]);
+    for (i = 0; i < article->intFieldsSize; i++) AddField(newArticle, FIELD_INT, article->intFieldNames[i]);
+    for (i = 0; i < article->floatFieldsSize; i++) AddField(newArticle, FIELD_FLOAT, article->floatFieldNames[i]);
+    for (i = 0; i < article->boolFieldsSize; i++) AddField(newArticle, FIELD_BOOL, article->boolFieldNames[i]);
+    for (i = 0; i < article->stringFieldsSize; i++) AddField(newArticle, FIELD_STRING, article->stringFieldNames[i]);
 }
 

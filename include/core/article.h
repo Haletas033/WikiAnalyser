@@ -20,10 +20,10 @@ typedef bool* PARRAYBOOLFIELDS;
 typedef char** PARRAYSTRFIELDS;
 
 enum Type {
-    INT,
-    FLOAT,
-    STRING,
-    BOOL
+    FIELD_INT,
+    FIELD_FLOAT,
+    FIELD_STRING,
+    FIELD_BOOL
 };
 
 typedef struct Article {
