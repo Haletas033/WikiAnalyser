@@ -34,6 +34,8 @@ add_executable(WikiAnalyser
         include/core/cleanup.h
         include/core/unwanted.h
         src/WINGUI.c
+        include/GUI.h
+        src/GUI.c
 )
 
 add_dependencies(WikiAnalyser ZigTarget)
