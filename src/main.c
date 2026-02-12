@@ -61,8 +61,6 @@ int main() {
     DrawRect((COLOUR_RECT){80,0, 100, 100, 255, 122, 0});
     OSMessageLoop();
 
-
-    printf("%d", paintStacks.colourRectsSize);
     return 0;
 }
 

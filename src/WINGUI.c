@@ -38,6 +38,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                 OSDrawRect(memDC, paintStacks.colourRects[i], windowWidth, windowHeight);
             }
 
+            OSDrawLine(memDC, (COLOUR_LINE){0, 0, 100, 100, 3, 0,0,0}, windowWidth,windowHeight);
+
+            OSDrawPoint(memDC, (COLOUR_POINT){50, 50, 50,255,255, 0}, windowWidth, windowHeight);
+
             BitBlt(hdc, 0, 0, windowWidth, windowHeight, memDC, 0, 0, SRCCOPY);
 
             DeleteObject(memBmp);
@@ -96,8 +100,63 @@ void OSDrawRect(HDC hdc, COLOUR_RECT colourRect, int scrW, int scrH) {
     const GUI_RECT rect = colourRect.rect;
     const GUI_RECT realRect = (GUI_RECT){(rect.x * scrW / 100), (rect.y * scrH / 100), (rect.w * scrW / 100), (rect.h * scrH / 100)};
     const COLOUR colour = colourRect.colour;
+
+    HBRUSH brush = CreateSolidBrush(RGB(colour.r, colour.g, colour.b));
     //The +1 ensures no 1 pixel white gaps caused by integer division
-    FillRect(hdc, &(RECT){realRect.x, realRect.y, realRect.w + 1, realRect.h + 1}, CreateSolidBrush(RGB(colour.r, colour.g, colour.b)));
+    FillRect(hdc, &(RECT){realRect.x, realRect.y, realRect.w + 1, realRect.h + 1}, brush);
+
+    DeleteObject(brush);
+}
+
+void OSDrawLine(HDC hdc, COLOUR_LINE colourLine, int scrW, int scrH) {
+    const COLOUR col = colourLine.colour;
+
+    const GUI_POINT p1 = (GUI_POINT){colourLine.line.p1.x * scrW / 100, colourLine.line.p1.y * scrH / 100};
+    const GUI_POINT p2 = (GUI_POINT){colourLine.line.p2.x * scrW / 100, colourLine.line.p2.y * scrH / 100};
+
+    HPEN pen = CreatePen(PS_SOLID, colourLine.line.thickness,RGB(col.r, col.g, col.b));
+    HPEN oldPen = SelectObject(hdc, pen);
+    MoveToEx(hdc, p1.x,p1.y, NULL);
+    LineTo(hdc, p2.x, p2.y);
+
+    SelectObject(hdc, oldPen);
+    DeleteObject(pen);
+}
+
+void OSDrawLineChain(HDC hdc, COLOUR_LINE_CHAIN colourLineChain, int scrW, int scrH) {
+    const COLOUR col = colourLineChain.colour;
+
+    const GUI_POINT p1 = (GUI_POINT){colourLineChain.linePath.points[0].x * scrW / 100, colourLineChain.linePath.points[0].y * scrH / 100};
+
+    #define nextPoint(i) (GUI_POINT){colourLineChain.linePath.points[i].x * scrW / 100, colourLineChain.linePath.points[i].y * scrH / 100}
+
+    HPEN pen = CreatePen(PS_SOLID, colourLineChain.linePath.thickness,RGB(col.r, col.g, col.b));
+    HPEN oldPen = SelectObject(hdc, pen);
+    MoveToEx(hdc, p1.x,p1.y, NULL);
+    int i;
+    for (i = 1; i < colourLineChain.linePath.pointsSize; i++)
+        LineTo(hdc, nextPoint(i).x, nextPoint(i).y);
+
+    SelectObject(hdc, oldPen);
+    DeleteObject(pen);
+}
+
+void OSDrawPoint(HDC hdc, COLOUR_POINT colourPoint, int scrW, int scrH) {
+    const COLOUR col = colourPoint.colour;
+    const GUI_POINT p = (GUI_POINT){colourPoint.point.x * scrW / 100, colourPoint.point.y * scrH / 100};
+    const int radius =colourPoint.radius/2 * min(scrW, scrH) / 100;
+
+    HPEN pen = CreatePen(PS_SOLID, 1,RGB(col.r, col.g, col.b));
+    HBRUSH brush = CreateSolidBrush(RGB(col.r, col.g, col.b));
+    HPEN oldPen = SelectObject(hdc, pen);
+    HBRUSH oldBrush = SelectObject(hdc, brush);
+
+    Ellipse(hdc, p.x - radius, p.y - radius, p.x + radius, p.y + radius);
+
+    SelectObject(hdc, oldPen);
+    SelectObject(hdc, oldBrush);
+    DeleteObject(pen);
+    DeleteObject(brush);
 }
 
 int GetRefreshRate() {
