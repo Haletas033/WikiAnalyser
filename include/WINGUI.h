@@ -5,7 +5,11 @@
 #ifndef WINGUI_H
 #define WINGUI_H
 
-#include <windows.h>
+#ifdef WIN32
+    #include <windows.h>
+#elifdef LINUX
+#endif
+
 #include "GUI.h"
 
 extern const wchar_t CLASS_NAME[];

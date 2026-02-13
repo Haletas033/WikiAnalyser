@@ -7,10 +7,10 @@
 int main() {
     UNWANTED unwanted = {0};
     ModifyUnwanted_CHAR(&unwanted, UNWANTED_ADD, "!@#$%^&*()l1234567890 \n");
-    ModifyUnwanted_CHAR(&unwanted, DELETE, "l");
+    ModifyUnwanted_CHAR(&unwanted, UNWANTED_DELETE, "l");
 
     ModifyUnwanted_STRING(&unwanted, UNWANTED_ADD, (char*[]){"foo", "bar", "ab"}, 3);
-    ModifyUnwanted_STRING(&unwanted, DELETE, (char*[]){"ab"}, 1);
+    ModifyUnwanted_STRING(&unwanted, UNWANTED_DELETE, (char*[]){"ab"}, 1);
 
     ModifyUnwanted_CONTAINER(
         &unwanted, UNWANTED_ADD,
@@ -19,7 +19,7 @@ int main() {
     );
 
     ModifyUnwanted_CONTAINER(
-        &unwanted, DELETE,
+        &unwanted, UNWANTED_DELETE,
         (char*[]){"aa"},(char*[]){"aa"},
         1
     );
