@@ -8,14 +8,20 @@
 
 const wchar_t CLASS_NAME[] = L"WINDOW CLASS";
 WNDCLASS wc = {};
+HBITMAP lImage;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
         case WM_DESTROY:
             PostQuitMessage(0);
             return 0;
+        case WM_CREATE:
+            lImage = (HBITMAP)LoadImage(NULL, "test.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+            if (!lImage) MessageBox(hwnd, "Failed to load image!", "Error", MB_OK);
+            return 0;
         case WM_TIMER:
             InvalidateRect(hwnd, NULL, FALSE);
+            return 0;
         case WM_PAINT:
         {
             PAINTSTRUCT ps;
@@ -33,14 +39,20 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             //Clear Background
             FillRect(memDC, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW+1));
 
+            OSDrawImage(memDC, (GUI_IMAGE){25, 25, 50, 50, ""}, windowWidth, windowHeight);
+
             int i;
             for (i = 0; i < paintStacks.colourRectsSize; i++) {
                 OSDrawRect(memDC, paintStacks.colourRects[i], windowWidth, windowHeight);
             }
-
-            OSDrawLine(memDC, (COLOUR_LINE){0, 0, 100, 100, 3, 0,0,0}, windowWidth,windowHeight);
+            GUI_POINT points[3] = {(GUI_POINT){0, 0}, (GUI_POINT){50, 70}, (GUI_POINT){100, 0}};
+            OSDrawLineChain(memDC, (COLOUR_LINE_CHAIN){points, 3, 3, 0,0,0}, windowWidth,windowHeight);
 
             OSDrawPoint(memDC, (COLOUR_POINT){50, 50, 50,255,255, 0}, windowWidth, windowHeight);
+
+            OSDrawText(memDC, (GUI_TEXT){"Hello, World", 50, 50, 50}, windowWidth, windowHeight);
+
+
 
             BitBlt(hdc, 0, 0, windowWidth, windowHeight, memDC, 0, 0, SRCCOPY);
 
@@ -60,7 +72,7 @@ void OSCreateWindowClass() {
     wc.hInstance = GetModuleHandle(NULL);
     wc.lpszClassName = CLASS_NAME;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wc.hbrBackground = NULL;
 
     RegisterClass(&wc);
 }
@@ -157,6 +169,49 @@ void OSDrawPoint(HDC hdc, COLOUR_POINT colourPoint, int scrW, int scrH) {
     SelectObject(hdc, oldBrush);
     DeleteObject(pen);
     DeleteObject(brush);
+}
+
+void OSDrawText(HDC hdc, GUI_TEXT text, int scrW, int scrH) {
+    text.size = text.size * min(scrW / 5, scrH) / 100;
+
+    HFONT hFont = CreateFont(
+        text.size, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE,
+        ANSI_CHARSET, OUT_TT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+        DEFAULT_PITCH | FF_DONTCARE, TEXT("Courier New")
+    ); SetBkMode(hdc, TRANSPARENT);
+    HFONT oldFont = SelectObject(hdc, hFont);
+
+    SIZE textSize;
+    GetTextExtentPoint32A(hdc, text.text, strlen(text.text), &textSize);
+
+    int x = text.pos.x * scrW  / 100;
+    int y = text.pos.y * scrH / 100;
+
+    x -= textSize.cx / 2;
+    y -= textSize.cy / 2;
+
+    TextOut(hdc, x, y, text.text, strlen(text.text));
+
+    SelectObject(hdc, oldFont);
+    DeleteObject(hFont);
+}
+
+void OSDrawImage(HDC hdc, GUI_IMAGE image, int scrW, int scrH) {
+    HDC imgDC = CreateCompatibleDC(hdc);
+    HBITMAP oldImage = SelectObject(imgDC, lImage);
+
+    BITMAP bm;
+    GetObject(lImage, sizeof(BITMAP), &bm);
+
+    const int x = image.rect.x * scrW / 100;
+    const int y = image.rect.y * scrH / 100;
+    const int w = image.rect.w * scrW / 100;
+    const int h = image.rect.h * scrH / 100;
+
+    StretchBlt(hdc, x, y, w, h, imgDC, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY);
+
+    SelectObject(imgDC, oldImage);
+    DeleteDC(imgDC);
 }
 
 int GetRefreshRate() {

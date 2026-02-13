@@ -15,6 +15,10 @@ typedef struct GUI_LINE { GUI_POINT p1, p2; int thickness; } GUI_LINE;
 
 typedef struct GUI_LINE_CHAIN { GUI_POINT* points; unsigned int pointsSize; int thickness; } GUI_LINE_CHAIN;
 
+typedef struct GUI_TEXT {const char* text; GUI_POINT pos; int size;} GUI_TEXT;
+
+typedef struct GUI_IMAGE {GUI_RECT rect; const char* imageLoc;} GUI_IMAGE;
+
 typedef struct COLOUR{ int r, g, b; } COLOUR;
 
 typedef struct COLOUR_RECT { GUI_RECT rect; COLOUR colour; } COLOUR_RECT;
