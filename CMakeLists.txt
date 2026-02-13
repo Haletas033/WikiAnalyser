@@ -3,24 +3,27 @@ project(WikiAnalyser C)
 
 set(CMAKE_C_STANDARD 90)
 
-#Zig source
 set(ZIG_SRC ${CMAKE_CURRENT_SOURCE_DIR}/zig/src/main.zig)
-set(ZIG_EXE "zig")
+set(ZIG_LIB ${CMAKE_BINARY_DIR}/libmain.so)
 
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR})
-
-#Custom command to generate the DLL/lib/header
 add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/main.dll ${CMAKE_BINARY_DIR}/main.lib ${CMAKE_BINARY_DIR}/main.h
-        COMMAND ${ZIG_EXE} build-lib ${ZIG_SRC} -dynamic -O ReleaseSmall -femit-h
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        OUTPUT ${ZIG_LIB} ${CMAKE_BINARY_DIR}/main.h
+        COMMAND zig build-lib ${ZIG_SRC}
+        -dynamic
+        -O ReleaseSmall
+        -femit-h
+        DEPENDS ${ZIG_SRC}
         COMMENT "Building Zig library"
         VERBATIM
 )
 
-#Custom target that depends on the above outputs
 add_custom_target(ZigTarget ALL
-        DEPENDS ${CMAKE_BINARY_DIR}/main.dll ${CMAKE_BINARY_DIR}/main.lib ${CMAKE_BINARY_DIR}/main.h
+        DEPENDS ${ZIG_LIB}
+)
+
+add_library(ZigLib SHARED IMPORTED)
+set_target_properties(ZigLib PROPERTIES
+        IMPORTED_LOCATION ${ZIG_LIB}
 )
 
 add_executable(WikiAnalyser
@@ -29,16 +32,19 @@ add_executable(WikiAnalyser
         src/core/article.c
         src/core/cleanup.c
         src/core/unwanted.c
+        src/GUI.c
+
         include/core/articleParser.h
         include/core/article.h
         include/core/cleanup.h
         include/core/unwanted.h
-        src/WINGUI.c
         include/GUI.h
-        src/GUI.c
+        include/LINUXGUI.h
+        src/LINUXGUI.c
 )
+
 
 add_dependencies(WikiAnalyser ZigTarget)
 
 target_include_directories(WikiAnalyser PRIVATE ${CMAKE_BINARY_DIR})
-target_link_libraries(WikiAnalyser PRIVATE ${CMAKE_BINARY_DIR}/main.lib)
+target_link_libraries(WikiAnalyser PRIVATE ZigLib X11)

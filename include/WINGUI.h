@@ -5,10 +5,7 @@
 #ifndef WINGUI_H
 #define WINGUI_H
 
-#ifdef WIN32
-    #include <windows.h>
-#elifdef LINUX
-#endif
+#include <windows.h>
 
 #include "GUI.h"
 

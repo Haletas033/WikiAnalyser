@@ -1,8 +1,14 @@
-#include "../include/WINGUI.h"
+
 #include "../include/core/unwanted.h"
 #include "../include/core/cleanup.h"
 #include "../include/core/article.h"
 #include "../include/core/articleParser.h"
+
+#ifdef __win32__
+#include "../include/WINGUI.h"
+#else
+#include "../include/LINUXGUI.h"
+#endif
 
 int main() {
     UNWANTED unwanted = {0};
@@ -57,9 +63,9 @@ int main() {
 
     OSCreateWindowClass();
     OSCreateWindow();
-    //Create an orange rectangle that starts at 80% of the x and goes to 100% of the x
-    DrawRect((COLOUR_RECT){80,0, 100, 100, 255, 122, 0});
-    OSMessageLoop();
+    // //Create an orange rectangle that starts at 80% of the x and goes to 100% of the x
+    // DrawRect((COLOUR_RECT){80,0, 100, 100, 255, 122, 0});
+    // OSMessageLoop();
 
     return 0;
 }
