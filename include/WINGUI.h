@@ -5,14 +5,16 @@
 #ifndef WINGUI_H
 #define WINGUI_H
 
+#ifndef __linux
 #include <windows.h>
+
 
 #include "GUI.h"
 
 extern const wchar_t CLASS_NAME[];
 extern WNDCLASS wc;
 extern HWND hwnd;
-
+#endif
 //Work with GUI on the OS level
 
 //Setup, Loop and Destroy
