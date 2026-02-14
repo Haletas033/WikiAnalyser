@@ -65,7 +65,7 @@ int main() {
     OSCreateWindow();
     // //Create an orange rectangle that starts at 80% of the x and goes to 100% of the x
     // DrawRect((COLOUR_RECT){80,0, 100, 100, 255, 122, 0});
-    // OSMessageLoop();
+    OSMessageLoop();
 
     return 0;
 }
