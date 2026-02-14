@@ -74,6 +74,7 @@ void OSMessageLoop() {
             XWindowAttributes attrs;
             XGetWindowAttributes(MainDisplay, _hdc.window, &attrs);
 
+            //Create the buffer if it doesn't exist or is the wrong size
             if (buffer == None || bufferWidth != attrs.width || bufferHeight != attrs.height) {
                 if (buffer != None) {
                     XFreePixmap(MainDisplay, buffer);
@@ -90,10 +91,14 @@ void OSMessageLoop() {
                 memDC = (HDC){buffer, bufferGC};
             }
 
+            //Clear the screen
             XSetForeground(MainDisplay, bufferGC, windowAttributes.background_pixel);
             XFillRectangle(MainDisplay, buffer, bufferGC, 0, 0, bufferWidth, bufferHeight);
 
             OSDrawRect(memDC, (COLOUR_RECT){80, 0, 100, 100, 255, 122, 0},
+                bufferWidth, bufferHeight);
+
+            OSDrawLine(memDC, (COLOUR_LINE){0, 0, 100, 100, 3, 0,0,0},
                 bufferWidth, bufferHeight);
 
             XCopyArea(MainDisplay, buffer, _hdc.window, _hdc.gc, 0, 0, bufferWidth, bufferHeight, 0, 0);
@@ -112,4 +117,16 @@ void OSDrawRect(HDC hdc, COLOUR_RECT colourRect, int scrW, int scrH) {
     const int h = (colourRect.rect.h * scrH / 100) - y;
 
     XFillRectangle(MainDisplay, hdc.window, hdc.gc, x, y, w, h);
+}
+
+void OSDrawLine(HDC hdc, COLOUR_LINE colourLine, int scrW, int scrH) {
+    //Set colour and thickness
+    XSetForeground(MainDisplay, hdc.gc, RGB(colourLine.colour));
+    XSetLineAttributes(MainDisplay, hdc.gc, colourLine.line.thickness, LineSolid, CapButt, JoinMiter);
+
+    //Create percentage based points
+    GUI_POINT p1 = (GUI_POINT){colourLine.line.p1.x * scrW / 100, colourLine.line.p1.y * scrH / 100};
+    GUI_POINT p2 = (GUI_POINT){colourLine.line.p2.x * scrW / 100, colourLine.line.p2.y * scrH / 100};
+
+    XDrawLine(MainDisplay, hdc.window, hdc.gc, p1.x, p1.y, p2.x, p2.y);
 }
