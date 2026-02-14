@@ -6,6 +6,8 @@
 
 #include <stdio.h>
 
+#ifdef __win32__
+
 const wchar_t CLASS_NAME[] = L"WINDOW CLASS";
 WNDCLASS wc = {};
 HBITMAP lImage;
@@ -220,3 +222,5 @@ int GetRefreshRate() {
     EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dev);
     return dev.dmDisplayFrequency;
 }
+
+#endif

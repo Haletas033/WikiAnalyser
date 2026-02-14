@@ -26,6 +26,7 @@ set_target_properties(ZigLib PROPERTIES
         IMPORTED_LOCATION ${ZIG_LIB}
 )
 
+
 add_executable(WikiAnalyser
         src/main.c
         src/core/articleParser.c
@@ -33,18 +34,34 @@ add_executable(WikiAnalyser
         src/core/cleanup.c
         src/core/unwanted.c
         src/GUI.c
-
+        src/LINUXGUI.c
+        src/WINGUI.c
         include/core/articleParser.h
         include/core/article.h
         include/core/cleanup.h
         include/core/unwanted.h
         include/GUI.h
         include/LINUXGUI.h
-        src/LINUXGUI.c
+        include/WINGUI.h
 )
 
-
 add_dependencies(WikiAnalyser ZigTarget)
-
 target_include_directories(WikiAnalyser PRIVATE ${CMAKE_BINARY_DIR})
-target_link_libraries(WikiAnalyser PRIVATE ZigLib X11)
+target_link_libraries(WikiAnalyser PRIVATE ZigLib X11 m)
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(XFT REQUIRED xft)
+pkg_check_modules(FREETYPE REQUIRED freetype2)
+
+target_include_directories(WikiAnalyser PRIVATE
+        ${XFT_INCLUDE_DIRS}
+        ${FREETYPE_INCLUDE_DIRS}
+)
+target_link_libraries(WikiAnalyser PRIVATE
+        ${XFT_LIBRARIES}
+        ${FREETYPE_LIBRARIES}
+)
+target_compile_options(WikiAnalyser PRIVATE
+        ${XFT_CFLAGS_OTHER}
+        ${FREETYPE_CFLAGS_OTHER}
+)
