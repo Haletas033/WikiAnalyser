@@ -5,8 +5,6 @@
 #ifndef WINGUI_H
 #define WINGUI_H
 
-#ifdef __win32__
-
 #include <windows.h>
 
 #include "GUI.h"
@@ -34,5 +32,3 @@ void OSDrawImage(HDC hdc, GUI_IMAGE image, int scrWm, int scrH);
 int GetRefreshRate();
 
 #endif
-
-#endif //WINGUI_H

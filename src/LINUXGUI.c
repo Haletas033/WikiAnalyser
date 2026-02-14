@@ -2,8 +2,6 @@
 // Created by haletas on 13/02/2026.
 //
 
-#ifdef __linux__
-
 #include "../include/LINUXGUI.h"
 
 #include <stdio.h>
@@ -275,5 +273,3 @@ void OSDrawLineChain(HDC hdc, COLOUR_LINE_CHAIN colourLineChain, int scrW, int s
     //Draw lines
     XDrawLines(MainDisplay, hdc.window, hdc.gc, points, colourLineChain.linePath.pointsSize, CoordModeOrigin);
 }
-
-#endif

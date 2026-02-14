@@ -6,8 +6,6 @@
 
 #include <stdio.h>
 
-#ifdef __win32__
-
 const wchar_t CLASS_NAME[] = L"WINDOW CLASS";
 WNDCLASS wc = {};
 HBITMAP lImage;
@@ -43,10 +41,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
             OSDrawImage(memDC, (GUI_IMAGE){25, 25, 50, 50, ""}, windowWidth, windowHeight);
 
-            int i;
-            for (i = 0; i < paintStacks.colourRectsSize; i++) {
-                OSDrawRect(memDC, paintStacks.colourRects[i], windowWidth, windowHeight);
-            }
+            OSDrawRect(memDC, (COLOUR_RECT){80, 0, 100, 100, 255, 122, 0}, windowWidth, windowHeight);
+
             GUI_POINT points[3] = {(GUI_POINT){0, 0}, (GUI_POINT){50, 70}, (GUI_POINT){100, 0}};
             OSDrawLineChain(memDC, (COLOUR_LINE_CHAIN){points, 3, 3, 0,0,0}, windowWidth,windowHeight);
 
@@ -222,5 +218,3 @@ int GetRefreshRate() {
     EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dev);
     return dev.dmDisplayFrequency;
 }
-
-#endif

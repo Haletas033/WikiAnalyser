@@ -5,8 +5,6 @@
 #ifndef WIKIANALYSER_LINUXGUI_H
 #define WIKIANALYSER_LINUXGUI_H
 
-#ifdef __linux__
-
 #include "GUI.h"
 #include "X11/Xlib.h"
 #include "X11/Xft/Xft.h"
@@ -40,6 +38,5 @@ void OSDrawImage(HDC hdc, GUI_IMAGE image, int scrWm, int scrH);
 //Functions unique to the linux version and only used in LINUXGUI
 unsigned long RGB(COLOUR col);
 
-#endif
 
 #endif //WIKIANALYSER_LINUXGUI_H

@@ -4,7 +4,7 @@
 #include "../include/core/article.h"
 #include "../include/core/articleParser.h"
 
-#ifdef __win32__
+#ifdef __WIN32__
 #include "../include/WINGUI.h"
 #else
 #include "../include/LINUXGUI.h"
@@ -63,8 +63,7 @@ int main() {
 
     OSCreateWindowClass();
     OSCreateWindow();
-    // //Create an orange rectangle that starts at 80% of the x and goes to 100% of the x
-    // DrawRect((COLOUR_RECT){80,0, 100, 100, 255, 122, 0});
+
     OSMessageLoop();
 
     return 0;
