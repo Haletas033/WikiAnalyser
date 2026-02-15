@@ -17,7 +17,9 @@ typedef struct GUI_LINE_CHAIN { GUI_POINT* points; unsigned int pointsSize; int 
 
 typedef struct GUI_TEXT {const char* text; GUI_POINT pos; int size;} GUI_TEXT;
 
-typedef struct GUI_IMAGE {GUI_RECT rect; const char* imageLoc;} GUI_IMAGE;
+typedef struct GUI_IMAGE {GUI_RECT rect; void* imgLoc;} GUI_IMAGE;
+
+typedef struct GUI_BUTTON_LIKE {const char* text; GUI_RECT rect; void* buttonLoc;} GUI_BUTTON;
 
 typedef struct COLOUR{ int r, g, b; } COLOUR;
 
@@ -29,19 +31,39 @@ typedef struct COLOUR_LINE_CHAIN { GUI_LINE_CHAIN linePath; COLOUR colour; } COL
 
 typedef struct COLOUR_POINT { GUI_POINT point; int radius; COLOUR colour; } COLOUR_POINT;
 
+
+
 typedef struct PaintStacks {
     COLOUR_RECT* colourRects;
     COLOUR_LINE* colourLines;
+    COLOUR_LINE_CHAIN* colourLineChains;
     COLOUR_POINT* colourPoints;
+    GUI_TEXT* texts;
+    GUI_IMAGE* images;
+    GUI_BUTTON* buttons;
 
     unsigned int colourRectsSize;
     unsigned int colourLinesSize;
+    unsigned int colourLinesChainsSize;
     unsigned int colourPointsSize;
+    unsigned int textsSize;
+    unsigned int imagesSize;
+    unsigned int buttonsSize;
 } PaintStacks;
 
 extern PaintStacks paintStacks;
 
-void DrawRect(COLOUR_RECT colourRect);
+COLOUR_RECT* DrawPermanentRect(COLOUR_RECT colourRect);
+COLOUR_LINE* DrawPermanentLine(COLOUR_LINE colourLine);
+COLOUR_LINE_CHAIN* DrawPermanentLineChain(COLOUR_LINE_CHAIN colourLineChain);
+COLOUR_POINT* DrawPermanentPoint(COLOUR_POINT colourPoint);
+GUI_TEXT* DrawPermanentText(GUI_TEXT text);
+GUI_IMAGE* DrawPermanentImage(GUI_IMAGE image);
+GUI_BUTTON* DrawPermanentButton(GUI_BUTTON button);
+
+void GUIStart();
+
+void GUILoop();
 
 
 #endif //GUI_H

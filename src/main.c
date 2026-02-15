@@ -9,6 +9,7 @@
 #else
 #include "../include/LINUXGUI.h"
 #endif
+#include "../include/GUI.h"
 
 int main() {
     UNWANTED unwanted = {0};
@@ -63,7 +64,7 @@ int main() {
 
     OSCreateWindowClass();
     OSCreateWindow();
-
+    GUIStart();
     OSMessageLoop();
 
     return 0;
