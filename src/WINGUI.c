@@ -6,16 +6,22 @@
 
 #include <stdio.h>
 
+;
+
 const wchar_t CLASS_NAME[] = L"WINDOW CLASS";
 WNDCLASS wc = {};
-BOOL SIZE_CHANGED;
+
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
         case WM_DESTROY:
             PostQuitMessage(0);
             return 0;
         case WM_TIMER:
-            InvalidateRect(hwnd, NULL, FALSE);
+            if (wParam == 1) {
+                InvalidateRect(hwnd, NULL, FALSE);
+            } else {
+                doAfters[wParam - 1].doAfterFunc();
+            }
             return 0;
         case WM_PAINT:
         {
@@ -267,6 +273,15 @@ void OSDrawButtonLike(GUI_BUTTON button, int scrW, int scrH) {
     MoveWindow(buttonHwnd, start.x, start.y, end.x, end.y, TRUE);
     SetWindowText(buttonHwnd, button.text);
     ShowWindow(buttonHwnd, 1);
+}
+
+void OSDoAfterMillis(const unsigned int id, const unsigned int millis, void (*func)(void)) {
+    doAfters[id - 1].doAfterFunc = func;
+    SetTimer(hwnd, id, millis, NULL);
+}
+
+void OSKillTimer(const unsigned int id) {
+    KillTimer(hwnd, id);
 }
 
 int GetRefreshRate() {

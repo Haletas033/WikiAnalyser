@@ -37,6 +37,9 @@ void OSDrawImage(HDC hdc, GUI_IMAGE image, int scrWm, int scrH);
 void OSDrawButtonLike(GUI_BUTTON button, int scrW, int scrH);
 
 //Misc
+void OSDoAfterMillis(unsigned int id, unsigned int millis, void (*func)(void));
+void OSKillTimer(unsigned int id);
 int GetRefreshRate();
+
 
 #endif

@@ -7,6 +7,12 @@
 
 #include <stdlib.h>
 
+#define IDT_DO_AFTER 2
+#define IDT_DO_AFTER_2 3
+#define IDT_DO_AFTER_3 4
+#define IDT_DO_AFTER_4 5
+#define IDT_DO_AFTER_5 6
+
 typedef struct GUI_RECT { int x, y, w, h; } GUI_RECT;
 
 typedef struct GUI_POINT { int x, y; } GUI_POINT;
@@ -31,7 +37,9 @@ typedef struct COLOUR_LINE_CHAIN { GUI_LINE_CHAIN linePath; COLOUR colour; } COL
 
 typedef struct COLOUR_POINT { GUI_POINT point; int radius; COLOUR colour; } COLOUR_POINT;
 
-
+typedef struct DO_AFTER_ENTRY {
+    void (*doAfterFunc)(void);
+} DO_AFTER_ENTRY;
 
 typedef struct PaintStacks {
     COLOUR_RECT* colourRects;
@@ -52,6 +60,7 @@ typedef struct PaintStacks {
 } PaintStacks;
 
 extern PaintStacks paintStacks;
+extern DO_AFTER_ENTRY doAfters[5];
 
 COLOUR_RECT* DrawPermanentRect(COLOUR_RECT colourRect);
 COLOUR_LINE* DrawPermanentLine(COLOUR_LINE colourLine);

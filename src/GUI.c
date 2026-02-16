@@ -6,6 +6,8 @@
 #include "../include/GUI.h"
 
 
+#include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 #ifdef __WIN32__
@@ -13,6 +15,7 @@
 #endif
 
 PaintStacks paintStacks = {0};
+DO_AFTER_ENTRY doAfters[5] = {0};
 
 //Draw functions that add themselves to paintStacks until manually removed
 COLOUR_RECT* DrawPermanentRect(COLOUR_RECT colourRect) {
@@ -85,25 +88,50 @@ GUI_BUTTON* DrawPermanentButton(GUI_BUTTON button){
     return &paintStacks.buttons[paintStacks.buttonsSize-1];
 }
 
-COLOUR_POINT* point;
+GUI_TEXT* greetingText;
+const char* greetingDialogue[6] = {
+    "Welcome to WikiAnalyser",
+    "It seems it is your first time here",
+    "Or your data is missing...",
+    "Anyways, to begin you are going to have to download a wikipedia dump",
+    "Well, I guess any .xml that has the same layout as the Wikipedia ones",
+    "Below are the 4 different options you have. You can either download all of wikipedia, the top n articles, a custom set of article, or open any .xml file on your computer"
+};
+
+int dialoguePos = 0;
+char subStr[1000];
+int animDone = 1;
+void animateText() {
+    static int subStrPos = 1;
+    strncpy(subStr, greetingDialogue[dialoguePos], subStrPos);
+    subStr[subStrPos] = '\0';
+    greetingText->text = subStr;
+    subStrPos++;
+    if (subStrPos == strlen(greetingDialogue[dialoguePos]) + 1) {
+        OSKillTimer(IDT_DO_AFTER_2);
+        subStrPos = 0;
+        animDone = 1;
+    }
+}
+
+void changeText() {
+    if (animDone) {
+        animDone = 0;
+        greetingText->text = greetingDialogue[dialoguePos];
+        OSDoAfterMillis(IDT_DO_AFTER_2, 100, animateText);
+        if (animDone) dialoguePos++;
+
+        if (dialoguePos == 6)
+            OSKillTimer(IDT_DO_AFTER);
+    }
+}
+
 void GUIStart() {
-    DrawPermanentRect((COLOUR_RECT){80, 0, 100, 100, 255, 122, 0});
+    greetingText = DrawPermanentText((GUI_TEXT){"Welcome to WikiAnalyser", 50, 50, 14});
+    OSDoAfterMillis(IDT_DO_AFTER, 100, changeText);
 
-    GUI_POINT points[3] = {(GUI_POINT){0, 0}, (GUI_POINT){50, 70}, (GUI_POINT){100, 0}};
-    DrawPermanentLineChain((COLOUR_LINE_CHAIN){points, 3, 3, 0,0, 0});
-
-    point = DrawPermanentPoint((COLOUR_POINT){50, 50, 50, 255, 255, 0});
-
-    DrawPermanentText((GUI_TEXT){"Hello, World!", 50, 50, 12});
-
-    DrawPermanentImage((GUI_IMAGE){25, 25, 50, 50, OSCreateImage("test.bmp")});
-
-    void* button = OSCreateButton();
-    DrawPermanentButton((GUI_BUTTON){"OK", 0, 0, 10, 10, button});
-
-    void* checkbox = OSCreateCheckBox();
-    DrawPermanentButton((GUI_BUTTON){"OK", 0, 10, 10, 10, checkbox});
 }
 
 void GUILoop() {
+
 }
