@@ -119,7 +119,7 @@ void changeText() {
         animDone = 0;
         greetingText->text = greetingDialogue[dialoguePos];
         OSDoAfterMillis(IDT_DO_AFTER_2, 100, animateText);
-        if (animDone) dialoguePos++;
+        dialoguePos++;
 
         if (dialoguePos == 6)
             OSKillTimer(IDT_DO_AFTER);
@@ -128,7 +128,7 @@ void changeText() {
 
 void GUIStart() {
     greetingText = DrawPermanentText((GUI_TEXT){"Welcome to WikiAnalyser", 50, 50, 14});
-    OSDoAfterMillis(IDT_DO_AFTER, 100, changeText);
+    OSDoAfterMillis(IDT_DO_AFTER, 1000, changeText);
 
 }
 
