@@ -23,6 +23,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                 doAfters[wParam - 1].doAfterFunc();
             }
             return 0;
+        case WM_COMMAND:
+            if (wParam <= 32) {
+                buttonCommands[wParam-1].buttonCommand();
+            }
         case WM_PAINT:
         {
             RECT windowRect;
@@ -121,7 +125,7 @@ void OSMessageLoop() {
     }
 }
 
-void* OSCreateButton() {
+void* OSCreateButton(const unsigned int id, void (*func)(void)) {
     HWND buttonHwnd = CreateWindowEx(
         0,
         "BUTTON",
@@ -129,14 +133,15 @@ void* OSCreateButton() {
         WS_TABSTOP | WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
         0,0,0,0,
         hwnd,
-        (HMENU)1,
+        (HMENU)id,
         wc.hInstance,
         NULL
     );
+    buttonCommands[id-1].buttonCommand = func;
     return buttonHwnd;
 }
 
-void* OSCreateCheckBox() {
+void* OSCreateCheckBox(const unsigned int id, void (*func)(void)) {
     HWND buttonHwnd = CreateWindowEx(
         0,
         "BUTTON",
@@ -144,10 +149,11 @@ void* OSCreateCheckBox() {
         WS_TABSTOP | WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
         0,0,0,0,
         hwnd,
-        (HMENU)1,
+        (HMENU)id,
         wc.hInstance,
         NULL
     );
+    buttonCommands[id-1].buttonCommand = func;
     return buttonHwnd;
 }
 

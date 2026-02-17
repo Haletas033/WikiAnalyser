@@ -16,6 +16,7 @@
 
 PaintStacks paintStacks = {0};
 DO_AFTER_ENTRY doAfters[5] = {0};
+BUTTON_COMMAND_ENTRY buttonCommands[32] = {0};
 
 //Draw functions that add themselves to paintStacks until manually removed
 COLOUR_RECT* DrawPermanentRect(COLOUR_RECT colourRect) {
@@ -89,17 +90,20 @@ GUI_BUTTON_LIKE* DrawPermanentButton(GUI_BUTTON_LIKE button){
 }
 
 GUI_TEXT* greetingText;
-const char* greetingDialogue[10] = {
+const char* greetingDialogue[11] = {
     "Welcome to WikiAnalyser",
     "It seems it is your first time here",
     "Or your data is missing...",
     "Anyways, to begin you are going to have to download a wikipedia dump",
     "Well, I guess any .xml that has the same layout as the Wikipedia ones",
     "For this you have a few options. Here they are",
-    "1. Download all of Wikipedia ≈ 100gb",
+    "1. Download all of Wikipedia ~100gb",
     "2. Download the top n articles",
     "3. Download a custom set of articles",
-    "4. Open a pre-existing .xml file on your computer"
+    "4. Open a pre-existing .xml file on your computer",
+
+    /* after choice */
+    "Great choice. Just running test to make sure everything is correct"
 };
 
 int dialoguePos = 0;
@@ -119,11 +123,16 @@ GUI_RECT GetButtonPos(const int totalButtons, const GUI_POINT center, const int 
     return (GUI_RECT){start.x+(buttonNumber*buttonSize)-buttonSize, start.y, buttonSize, buttonSize};
 }
 
+void performCheck();
 void createButtons() {
-    if (dialoguePos == OPTION(FULL)) DrawPermanentButton((GUI_BUTTON_LIKE){"Full", GetButtonPos(4, (GUI_POINT){50, 60} ,10, 1), OSCreateButton()});
-    else if (dialoguePos == OPTION(TOP_N)) DrawPermanentButton((GUI_BUTTON_LIKE){"Top n", GetButtonPos(4, (GUI_POINT){50, 60} ,10, 2), OSCreateButton()});
-    else if (dialoguePos == OPTION(CUSTOM)) DrawPermanentButton((GUI_BUTTON_LIKE){"Custom", GetButtonPos(4, (GUI_POINT){50, 60} ,10, 3), OSCreateButton()});
-    else if (dialoguePos == OPTION(OPEN)) DrawPermanentButton((GUI_BUTTON_LIKE){"Open", GetButtonPos(4, (GUI_POINT){50, 60} ,10, 4), OSCreateButton()});
+    if (dialoguePos == OPTION(FULL)) DrawPermanentButton((GUI_BUTTON_LIKE){"Full", GetButtonPos(4,
+        (GUI_POINT){50, 60} ,10, 1), OSCreateButton(1, performCheck)});
+    else if (dialoguePos == OPTION(TOP_N)) DrawPermanentButton((GUI_BUTTON_LIKE){"Top n", GetButtonPos(4,
+        (GUI_POINT){50, 60} ,10, 2), OSCreateButton(2, performCheck)});
+    else if (dialoguePos == OPTION(CUSTOM)) DrawPermanentButton((GUI_BUTTON_LIKE){"Custom", GetButtonPos(4,
+        (GUI_POINT){50, 60} ,10, 3), OSCreateButton(3, performCheck)});
+    else if (dialoguePos == OPTION(OPEN)) DrawPermanentButton((GUI_BUTTON_LIKE){"Open", GetButtonPos(4,
+        (GUI_POINT){50, 60} ,10, 4), OSCreateButton(4, performCheck)});
 }
 
 void changeText();
@@ -143,13 +152,19 @@ void animateText() {
     }
 }
 
+
 void changeText() {
     if (animDone) {
         animDone = 0;
         createButtons();
-        if (dialoguePos < 10) OSDoAfterMillis(IDT_DO_AFTER_2, 50, animateText);
+        if (dialoguePos < 10)
+            OSDoAfterMillis(IDT_DO_AFTER_2, 1, animateText);
         OSKillTimer(IDT_DO_AFTER);
     }
+}
+
+void performCheck() {
+    OSDoAfterMillis(IDT_DO_AFTER_2, 1, animateText);
 }
 
 void GUIStart() {

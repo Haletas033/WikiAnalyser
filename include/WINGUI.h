@@ -24,8 +24,8 @@ void OSMessageLoop();
 
 //Creation functions
 void* OSCreateImage(const char* imgPath);
-void* OSCreateButton();
-void* OSCreateCheckBox();
+void* OSCreateButton(unsigned int id, void (*func)(void));
+void* OSCreateCheckBox(unsigned int id, void (*func)(void));
 
 //Drawing functions
 void OSDrawRect(HDC hdc, COLOUR_RECT colourRect, int scrW, int scrH);

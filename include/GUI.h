@@ -43,6 +43,10 @@ typedef struct DO_AFTER_ENTRY {
     void (*doAfterFunc)(void);
 } DO_AFTER_ENTRY;
 
+typedef struct BUTTON_COMMAND_ENTRY {
+    void (*buttonCommand)(void);
+} BUTTON_COMMAND_ENTRY;
+
 typedef struct PaintStacks {
     COLOUR_RECT* colourRects;
     COLOUR_LINE* colourLines;
@@ -63,6 +67,7 @@ typedef struct PaintStacks {
 
 extern PaintStacks paintStacks;
 extern DO_AFTER_ENTRY doAfters[5];
+extern BUTTON_COMMAND_ENTRY buttonCommands[32];
 
 COLOUR_RECT* DrawPermanentRect(COLOUR_RECT colourRect);
 COLOUR_LINE* DrawPermanentLine(COLOUR_LINE colourLine);
