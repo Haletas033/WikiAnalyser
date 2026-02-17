@@ -34,7 +34,7 @@ void OSDrawLineChain(HDC hdc, COLOUR_LINE_CHAIN colourLineChain, int scrW, int s
 void OSDrawPoint(HDC hdc, COLOUR_POINT colourPoint, int scrW, int scrH);
 void OSDrawText(HDC hdc, GUI_TEXT text, int scrW, int scrH);
 void OSDrawImage(HDC hdc, GUI_IMAGE image, int scrWm, int scrH);
-void OSDrawButtonLike(GUI_BUTTON button, int scrW, int scrH);
+void OSDrawButtonLike(GUI_BUTTON_LIKE button, int scrW, int scrH);
 
 //Misc
 void OSDoAfterMillis(unsigned int id, unsigned int millis, void (*func)(void));

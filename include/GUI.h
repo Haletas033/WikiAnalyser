@@ -13,6 +13,8 @@
 #define IDT_DO_AFTER_4 5
 #define IDT_DO_AFTER_5 6
 
+#define OPTION(i) i+6
+
 typedef struct GUI_RECT { int x, y, w, h; } GUI_RECT;
 
 typedef struct GUI_POINT { int x, y; } GUI_POINT;
@@ -25,7 +27,7 @@ typedef struct GUI_TEXT {const char* text; GUI_POINT pos; int size;} GUI_TEXT;
 
 typedef struct GUI_IMAGE {GUI_RECT rect; void* imgLoc;} GUI_IMAGE;
 
-typedef struct GUI_BUTTON_LIKE {const char* text; GUI_RECT rect; void* buttonLoc;} GUI_BUTTON;
+typedef struct GUI_BUTTON_LIKE {const char* text; GUI_RECT rect; void* buttonLoc;} GUI_BUTTON_LIKE;
 
 typedef struct COLOUR{ int r, g, b; } COLOUR;
 
@@ -48,7 +50,7 @@ typedef struct PaintStacks {
     COLOUR_POINT* colourPoints;
     GUI_TEXT* texts;
     GUI_IMAGE* images;
-    GUI_BUTTON* buttons;
+    GUI_BUTTON_LIKE* buttons;
 
     unsigned int colourRectsSize;
     unsigned int colourLinesSize;
@@ -68,7 +70,7 @@ COLOUR_LINE_CHAIN* DrawPermanentLineChain(COLOUR_LINE_CHAIN colourLineChain);
 COLOUR_POINT* DrawPermanentPoint(COLOUR_POINT colourPoint);
 GUI_TEXT* DrawPermanentText(GUI_TEXT text);
 GUI_IMAGE* DrawPermanentImage(GUI_IMAGE image);
-GUI_BUTTON* DrawPermanentButton(GUI_BUTTON button);
+GUI_BUTTON_LIKE* DrawPermanentButton(GUI_BUTTON_LIKE button);
 
 void GUIStart();
 

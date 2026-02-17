@@ -263,7 +263,7 @@ void OSDrawImage(HDC hdc, GUI_IMAGE image, int scrW, int scrH) {
     DeleteDC(imgDC);
 }
 
-void OSDrawButtonLike(GUI_BUTTON button, int scrW, int scrH) {
+void OSDrawButtonLike(GUI_BUTTON_LIKE button, int scrW, int scrH) {
     HWND buttonHwnd = button.buttonLoc;
 
     //Get percentage based x,y,w,h
