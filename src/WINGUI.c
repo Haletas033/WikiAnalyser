@@ -227,7 +227,7 @@ void OSDrawPoint(HDC hdc, COLOUR_POINT colourPoint, int scrW, int scrH) {
 }
 
 void OSDrawText(HDC hdc, GUI_TEXT text, int scrW, int scrH) {
-    text.size = text.size * min(scrW / 5, scrH) / 100;
+    text.size = text.size * min(scrW / 6, scrH) / 100;
 
     HFONT hFont = CreateFont(
         text.size, 0, 0, 0, FW_DONTCARE, FALSE, FALSE, FALSE,
@@ -288,6 +288,10 @@ void OSDoAfterMillis(const unsigned int id, const unsigned int millis, void (*fu
 
 void OSKillTimer(const unsigned int id) {
     KillTimer(hwnd, id);
+}
+
+void OSDestroyButtonById(const unsigned int id) {
+    DestroyWindow(GetDlgItem(hwnd, id));
 }
 
 int GetRefreshRate() {

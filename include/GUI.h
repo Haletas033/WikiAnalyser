@@ -13,7 +13,7 @@
 #define IDT_DO_AFTER_4 5
 #define IDT_DO_AFTER_5 6
 
-#define OPTION(i) i+6
+
 
 typedef struct GUI_RECT { int x, y, w, h; } GUI_RECT;
 
@@ -76,6 +76,9 @@ COLOUR_POINT* DrawPermanentPoint(COLOUR_POINT colourPoint);
 GUI_TEXT* DrawPermanentText(GUI_TEXT text);
 GUI_IMAGE* DrawPermanentImage(GUI_IMAGE image);
 GUI_BUTTON_LIKE* DrawPermanentButton(GUI_BUTTON_LIKE button);
+GUI_RECT GetButtonPos(int totalButtons, GUI_POINT center, int buttonSize, int buttonNumber);
+
+void ClearGUI(PaintStacks* paintStacks, DO_AFTER_ENTRY* doAfters[5], BUTTON_COMMAND_ENTRY* buttonCommands[32]);
 
 void GUIStart();
 

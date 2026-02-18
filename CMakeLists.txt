@@ -47,46 +47,40 @@ else ()
 endif()
 
 if (WIN32)
-    set(SRC
-            src/main.c
-            src/core/articleParser.c
-            src/core/article.c
-            src/core/cleanup.c
-            src/core/unwanted.c
-            src/GUI.c
+    set(OS_SRC
             src/WINGUI.c
     )
-    set(INCLUDE
-            include/core/articleParser.h
-            include/core/article.h
-            include/core/cleanup.h
-            include/core/unwanted.h
-            include/GUI.h
+    set(OS_INCLUDE
             include/WINGUI.h
     )
 else()
-    set(SRC
-            src/main.c
-            src/core/articleParser.c
-            src/core/article.c
-            src/core/cleanup.c
-            src/core/unwanted.c
-            src/GUI.c
+    set(OS_SRC
             src/LINUXGUI.c
     )
-    set(INCLUDE
-            include/core/articleParser.h
-            include/core/article.h
-            include/core/cleanup.h
-            include/core/unwanted.h
-            include/GUI.h
+    set(OS_INCLUDE
             include/LINUXGUI.h
     )
 endif()
 
 add_executable(WikiAnalyser
-        ${SRC}
-        ${INCLUDE}
+        ${OS_SRC}
+        ${OS_INCLUDE}
+        src/main.c
+        src/core/articleParser.c
+        src/core/article.c
+        src/core/cleanup.c
+        src/core/unwanted.c
+        src/GUI.c
+        src/welcomeGUI.c
+
+        include/core/articleParser.h
+        include/core/article.h
+        include/core/cleanup.h
+        include/core/unwanted.h
+        include/GUI.h
+        include/welcomeGUI.h
+
+
 )
 
 add_dependencies(WikiAnalyser ZigTarget)

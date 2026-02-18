@@ -39,6 +39,7 @@ void OSDrawButtonLike(GUI_BUTTON_LIKE button, int scrW, int scrH);
 //Misc
 void OSDoAfterMillis(unsigned int id, unsigned int millis, void (*func)(void));
 void OSKillTimer(unsigned int id);
+void OSDestroyButtonById(unsigned int id);
 int GetRefreshRate();
 
 
