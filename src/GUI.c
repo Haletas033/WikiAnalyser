@@ -21,13 +21,13 @@ DO_AFTER_ENTRY doAfters[5] = {0};
 BUTTON_COMMAND_ENTRY buttonCommands[32] = {0};
 
 //Draw functions that add themselves to paintStacks until manually removed
-COLOUR_RECT* DrawPermanentRect(COLOUR_RECT colourRect) {
-    paintStacks.colourRectsSize++;
-    COLOUR_RECT* tmp = realloc(paintStacks.colourRects, paintStacks.colourRectsSize*sizeof(COLOUR_RECT));
+COLOUR_RECT* DrawPermanentRect(COLOUR_RECT colourRect, PaintStacks* ps) {
+    ps->colourRectsSize++;
+    COLOUR_RECT* tmp = realloc(ps->colourRects, ps->colourRectsSize*sizeof(COLOUR_RECT));
     if (!tmp) { return NULL; }
-    paintStacks.colourRects = tmp;
-    paintStacks.colourRects[paintStacks.colourRectsSize-1] = colourRect;
-    return &paintStacks.colourRects[paintStacks.colourRectsSize-1];
+    ps->colourRects = tmp;
+    ps->colourRects[ps->colourRectsSize-1] = colourRect;
+    return &ps->colourRects[ps->colourRectsSize-1];
 }
 
 COLOUR_LINE* DrawPermanentLine(COLOUR_LINE colourLine) {
@@ -93,7 +93,7 @@ GUI_BUTTON_LIKE* DrawPermanentButton(GUI_BUTTON_LIKE button){
 
 GUI_RECT GetButtonPos(const int totalButtons, const GUI_POINT center, const int buttonSize, const int buttonNumber) {
     const int t = totalButtons*buttonSize;
-    const GUI_POINT start = (GUI_POINT){center.x-t/2, center.y};
+    const GUI_POINT start = (GUI_POINT){center.x-t/2, center.y}; 
     return (GUI_RECT){start.x+(buttonNumber*buttonSize)-buttonSize, start.y, buttonSize, buttonSize};
 }
 
@@ -104,7 +104,8 @@ void ClearGUI(PaintStacks* paintStacks, DO_AFTER_ENTRY* doAfters[5], BUTTON_COMM
 }
 
 void GUIStart() {
-    WelcomeGUI();
+    DrawPermanentRect((COLOUR_RECT){0,0, 100, 100, 255, 0, 0}, &paintStacks);
+    //WelcomeGUI();
 }
 
 void GUILoop() {

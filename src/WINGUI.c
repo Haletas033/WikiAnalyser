@@ -10,6 +10,7 @@
 
 const wchar_t CLASS_NAME[] = L"WINDOW CLASS";
 WNDCLASS wc = {};
+HWND rootHwnd;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
@@ -44,27 +45,29 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             //Clear Background
             FillRect(memDC, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW+1));
 
+            const PaintStacks* hwndPaintStacks = (PaintStacks*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+
             int i;
-            for (i = 0; i < paintStacks.buttonsSize; i++)
-                OSDrawButtonLike(paintStacks.buttons[i], windowWidth, windowHeight);
+            for (i = 0; i < hwndPaintStacks->buttonsSize; i++)
+                OSDrawButtonLike(hwndPaintStacks->buttons[i], windowWidth, windowHeight);
 
-            for (i = 0; i < paintStacks.imagesSize; i++)
-                OSDrawImage(memDC, paintStacks.images[i], windowWidth, windowHeight);
+            for (i = 0; i < hwndPaintStacks->imagesSize; i++)
+                OSDrawImage(memDC, hwndPaintStacks->images[i], windowWidth, windowHeight);
 
-            for (i = 0; i < paintStacks.colourRectsSize; i++)
-                OSDrawRect(memDC, paintStacks.colourRects[i], windowWidth, windowHeight);
+            for (i = 0; i < hwndPaintStacks->colourRectsSize; i++)
+                OSDrawRect(memDC, hwndPaintStacks->colourRects[i], windowWidth, windowHeight);
 
-            for (i = 0; i < paintStacks.colourLinesSize; i++)
-                OSDrawLine(memDC, paintStacks.colourLines[i], windowWidth, windowHeight);
+            for (i = 0; i < hwndPaintStacks->colourLinesSize; i++)
+                OSDrawLine(memDC, hwndPaintStacks->colourLines[i], windowWidth, windowHeight);
 
-            for (i = 0; i < paintStacks.colourLinesChainsSize; i++)
-                OSDrawLineChain(memDC, paintStacks.colourLineChains[i], windowWidth,windowHeight);
+            for (i = 0; i < hwndPaintStacks->colourLinesChainsSize; i++)
+                OSDrawLineChain(memDC, hwndPaintStacks->colourLineChains[i], windowWidth,windowHeight);
 
-            for (i = 0; i < paintStacks.colourPointsSize; i++)
-                OSDrawPoint(memDC, paintStacks.colourPoints[i], windowWidth, windowHeight);
+            for (i = 0; i < hwndPaintStacks->colourPointsSize; i++)
+                OSDrawPoint(memDC, hwndPaintStacks->colourPoints[i], windowWidth, windowHeight);
 
-            for (i = 0; i < paintStacks.textsSize; i++)
-                OSDrawText(memDC, paintStacks.texts[i], windowWidth, windowHeight);
+            for (i = 0; i < hwndPaintStacks->textsSize; i++)
+                OSDrawText(memDC, hwndPaintStacks->texts[i], windowWidth, windowHeight);
 
 
 
@@ -74,8 +77,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             DeleteDC(memDC);
 
             EndPaint(hwnd, &ps);
-            return 0;
         }
+        return 0;
+
         default:
             return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
@@ -92,9 +96,8 @@ void OSCreateWindowClass() {
     RegisterClass(&wc);
 }
 
-HWND hwnd;
-void OSCreateWindow() {
-    hwnd = CreateWindowEx(
+void OSCreateWindow(PaintStacks* ps) {
+    rootHwnd = CreateWindowEx(
         0,
         CLASS_NAME,
         "WikiAnalyser",
@@ -106,14 +109,15 @@ void OSCreateWindow() {
         NULL
     );
 
-    if (hwnd == NULL)
-    {
+    if (rootHwnd == NULL) {
         return;
     }
 
-    SetTimer(hwnd, 1, min(1000 / 120, 1000 / GetRefreshRate()), NULL);
+    SetWindowLongPtr(rootHwnd, GWLP_USERDATA, (LONG_PTR)ps);
 
-    ShowWindow(hwnd, 1);
+    SetTimer(rootHwnd, 1, min(1000 / 120, 1000 / GetRefreshRate()), NULL);
+
+    ShowWindow(rootHwnd, 1);
 }
 
 void OSMessageLoop() {
@@ -125,6 +129,24 @@ void OSMessageLoop() {
     }
 }
 
+void* OSCreateChildWindow(const unsigned int id, const char* name, PaintStacks* ps) {
+    HWND windowHwnd = CreateWindowEx(
+        0,
+        CLASS_NAME,
+        name,
+        WS_CHILD | WS_VISIBLE,
+        0, 0, 100, 100,
+        rootHwnd,
+        (HMENU)id,
+        wc.hInstance,
+        NULL
+    );
+
+    SetWindowLongPtr(windowHwnd, GWLP_USERDATA, (LONG_PTR)ps);
+
+    return windowHwnd;
+}
+
 void* OSCreateButton(const unsigned int id, void (*func)(void)) {
     HWND buttonHwnd = CreateWindowEx(
         0,
@@ -132,7 +154,7 @@ void* OSCreateButton(const unsigned int id, void (*func)(void)) {
         "",
         WS_TABSTOP | WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
         0,0,0,0,
-        hwnd,
+        rootHwnd,
         (HMENU)id,
         wc.hInstance,
         NULL
@@ -148,7 +170,7 @@ void* OSCreateCheckBox(const unsigned int id, void (*func)(void)) {
         "",
         WS_TABSTOP | WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
         0,0,0,0,
-        hwnd,
+        rootHwnd,
         (HMENU)id,
         wc.hInstance,
         NULL
@@ -283,15 +305,15 @@ void OSDrawButtonLike(GUI_BUTTON_LIKE button, int scrW, int scrH) {
 
 void OSDoAfterMillis(const unsigned int id, const unsigned int millis, void (*func)(void)) {
     doAfters[id - 1].doAfterFunc = func;
-    SetTimer(hwnd, id, millis, NULL);
+    SetTimer(rootHwnd, id, millis, NULL);
 }
 
 void OSKillTimer(const unsigned int id) {
-    KillTimer(hwnd, id);
+    KillTimer(rootHwnd, id);
 }
 
 void OSDestroyButtonById(const unsigned int id) {
-    DestroyWindow(GetDlgItem(hwnd, id));
+    DestroyWindow(GetDlgItem(rootHwnd, id));
 }
 
 int GetRefreshRate() {

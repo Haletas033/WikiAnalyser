@@ -19,11 +19,12 @@ extern HWND hwnd;
 
 //Setup, Loop and Destroy
 void OSCreateWindowClass();
-void OSCreateWindow();
+void OSCreateWindow(PaintStacks* ps);
 void OSMessageLoop();
 
 //Creation functions
 void* OSCreateImage(const char* imgPath);
+void* OSCreateChildWindow(unsigned int id, const char* name, PaintStacks* ps);
 void* OSCreateButton(unsigned int id, void (*func)(void));
 void* OSCreateCheckBox(unsigned int id, void (*func)(void));
 

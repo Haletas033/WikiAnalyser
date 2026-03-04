@@ -69,7 +69,16 @@ extern PaintStacks paintStacks;
 extern DO_AFTER_ENTRY doAfters[5];
 extern BUTTON_COMMAND_ENTRY buttonCommands[32];
 
-COLOUR_RECT* DrawPermanentRect(COLOUR_RECT colourRect);
+typedef struct Window {
+    GUI_RECT windowRect;
+    PaintStacks paintStacks;
+} Window;
+
+typedef struct Layout {
+    Window* windows;
+} Layout;
+
+COLOUR_RECT* DrawPermanentRect(COLOUR_RECT colourRect, PaintStacks* ps);
 COLOUR_LINE* DrawPermanentLine(COLOUR_LINE colourLine);
 COLOUR_LINE_CHAIN* DrawPermanentLineChain(COLOUR_LINE_CHAIN colourLineChain);
 COLOUR_POINT* DrawPermanentPoint(COLOUR_POINT colourPoint);

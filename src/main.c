@@ -63,7 +63,10 @@ int main() {
     }
 
     OSCreateWindowClass();
-    OSCreateWindow();
+    OSCreateWindow(&paintStacks);
+    PaintStacks stack = {0};
+    DrawPermanentRect((COLOUR_RECT){0, 0, 50, 50, 0, 0, 255}, &stack);
+    OSCreateChildWindow(42, "Menu", &stack);
     GUIStart();
     OSMessageLoop();
 
