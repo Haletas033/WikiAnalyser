@@ -85,28 +85,28 @@ void openMainGUI() {
     destroyWelcomeGUI();
 }
 
-void createButtons() {
+void createButtons(Window* wnd) {
     switch (dialoguePos) {
         case WIKI_OPTION(WIKI_FULL): DrawPermanentButton((GUI_BUTTON_LIKE){"Full", GetButtonPos(4,
-            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 1), OSCreateButton(1, downloadFullWikipediaDump)});
+            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 1), OSCreateButton(1, downloadFullWikipediaDump)}, wnd);
             break;
         case WIKI_OPTION(WIKI_TOP_N): DrawPermanentButton((GUI_BUTTON_LIKE){"Top n", GetButtonPos(4,
-            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 2), OSCreateButton(2, downloadTopNWikipediaDump)});
+            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 2), OSCreateButton(2, downloadTopNWikipediaDump)}, wnd);
             break;
         case WIKI_OPTION(WIKI_CUSTOM): DrawPermanentButton((GUI_BUTTON_LIKE){"Custom", GetButtonPos(4,
-            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 3), OSCreateButton(3, downloadCustomWikipediaDump)});
+            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 3), OSCreateButton(3, downloadCustomWikipediaDump)}, wnd);
             break;
         case WIKI_OPTION(WIKI_OPEN): DrawPermanentButton((GUI_BUTTON_LIKE){"Open", GetButtonPos(4,
-            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 4), OSCreateButton(4, openWikipediaDump)});
+            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 4), OSCreateButton(4, openWikipediaDump)}, wnd);
             break;
         case ZIG_OPTION(ZIG_DOWNLOAD): DrawPermanentButton((GUI_BUTTON_LIKE){"Download", GetButtonPos(2,
-            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 1), OSCreateButton(1, downloadZig)});
+            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 1), OSCreateButton(1, downloadZig)}, wnd);
             break;
         case ZIG_OPTION(ZIG_OPEN): DrawPermanentButton((GUI_BUTTON_LIKE){"Open", GetButtonPos(2,
-            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 2), OSCreateButton(2, openZig)});
+            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 2), OSCreateButton(2, openZig)}, wnd);
             break;
         case FINISH_SETUP: DrawPermanentButton((GUI_BUTTON_LIKE){"OK", GetButtonPos(1,
-            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 1), OSCreateButton(1, openMainGUI)});
+            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 1), OSCreateButton(1, openMainGUI)}, wnd);
             break;
         default: break;
     }
@@ -132,10 +132,10 @@ void animateText() {
     }
 }
 
-void changeGreetingText() {
+void changeGreetingText(Window* wnd) {
     if (animDone) {
         animDone = 0;
-        createButtons();
+        createButtons(wnd);
         if (dialoguePos < WELCOME_TEXT_END)
             OSDoAfterMillis(IDT_DO_AFTER_2, TYPING_SPEED, animateText);
         OSKillTimer(IDT_DO_AFTER);
@@ -156,20 +156,20 @@ void changePerformCheckText() {
     }
 }
 
-void changeFailureText() {
+void changeFailureText(Window* wnd) {
     if (animDone) {
         animDone = 0;
-        createButtons();
+        createButtons(wnd);
         if (dialoguePos < ZIG_OPTIONS_TEXT_END)
             OSDoAfterMillis(IDT_DO_AFTER_2, TYPING_SPEED, animateText);
         OSKillTimer(IDT_DO_AFTER);
     }
 }
 
-void changeSuccessText() {
+void changeSuccessText(Window* wnd) {
     if (animDone) {
         animDone = 0;
-        createButtons();
+        createButtons(wnd);
         if (dialoguePos < SUCCESS_TEXT_END)
             OSDoAfterMillis(IDT_DO_AFTER_2, TYPING_SPEED, animateText);
         OSKillTimer(IDT_DO_AFTER);
@@ -183,19 +183,19 @@ void deleteButtons() {
     OSDestroyButtonById(4);
 }
 
-void failureOptions() {
+void failureOptions(Window* wnd) {
     animDone = 1;
     dialoguePos = ZIG_OPTIONS_TEXT_START;
     changeTextFunc = changeFailureText;
-    changeFailureText();
+    changeFailureText(wnd);
 }
 
-void success() {
+void success(Window* wnd) {
     animDone = 1;
     deleteButtons();
     dialoguePos = SUCCESS_TEXT_START;
     changeTextFunc = changeSuccessText;
-    changeSuccessText();
+    changeSuccessText(wnd);
 }
 
 void performCheckText() {
@@ -205,7 +205,7 @@ void performCheckText() {
     changePerformCheckText();
 }
 
-void WelcomeGUI() {
-    greetingText = DrawPermanentText((GUI_TEXT){"", 50, 50, 14});
-    changeGreetingText();
+void WelcomeGUI(Window* wnd) {
+    greetingText = DrawPermanentText((GUI_TEXT){"", 50, 50, 14}, wnd);
+    changeGreetingText(wnd);
 }

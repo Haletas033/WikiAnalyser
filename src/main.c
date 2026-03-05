@@ -62,12 +62,14 @@ int main() {
         zigPrintTest(&articles[i]);
     }
 
+    Window window = {(GUI_RECT){0,0,0,0}, paintStacks};
+
     OSCreateWindowClass();
-    OSCreateWindow(&paintStacks);
-    PaintStacks stack = {0};
-    DrawPermanentRect((COLOUR_RECT){0, 0, 50, 50, 0, 0, 255}, &stack);
-    OSCreateChildWindow(42, "Menu", &stack);
-    GUIStart();
+    OSCreateWindow(&window);
+    Window childWnd = {0};
+    DrawPermanentRect((COLOUR_RECT){0, 0, 50, 50, 0, 0, 255}, &childWnd);
+    OSCreateChildWindow(42, "Menu", &childWnd);
+    GUIStart(&window);
     OSMessageLoop();
 
     return 0;

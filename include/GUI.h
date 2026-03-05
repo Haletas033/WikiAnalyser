@@ -78,18 +78,18 @@ typedef struct Layout {
     Window* windows;
 } Layout;
 
-COLOUR_RECT* DrawPermanentRect(COLOUR_RECT colourRect, PaintStacks* ps);
-COLOUR_LINE* DrawPermanentLine(COLOUR_LINE colourLine);
-COLOUR_LINE_CHAIN* DrawPermanentLineChain(COLOUR_LINE_CHAIN colourLineChain);
-COLOUR_POINT* DrawPermanentPoint(COLOUR_POINT colourPoint);
-GUI_TEXT* DrawPermanentText(GUI_TEXT text);
-GUI_IMAGE* DrawPermanentImage(GUI_IMAGE image);
-GUI_BUTTON_LIKE* DrawPermanentButton(GUI_BUTTON_LIKE button);
+COLOUR_RECT* DrawPermanentRect(COLOUR_RECT colourRect, Window* wnd);
+COLOUR_LINE* DrawPermanentLine(COLOUR_LINE colourLine, Window* wnd);
+COLOUR_LINE_CHAIN* DrawPermanentLineChain(COLOUR_LINE_CHAIN colourLineChain, Window* wnd);
+COLOUR_POINT* DrawPermanentPoint(COLOUR_POINT colourPoint, Window* wnd);
+GUI_TEXT* DrawPermanentText(GUI_TEXT text, Window* wnd);
+GUI_IMAGE* DrawPermanentImage(GUI_IMAGE image, Window* wnd);
+GUI_BUTTON_LIKE* DrawPermanentButton(GUI_BUTTON_LIKE button, Window* wnd);
 GUI_RECT GetButtonPos(int totalButtons, GUI_POINT center, int buttonSize, int buttonNumber);
 
 void ClearGUI(PaintStacks* paintStacks, DO_AFTER_ENTRY* doAfters[5], BUTTON_COMMAND_ENTRY* buttonCommands[32]);
 
-void GUIStart();
+void GUIStart(Window* wnd);
 
 void GUILoop();
 

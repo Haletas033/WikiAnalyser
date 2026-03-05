@@ -96,7 +96,7 @@ void OSCreateWindowClass() {
     RegisterClass(&wc);
 }
 
-void OSCreateWindow(PaintStacks* ps) {
+void OSCreateWindow(Window* wnd) {
     rootHwnd = CreateWindowEx(
         0,
         CLASS_NAME,
@@ -113,7 +113,7 @@ void OSCreateWindow(PaintStacks* ps) {
         return;
     }
 
-    SetWindowLongPtr(rootHwnd, GWLP_USERDATA, (LONG_PTR)ps);
+    SetWindowLongPtr(rootHwnd, GWLP_USERDATA, (LONG_PTR)&wnd->paintStacks);
 
     SetTimer(rootHwnd, 1, min(1000 / 120, 1000 / GetRefreshRate()), NULL);
 
@@ -129,7 +129,7 @@ void OSMessageLoop() {
     }
 }
 
-void* OSCreateChildWindow(const unsigned int id, const char* name, PaintStacks* ps) {
+void* OSCreateChildWindow(const unsigned int id, const char* name, Window* wnd) {
     HWND windowHwnd = CreateWindowEx(
         0,
         CLASS_NAME,
@@ -142,7 +142,7 @@ void* OSCreateChildWindow(const unsigned int id, const char* name, PaintStacks* 
         NULL
     );
 
-    SetWindowLongPtr(windowHwnd, GWLP_USERDATA, (LONG_PTR)ps);
+    SetWindowLongPtr(windowHwnd, GWLP_USERDATA, (LONG_PTR)&wnd->paintStacks);
 
     return windowHwnd;
 }

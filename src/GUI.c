@@ -21,29 +21,29 @@ DO_AFTER_ENTRY doAfters[5] = {0};
 BUTTON_COMMAND_ENTRY buttonCommands[32] = {0};
 
 //Draw functions that add themselves to paintStacks until manually removed
-COLOUR_RECT* DrawPermanentRect(COLOUR_RECT colourRect, PaintStacks* ps) {
-    ps->colourRectsSize++;
-    COLOUR_RECT* tmp = realloc(ps->colourRects, ps->colourRectsSize*sizeof(COLOUR_RECT));
+COLOUR_RECT* DrawPermanentRect(COLOUR_RECT colourRect, Window* wnd) {
+    wnd->paintStacks.colourRectsSize++;
+    COLOUR_RECT* tmp = realloc(wnd->paintStacks.colourRects, wnd->paintStacks.colourRectsSize*sizeof(COLOUR_RECT));
     if (!tmp) { return NULL; }
-    ps->colourRects = tmp;
-    ps->colourRects[ps->colourRectsSize-1] = colourRect;
-    return &ps->colourRects[ps->colourRectsSize-1];
+    wnd->paintStacks.colourRects = tmp;
+    wnd->paintStacks.colourRects[wnd->paintStacks.colourRectsSize-1] = colourRect;
+    return &wnd->paintStacks.colourRects[wnd->paintStacks.colourRectsSize-1];
 }
 
-COLOUR_LINE* DrawPermanentLine(COLOUR_LINE colourLine) {
-    paintStacks.colourLinesSize++;
-    COLOUR_LINE* tmp = realloc(paintStacks.colourLines, paintStacks.colourLinesSize*sizeof(COLOUR_LINE));
+COLOUR_LINE* DrawPermanentLine(COLOUR_LINE colourLine, Window* wnd) {
+    wnd->paintStacks.colourLinesSize++;
+    COLOUR_LINE* tmp = realloc(wnd->paintStacks.colourLines, wnd->paintStacks.colourLinesSize*sizeof(COLOUR_LINE));
     if (!tmp) { return NULL; }
-    paintStacks.colourLines = tmp;
-    paintStacks.colourLines[paintStacks.colourLinesSize-1] = colourLine;
-    return &paintStacks.colourLines[paintStacks.colourLinesSize-1];
+    wnd->paintStacks.colourLines = tmp;
+    wnd->paintStacks.colourLines[wnd->paintStacks.colourLinesSize-1] = colourLine;
+    return &wnd->paintStacks.colourLines[wnd->paintStacks.colourLinesSize-1];
 }
 
-COLOUR_LINE_CHAIN* DrawPermanentLineChain(COLOUR_LINE_CHAIN colourLineChain) {
-    paintStacks.colourLinesChainsSize++;
-    COLOUR_LINE_CHAIN* tmp = realloc(paintStacks.colourLineChains, paintStacks.colourLinesChainsSize*sizeof(COLOUR_LINE_CHAIN));
+COLOUR_LINE_CHAIN* DrawPermanentLineChain(COLOUR_LINE_CHAIN colourLineChain, Window* wnd) {
+    wnd->paintStacks.colourLinesChainsSize++;
+    COLOUR_LINE_CHAIN* tmp = realloc(wnd->paintStacks.colourLineChains, wnd->paintStacks.colourLinesChainsSize*sizeof(COLOUR_LINE_CHAIN));
     if (!tmp) { return NULL; }
-    paintStacks.colourLineChains = tmp;
+    wnd->paintStacks.colourLineChains = tmp;
 
     //Deep copy points
     GUI_POINT* points = malloc(colourLineChain.linePath.pointsSize * sizeof(GUI_POINT));
@@ -51,44 +51,44 @@ COLOUR_LINE_CHAIN* DrawPermanentLineChain(COLOUR_LINE_CHAIN colourLineChain) {
     memcpy(points, colourLineChain.linePath.points, colourLineChain.linePath.pointsSize * sizeof(GUI_POINT));
     colourLineChain.linePath.points = points;
 
-    paintStacks.colourLineChains[paintStacks.colourLinesChainsSize-1] = colourLineChain;
-    return &paintStacks.colourLineChains[paintStacks.colourLinesChainsSize-1];
+    wnd->paintStacks.colourLineChains[wnd->paintStacks.colourLinesChainsSize-1] = colourLineChain;
+    return &wnd->paintStacks.colourLineChains[wnd->paintStacks.colourLinesChainsSize-1];
 }
 
-COLOUR_POINT* DrawPermanentPoint(COLOUR_POINT colourPoint) {
-    paintStacks.colourPointsSize++;
-    COLOUR_POINT* tmp = realloc(paintStacks.colourPoints, paintStacks.colourPointsSize*sizeof(COLOUR_POINT));
+COLOUR_POINT* DrawPermanentPoint(COLOUR_POINT colourPoint, Window* wnd) {
+    wnd->paintStacks.colourPointsSize++;
+    COLOUR_POINT* tmp = realloc(wnd->paintStacks.colourPoints, wnd->paintStacks.colourPointsSize*sizeof(COLOUR_POINT));
     if (!tmp) { return NULL; }
-    paintStacks.colourPoints = tmp;
-    paintStacks.colourPoints[paintStacks.colourPointsSize-1] = colourPoint;
-    return &paintStacks.colourPoints[paintStacks.colourPointsSize-1];
+    wnd->paintStacks.colourPoints = tmp;
+    wnd->paintStacks.colourPoints[wnd->paintStacks.colourPointsSize-1] = colourPoint;
+    return &wnd->paintStacks.colourPoints[wnd->paintStacks.colourPointsSize-1];
 }
 
-GUI_TEXT* DrawPermanentText(GUI_TEXT text) {
-    paintStacks.textsSize++;
-    GUI_TEXT* tmp = realloc(paintStacks.texts, paintStacks.textsSize*sizeof(GUI_TEXT));
+GUI_TEXT* DrawPermanentText(GUI_TEXT text, Window* wnd) {
+    wnd->paintStacks.textsSize++;
+    GUI_TEXT* tmp = realloc(wnd->paintStacks.texts, wnd->paintStacks.textsSize*sizeof(GUI_TEXT));
     if (!tmp) { return NULL; }
-    paintStacks.texts = tmp;
-    paintStacks.texts[paintStacks.textsSize-1] = text;
-    return &paintStacks.texts[paintStacks.textsSize-1];
+    wnd->paintStacks.texts = tmp;
+    wnd->paintStacks.texts[wnd->paintStacks.textsSize-1] = text;
+    return &wnd->paintStacks.texts[wnd->paintStacks.textsSize-1];
 }
 
-GUI_IMAGE* DrawPermanentImage(GUI_IMAGE image) {
-    paintStacks.imagesSize++;
-    GUI_IMAGE* tmp = realloc(paintStacks.images, paintStacks.imagesSize*sizeof(GUI_IMAGE));
+GUI_IMAGE* DrawPermanentImage(GUI_IMAGE image, Window* wnd) {
+    wnd->paintStacks.imagesSize++;
+    GUI_IMAGE* tmp = realloc(wnd->paintStacks.images, wnd->paintStacks.imagesSize*sizeof(GUI_IMAGE));
     if (!tmp) { return NULL; }
-    paintStacks.images = tmp;
-    paintStacks.images[paintStacks.imagesSize-1] = image;
-    return &paintStacks.images[paintStacks.imagesSize-1];
+    wnd->paintStacks.images = tmp;
+    wnd->paintStacks.images[wnd->paintStacks.imagesSize-1] = image;
+    return &wnd->paintStacks.images[wnd->paintStacks.imagesSize-1];
 }
 
-GUI_BUTTON_LIKE* DrawPermanentButton(GUI_BUTTON_LIKE button){
-    paintStacks.buttonsSize++;
-    GUI_BUTTON_LIKE* tmp = realloc(paintStacks.buttons, paintStacks.buttonsSize*sizeof(GUI_BUTTON_LIKE));
+GUI_BUTTON_LIKE* DrawPermanentButton(GUI_BUTTON_LIKE button, Window* wnd){
+    wnd->paintStacks.buttonsSize++;
+    GUI_BUTTON_LIKE* tmp = realloc(wnd->paintStacks.buttons, wnd->paintStacks.buttonsSize*sizeof(GUI_BUTTON_LIKE));
     if (!tmp) { return NULL; }
-    paintStacks.buttons = tmp;
-    paintStacks.buttons[paintStacks.buttonsSize-1] = button;
-    return &paintStacks.buttons[paintStacks.buttonsSize-1];
+    wnd->paintStacks.buttons = tmp;
+    wnd->paintStacks.buttons[wnd->paintStacks.buttonsSize-1] = button;
+    return &wnd->paintStacks.buttons[wnd->paintStacks.buttonsSize-1];
 }
 
 GUI_RECT GetButtonPos(const int totalButtons, const GUI_POINT center, const int buttonSize, const int buttonNumber) {
@@ -103,9 +103,8 @@ void ClearGUI(PaintStacks* paintStacks, DO_AFTER_ENTRY* doAfters[5], BUTTON_COMM
     *buttonCommands = NULL;
 }
 
-void GUIStart() {
-    DrawPermanentRect((COLOUR_RECT){0,0, 100, 100, 255, 0, 0}, &paintStacks);
-    //WelcomeGUI();
+void GUIStart(Window* wnd) {
+    WelcomeGUI(wnd);
 }
 
 void GUILoop() {

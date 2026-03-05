@@ -30,6 +30,6 @@
 #include "../include/WINGUI.h"
 #endif
 
-void WelcomeGUI();
+void WelcomeGUI(Window* wnd);
 
 #endif //WELCOMEGUI_H
