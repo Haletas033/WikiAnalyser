@@ -25,8 +25,8 @@ void OSMessageLoop();
 //Creation functions
 void* OSCreateImage(const char* imgPath);
 void* OSCreateChildWindow(unsigned int id, const char* name, Window* wnd);
-void* OSCreateButton(unsigned int id, void (*func)(void));
-void* OSCreateCheckBox(unsigned int id, void (*func)(void));
+void* OSCreateButton(unsigned int id, void (*func)(Window* wnd), Window* wnd);
+void* OSCreateCheckBox(unsigned int id, void (*func)(Window* wnd), Window* wnd);
 
 //Drawing functions
 void OSDrawRect(HDC hdc, COLOUR_RECT colourRect, int scrW, int scrH);
@@ -35,12 +35,13 @@ void OSDrawLineChain(HDC hdc, COLOUR_LINE_CHAIN colourLineChain, int scrW, int s
 void OSDrawPoint(HDC hdc, COLOUR_POINT colourPoint, int scrW, int scrH);
 void OSDrawText(HDC hdc, GUI_TEXT text, int scrW, int scrH);
 void OSDrawImage(HDC hdc, GUI_IMAGE image, int scrWm, int scrH);
+void OSDrawChildWindow(Window wnd, int scrW, int scrH);
 void OSDrawButtonLike(GUI_BUTTON_LIKE button, int scrW, int scrH);
 
 //Misc
-void OSDoAfterMillis(unsigned int id, unsigned int millis, void (*func)(void));
-void OSKillTimer(unsigned int id);
-void OSDestroyButtonById(unsigned int id);
+void OSDoAfterMillis(Window* wnd, unsigned int id, unsigned int millis, void (*func)(Window* wnd));
+void OSKillTimer(const Window* wnd,  unsigned int id);
+void OSDestroyButtonById(const Window* wnd,  unsigned int id);
 int GetRefreshRate();
 
 

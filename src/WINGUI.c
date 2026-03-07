@@ -6,8 +6,6 @@
 
 #include <stdio.h>
 
-;
-
 const wchar_t CLASS_NAME[] = L"WINDOW CLASS";
 WNDCLASS wc = {};
 HWND rootHwnd;
@@ -21,12 +19,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             if (wParam == 1) {
                 InvalidateRect(hwnd, NULL, FALSE);
             } else {
-                doAfters[wParam - 1].doAfterFunc();
+                doAfters[wParam - 1].doAfterFunc(doAfters[wParam - 1].wnd);
             }
             return 0;
         case WM_COMMAND:
             if (wParam <= 32) {
-                buttonCommands[wParam-1].buttonCommand();
+                buttonCommands[wParam-1].buttonCommand(buttonCommands[wParam-1].wnd);
             }
         case WM_PAINT:
         {
@@ -48,6 +46,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             const PaintStacks* hwndPaintStacks = (PaintStacks*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
             int i;
+            for (i = 0; i < hwndPaintStacks->windowsSize; i++)
+                OSDrawChildWindow(hwndPaintStacks->windows[i], windowWidth, windowHeight);
+
             for (i = 0; i < hwndPaintStacks->buttonsSize; i++)
                 OSDrawButtonLike(hwndPaintStacks->buttons[i], windowWidth, windowHeight);
 
@@ -135,7 +136,7 @@ void* OSCreateChildWindow(const unsigned int id, const char* name, Window* wnd) 
         CLASS_NAME,
         name,
         WS_CHILD | WS_VISIBLE,
-        0, 0, 100, 100,
+        0, 0, 0, 0,
         rootHwnd,
         (HMENU)id,
         wc.hInstance,
@@ -144,38 +145,43 @@ void* OSCreateChildWindow(const unsigned int id, const char* name, Window* wnd) 
 
     SetWindowLongPtr(windowHwnd, GWLP_USERDATA, (LONG_PTR)&wnd->paintStacks);
 
+    SetTimer(windowHwnd, 1, min(1000 / 120, 1000 / GetRefreshRate()), NULL);
+
+    wnd->wndHwnd = windowHwnd;
     return windowHwnd;
 }
 
-void* OSCreateButton(const unsigned int id, void (*func)(void)) {
+void* OSCreateButton(const unsigned int id, void (*func)(Window* wnd), Window* wnd) {
     HWND buttonHwnd = CreateWindowEx(
         0,
         "BUTTON",
         "",
         WS_TABSTOP | WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
         0,0,0,0,
-        rootHwnd,
+        wnd->wndHwnd,
         (HMENU)id,
         wc.hInstance,
         NULL
     );
     buttonCommands[id-1].buttonCommand = func;
+    buttonCommands[id-1].wnd = wnd;
     return buttonHwnd;
 }
 
-void* OSCreateCheckBox(const unsigned int id, void (*func)(void)) {
+void* OSCreateCheckBox(const unsigned int id, void (*func)(Window* wnd), Window* wnd) {
     HWND buttonHwnd = CreateWindowEx(
         0,
         "BUTTON",
         "",
         WS_TABSTOP | WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX,
         0,0,0,0,
-        rootHwnd,
+        wnd->wndHwnd,
         (HMENU)id,
         wc.hInstance,
         NULL
     );
     buttonCommands[id-1].buttonCommand = func;
+    buttonCommands[id-1].wnd = wnd;
     return buttonHwnd;
 }
 
@@ -291,6 +297,17 @@ void OSDrawImage(HDC hdc, GUI_IMAGE image, int scrW, int scrH) {
     DeleteDC(imgDC);
 }
 
+void OSDrawChildWindow(Window wnd, int scrW, int scrH) {
+    HWND buttonHwnd = wnd.wndHwnd;
+
+    //Get percentage based x,y,w,h
+    const GUI_POINT start = (GUI_POINT){wnd.windowRect.x * scrW / 100, wnd.windowRect.y * scrH / 100};
+    const GUI_POINT end = (GUI_POINT){wnd.windowRect.w * scrW / 100, wnd.windowRect.h * scrH / 100};
+
+    MoveWindow(buttonHwnd, start.x, start.y, end.x, end.y, TRUE);
+    ShowWindow(buttonHwnd, 1);
+}
+
 void OSDrawButtonLike(GUI_BUTTON_LIKE button, int scrW, int scrH) {
     HWND buttonHwnd = button.buttonLoc;
 
@@ -303,17 +320,18 @@ void OSDrawButtonLike(GUI_BUTTON_LIKE button, int scrW, int scrH) {
     ShowWindow(buttonHwnd, 1);
 }
 
-void OSDoAfterMillis(const unsigned int id, const unsigned int millis, void (*func)(void)) {
+void OSDoAfterMillis(Window* wnd, const unsigned int id, const unsigned int millis, void (*func)(Window* wnd)) {
     doAfters[id - 1].doAfterFunc = func;
-    SetTimer(rootHwnd, id, millis, NULL);
+    doAfters[id - 1].wnd = wnd;
+    SetTimer(wnd->wndHwnd, id, millis, NULL);
 }
 
-void OSKillTimer(const unsigned int id) {
-    KillTimer(rootHwnd, id);
+void OSKillTimer(const Window* wnd, const unsigned int id) {
+    KillTimer(wnd->wndHwnd, id);
 }
 
-void OSDestroyButtonById(const unsigned int id) {
-    DestroyWindow(GetDlgItem(rootHwnd, id));
+void OSDestroyButtonById(const Window* wnd, const unsigned int id) {
+    DestroyWindow(GetDlgItem(wnd->wndHwnd, id));
 }
 
 int GetRefreshRate() {

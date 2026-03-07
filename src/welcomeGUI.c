@@ -46,77 +46,77 @@ enum buttons {
     ZIG_OPEN
 };
 
-void performCheckText();
-void failureOptions();
-void success();
+void performCheckText(Window* wnd);
+void failureOptions(Window* wnd);
+void success(Window* wnd);
 
-void deleteButtons();
-void destroyWelcomeGUI() {
-    deleteButtons();
+void deleteButtons(Window* wnd);
+void destroyWelcomeGUI(Window* wnd) {
+    deleteButtons(wnd);
     ClearGUI(&paintStacks, doAfters, buttonCommands);
 }
 
-void downloadFullWikipediaDump() {
-    performCheckText();
+void downloadFullWikipediaDump(Window* wnd) {
+    performCheckText(wnd);
 }
 
-void downloadTopNWikipediaDump() {
-    performCheckText();
+void downloadTopNWikipediaDump(Window* wnd) {
+    performCheckText(wnd);
 }
 
-void downloadCustomWikipediaDump() {
-    performCheckText();
+void downloadCustomWikipediaDump(Window* wnd) {
+    performCheckText(wnd);
 }
 
-void openWikipediaDump() {
-    performCheckText();
+void openWikipediaDump(Window* wnd) {
+    performCheckText(wnd);
 }
 
-void downloadZig() {
-    success();
+void downloadZig(Window* wnd) {
+    success(wnd);
 }
 
-void openZig() {
-    success();
+void openZig(Window* wnd) {
+    success(wnd);
 }
 
-void openMainGUI() {
+void openMainGUI(Window* wnd) {
     printf("Opening main GUI...\n");
-    destroyWelcomeGUI();
+    destroyWelcomeGUI(wnd);
 }
 
 void createButtons(Window* wnd) {
     switch (dialoguePos) {
         case WIKI_OPTION(WIKI_FULL): DrawPermanentButton((GUI_BUTTON_LIKE){"Full", GetButtonPos(4,
-            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 1), OSCreateButton(1, downloadFullWikipediaDump)}, wnd);
+            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 1), OSCreateButton(1, downloadFullWikipediaDump, wnd)}, wnd);
             break;
         case WIKI_OPTION(WIKI_TOP_N): DrawPermanentButton((GUI_BUTTON_LIKE){"Top n", GetButtonPos(4,
-            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 2), OSCreateButton(2, downloadTopNWikipediaDump)}, wnd);
+            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 2), OSCreateButton(2, downloadTopNWikipediaDump, wnd)}, wnd);
             break;
         case WIKI_OPTION(WIKI_CUSTOM): DrawPermanentButton((GUI_BUTTON_LIKE){"Custom", GetButtonPos(4,
-            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 3), OSCreateButton(3, downloadCustomWikipediaDump)}, wnd);
+            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 3), OSCreateButton(3, downloadCustomWikipediaDump, wnd)}, wnd);
             break;
         case WIKI_OPTION(WIKI_OPEN): DrawPermanentButton((GUI_BUTTON_LIKE){"Open", GetButtonPos(4,
-            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 4), OSCreateButton(4, openWikipediaDump)}, wnd);
+            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 4), OSCreateButton(4, openWikipediaDump, wnd)}, wnd);
             break;
         case ZIG_OPTION(ZIG_DOWNLOAD): DrawPermanentButton((GUI_BUTTON_LIKE){"Download", GetButtonPos(2,
-            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 1), OSCreateButton(1, downloadZig)}, wnd);
+            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 1), OSCreateButton(1, downloadZig, wnd)}, wnd);
             break;
         case ZIG_OPTION(ZIG_OPEN): DrawPermanentButton((GUI_BUTTON_LIKE){"Open", GetButtonPos(2,
-            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 2), OSCreateButton(2, openZig)}, wnd);
+            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 2), OSCreateButton(2, openZig, wnd)}, wnd);
             break;
         case FINISH_SETUP: DrawPermanentButton((GUI_BUTTON_LIKE){"OK", GetButtonPos(1,
-            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 1), OSCreateButton(1, openMainGUI)}, wnd);
+            (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 1), OSCreateButton(1, openMainGUI, wnd)}, wnd);
             break;
         default: break;
     }
 }
 
-void changeGreetingText();
+void changeGreetingText(Window* wnd);
 
-void(*changeTextFunc)(void) = changeGreetingText;
+void(*changeTextFunc)(Window* wnd) = changeGreetingText;
 
-void animateText() {
+void animateText(Window* wnd) {
     static int subStrPos = 1;
     memcpy(subStr, greetingDialogue[dialoguePos], subStrPos);
     subStr[subStrPos] = '\0';
@@ -127,8 +127,8 @@ void animateText() {
         animDone = 1;
         dialoguePos++;
 
-        OSDoAfterMillis(IDT_DO_AFTER, WAIT_AFTER_TEXT, changeTextFunc);
-        OSKillTimer(IDT_DO_AFTER_2);
+        OSDoAfterMillis(wnd, IDT_DO_AFTER, WAIT_AFTER_TEXT, changeTextFunc);
+        OSKillTimer(wnd, IDT_DO_AFTER_2);
     }
 }
 
@@ -137,22 +137,24 @@ void changeGreetingText(Window* wnd) {
         animDone = 0;
         createButtons(wnd);
         if (dialoguePos < WELCOME_TEXT_END)
-            OSDoAfterMillis(IDT_DO_AFTER_2, TYPING_SPEED, animateText);
-        OSKillTimer(IDT_DO_AFTER);
+            OSDoAfterMillis(wnd, IDT_DO_AFTER_2, TYPING_SPEED, animateText);
+
+        OSKillTimer(wnd, IDT_DO_AFTER);
+
     }
 }
 
-void performCheck() {
-    success();
+void performCheck(Window* wnd) {
+    success(wnd);
 }
 
-void changePerformCheckText() {
+void changePerformCheckText(Window* wnd) {
     if (animDone) {
         animDone = 0;
         if (dialoguePos < PERFORM_CHECK_TEXT_END)
-            OSDoAfterMillis(IDT_DO_AFTER_2, TYPING_SPEED, animateText);
-        else performCheck();
-        OSKillTimer(IDT_DO_AFTER);
+            OSDoAfterMillis(wnd, IDT_DO_AFTER_2, TYPING_SPEED, animateText);
+        else performCheck(wnd);
+        OSKillTimer(wnd, IDT_DO_AFTER);
     }
 }
 
@@ -161,8 +163,8 @@ void changeFailureText(Window* wnd) {
         animDone = 0;
         createButtons(wnd);
         if (dialoguePos < ZIG_OPTIONS_TEXT_END)
-            OSDoAfterMillis(IDT_DO_AFTER_2, TYPING_SPEED, animateText);
-        OSKillTimer(IDT_DO_AFTER);
+            OSDoAfterMillis(wnd, IDT_DO_AFTER_2, TYPING_SPEED, animateText);
+        OSKillTimer(wnd, IDT_DO_AFTER);
     }
 }
 
@@ -171,16 +173,16 @@ void changeSuccessText(Window* wnd) {
         animDone = 0;
         createButtons(wnd);
         if (dialoguePos < SUCCESS_TEXT_END)
-            OSDoAfterMillis(IDT_DO_AFTER_2, TYPING_SPEED, animateText);
-        OSKillTimer(IDT_DO_AFTER);
+            OSDoAfterMillis(wnd, IDT_DO_AFTER_2, TYPING_SPEED, animateText);
+        OSKillTimer(wnd, IDT_DO_AFTER);
     }
 }
 
-void deleteButtons() {
-    OSDestroyButtonById(1);
-    OSDestroyButtonById(2);
-    OSDestroyButtonById(3);
-    OSDestroyButtonById(4);
+void deleteButtons(Window* wnd) {
+    OSDestroyButtonById(wnd, 1);
+    OSDestroyButtonById(wnd, 2);
+    OSDestroyButtonById(wnd, 3);
+    OSDestroyButtonById(wnd, 4);
 }
 
 void failureOptions(Window* wnd) {
@@ -192,17 +194,17 @@ void failureOptions(Window* wnd) {
 
 void success(Window* wnd) {
     animDone = 1;
-    deleteButtons();
+    deleteButtons(wnd);
     dialoguePos = SUCCESS_TEXT_START;
     changeTextFunc = changeSuccessText;
     changeSuccessText(wnd);
 }
 
-void performCheckText() {
+void performCheckText(Window* wnd) {
     animDone = 1;
-    deleteButtons();
+    deleteButtons(wnd);
     changeTextFunc = changePerformCheckText;
-    changePerformCheckText();
+    changePerformCheckText(wnd);
 }
 
 void WelcomeGUI(Window* wnd) {

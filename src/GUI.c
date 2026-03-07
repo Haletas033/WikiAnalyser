@@ -82,6 +82,15 @@ GUI_IMAGE* DrawPermanentImage(GUI_IMAGE image, Window* wnd) {
     return &wnd->paintStacks.images[wnd->paintStacks.imagesSize-1];
 }
 
+Window* DrawPermanentWindow(Window wnd, Window* parentWnd) {
+    parentWnd->paintStacks.windowsSize++;
+    Window* tmp = realloc(parentWnd->paintStacks.windows, parentWnd->paintStacks.windowsSize*sizeof(Window));
+    if (!tmp) { return NULL; }
+    parentWnd->paintStacks.windows = tmp;
+    parentWnd->paintStacks.windows[parentWnd->paintStacks.windowsSize-1] = wnd;
+    return &parentWnd->paintStacks.windows[parentWnd->paintStacks.windowsSize-1];
+}
+
 GUI_BUTTON_LIKE* DrawPermanentButton(GUI_BUTTON_LIKE button, Window* wnd){
     wnd->paintStacks.buttonsSize++;
     GUI_BUTTON_LIKE* tmp = realloc(wnd->paintStacks.buttons, wnd->paintStacks.buttonsSize*sizeof(GUI_BUTTON_LIKE));

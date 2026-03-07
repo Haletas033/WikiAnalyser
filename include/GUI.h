@@ -39,13 +39,7 @@ typedef struct COLOUR_LINE_CHAIN { GUI_LINE_CHAIN linePath; COLOUR colour; } COL
 
 typedef struct COLOUR_POINT { GUI_POINT point; int radius; COLOUR colour; } COLOUR_POINT;
 
-typedef struct DO_AFTER_ENTRY {
-    void (*doAfterFunc)(void);
-} DO_AFTER_ENTRY;
-
-typedef struct BUTTON_COMMAND_ENTRY {
-    void (*buttonCommand)(void);
-} BUTTON_COMMAND_ENTRY;
+typedef struct Window Window;
 
 typedef struct PaintStacks {
     COLOUR_RECT* colourRects;
@@ -54,6 +48,7 @@ typedef struct PaintStacks {
     COLOUR_POINT* colourPoints;
     GUI_TEXT* texts;
     GUI_IMAGE* images;
+    Window* windows;
     GUI_BUTTON_LIKE* buttons;
 
     unsigned int colourRectsSize;
@@ -62,17 +57,29 @@ typedef struct PaintStacks {
     unsigned int colourPointsSize;
     unsigned int textsSize;
     unsigned int imagesSize;
+    unsigned int windowsSize;
     unsigned int buttonsSize;
 } PaintStacks;
-
-extern PaintStacks paintStacks;
-extern DO_AFTER_ENTRY doAfters[5];
-extern BUTTON_COMMAND_ENTRY buttonCommands[32];
 
 typedef struct Window {
     GUI_RECT windowRect;
     PaintStacks paintStacks;
+    void* wndHwnd;
 } Window;
+
+typedef struct DO_AFTER_ENTRY {
+    void (*doAfterFunc)(Window* wnd);
+    Window* wnd;
+} DO_AFTER_ENTRY;
+
+typedef struct BUTTON_COMMAND_ENTRY {
+    void (*buttonCommand)(Window* wnd);
+    Window* wnd;
+} BUTTON_COMMAND_ENTRY;
+
+extern PaintStacks paintStacks;
+extern DO_AFTER_ENTRY doAfters[5];
+extern BUTTON_COMMAND_ENTRY buttonCommands[32];
 
 typedef struct Layout {
     Window* windows;
@@ -84,6 +91,7 @@ COLOUR_LINE_CHAIN* DrawPermanentLineChain(COLOUR_LINE_CHAIN colourLineChain, Win
 COLOUR_POINT* DrawPermanentPoint(COLOUR_POINT colourPoint, Window* wnd);
 GUI_TEXT* DrawPermanentText(GUI_TEXT text, Window* wnd);
 GUI_IMAGE* DrawPermanentImage(GUI_IMAGE image, Window* wnd);
+Window* DrawPermanentWindow(Window wnd, Window* parentWnd);
 GUI_BUTTON_LIKE* DrawPermanentButton(GUI_BUTTON_LIKE button, Window* wnd);
 GUI_RECT GetButtonPos(int totalButtons, GUI_POINT center, int buttonSize, int buttonNumber);
 
