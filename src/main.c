@@ -82,11 +82,6 @@ int main() {
     OSCreateChildWindow(42, "Menu", &childWnd3);
     DrawPermanentWindow(childWnd3, &window);
 
-    DrawPermanentRect((COLOUR_RECT){0,0,100,100, 255, 255, 255}, &childWnd);
-    DrawPermanentRect((COLOUR_RECT){0,0,100,100, 255, 255, 255}, &childWnd1);
-    DrawPermanentRect((COLOUR_RECT){0,0,100,100, 255, 255, 255}, &childWnd2);
-    DrawPermanentRect((COLOUR_RECT){0,0,100,100, 255, 255, 255}, &childWnd3);
-
     // GUIStart(&childWnd);
     // GUIStart(&childWnd1);
     // GUIStart(&childWnd2);
