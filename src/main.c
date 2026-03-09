@@ -68,10 +68,28 @@ int main() {
 
     OSCreateWindowClass();
     OSCreateWindow(&window);
-    Window childWnd = {25, 25, 50, 50};
+    Window childWnd = {0, 0, 20, 100};
+    Window childWnd1 = {80, 0, 20, 100};
+    Window childWnd2 = {20, 80, 60, 20};
+    Window childWnd3 = {20, 0, 60, 80};
+
     OSCreateChildWindow(42, "Menu", &childWnd);
     DrawPermanentWindow(childWnd, &window);
-    GUIStart(&childWnd);
+    OSCreateChildWindow(42, "Menu", &childWnd1);
+    DrawPermanentWindow(childWnd1, &window);
+    OSCreateChildWindow(42, "Menu", &childWnd2);
+    DrawPermanentWindow(childWnd2, &window);
+    OSCreateChildWindow(42, "Menu", &childWnd3);
+    DrawPermanentWindow(childWnd3, &window);
+
+    DrawPermanentRect((COLOUR_RECT){0,0,100,100, 255, 255, 255}, &childWnd);
+    DrawPermanentRect((COLOUR_RECT){0,0,100,100, 255, 255, 255}, &childWnd1);
+    DrawPermanentRect((COLOUR_RECT){0,0,100,100, 255, 255, 255}, &childWnd2);
+    DrawPermanentRect((COLOUR_RECT){0,0,100,100, 255, 255, 255}, &childWnd3);
+
+    // GUIStart(&childWnd);
+    // GUIStart(&childWnd1);
+    // GUIStart(&childWnd2);
 
     OSMessageLoop();
 
