@@ -12,9 +12,17 @@ HWND rootHwnd;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
-        case WM_DESTROY:
-            PostQuitMessage(0);
+        case WM_DESTROY: {
+            const PaintStacks* hwndPaintStacks = (PaintStacks*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+            int i;
+            for (i = 0; i < hwndPaintStacks->windowsSize; i++) {
+                free(hwndPaintStacks->windows[i]);
+            }
+
+            if (hwnd == rootHwnd)
+                PostQuitMessage(0);
             return 0;
+        }
         case WM_TIMER:
             if (wParam == 1) {
                 InvalidateRect(hwnd, NULL, FALSE);
@@ -26,8 +34,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             if (wParam <= 32) {
                 buttonCommands[wParam-1].buttonCommand(buttonCommands[wParam-1].wnd);
             }
-        case WM_PAINT:
-        {
+            return 0;
+        case WM_PAINT: {
             RECT windowRect;
             GetClientRect(hwnd, &windowRect);
             const int windowWidth = windowRect.right - windowRect.left;
@@ -119,6 +127,8 @@ void OSCreateWindow(Window* wnd) {
     SetTimer(rootHwnd, 1, min(1000 / 120, 1000 / GetRefreshRate()), NULL);
 
     ShowWindow(rootHwnd, 1);
+
+    wnd->wndHwnd = rootHwnd;
 }
 
 void OSMessageLoop() {
@@ -297,12 +307,12 @@ void OSDrawImage(HDC hdc, GUI_IMAGE image, int scrW, int scrH) {
     DeleteDC(imgDC);
 }
 
-void OSDrawChildWindow(Window wnd, int scrW, int scrH) {
-    HWND buttonHwnd = wnd.wndHwnd;
+void OSDrawChildWindow(Window* wnd, int scrW, int scrH) {
+    HWND buttonHwnd = wnd->wndHwnd;
 
     //Get percentage based x,y,w,h
-    const GUI_POINT start = (GUI_POINT){wnd.windowRect.x * scrW / 100, wnd.windowRect.y * scrH / 100};
-    const GUI_POINT end = (GUI_POINT){wnd.windowRect.w * scrW / 100, wnd.windowRect.h * scrH / 100};
+    const GUI_POINT start = (GUI_POINT){wnd->windowRect.x * scrW / 100, wnd->windowRect.y * scrH / 100};
+    const GUI_POINT end = (GUI_POINT){wnd->windowRect.w * scrW / 100, wnd->windowRect.h * scrH / 100};
 
     MoveWindow(buttonHwnd, start.x, start.y, end.x, end.y, TRUE);
     ShowWindow(buttonHwnd, 1);

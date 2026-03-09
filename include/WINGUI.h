@@ -35,7 +35,7 @@ void OSDrawLineChain(HDC hdc, COLOUR_LINE_CHAIN colourLineChain, int scrW, int s
 void OSDrawPoint(HDC hdc, COLOUR_POINT colourPoint, int scrW, int scrH);
 void OSDrawText(HDC hdc, GUI_TEXT text, int scrW, int scrH);
 void OSDrawImage(HDC hdc, GUI_IMAGE image, int scrWm, int scrH);
-void OSDrawChildWindow(Window wnd, int scrW, int scrH);
+void OSDrawChildWindow(Window* wnd, int scrW, int scrH);
 void OSDrawButtonLike(GUI_BUTTON_LIKE button, int scrW, int scrH);
 
 //Misc

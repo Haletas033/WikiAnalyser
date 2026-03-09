@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 
+void(*callback)(Window* wnd);
+
 GUI_TEXT* greetingText;
 const char* greetingDialogue[18] = {
     "Welcome to WikiAnalyser",
@@ -53,7 +55,7 @@ void success(Window* wnd);
 void deleteButtons(Window* wnd);
 void destroyWelcomeGUI(Window* wnd) {
     deleteButtons(wnd);
-    ClearGUI(&paintStacks, doAfters, buttonCommands);
+    ClearGUI(&wnd->paintStacks, doAfters, buttonCommands);
 }
 
 void downloadFullWikipediaDump(Window* wnd) {
@@ -81,8 +83,8 @@ void openZig(Window* wnd) {
 }
 
 void openMainGUI(Window* wnd) {
-    printf("Opening main GUI...\n");
     destroyWelcomeGUI(wnd);
+    callback(wnd);
 }
 
 void createButtons(Window* wnd) {
@@ -207,7 +209,8 @@ void performCheckText(Window* wnd) {
     changePerformCheckText(wnd);
 }
 
-void WelcomeGUI(Window* wnd) {
+void WelcomeGUI(Window* wnd, void(*funcCallback)(Window* wnd)) {
+    callback = funcCallback;
     greetingText = DrawPermanentText((GUI_TEXT){"", 50, 50, 14}, wnd);
     changeGreetingText(wnd);
 }

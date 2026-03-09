@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 
+
 #define IDT_DO_AFTER 2
 #define IDT_DO_AFTER_2 3
 #define IDT_DO_AFTER_3 4
@@ -48,7 +49,7 @@ typedef struct PaintStacks {
     COLOUR_POINT* colourPoints;
     GUI_TEXT* texts;
     GUI_IMAGE* images;
-    Window* windows;
+    Window** windows;
     GUI_BUTTON_LIKE* buttons;
 
     unsigned int colourRectsSize;
@@ -91,7 +92,8 @@ COLOUR_LINE_CHAIN* DrawPermanentLineChain(COLOUR_LINE_CHAIN colourLineChain, Win
 COLOUR_POINT* DrawPermanentPoint(COLOUR_POINT colourPoint, Window* wnd);
 GUI_TEXT* DrawPermanentText(GUI_TEXT text, Window* wnd);
 GUI_IMAGE* DrawPermanentImage(GUI_IMAGE image, Window* wnd);
-Window* DrawPermanentWindow(Window wnd, Window* parentWnd);
+
+Window **DrawPermanentWindow(const Window *wnd, Window *parentWnd);
 GUI_BUTTON_LIKE* DrawPermanentButton(GUI_BUTTON_LIKE button, Window* wnd);
 GUI_RECT GetButtonPos(int totalButtons, GUI_POINT center, int buttonSize, int buttonNumber);
 

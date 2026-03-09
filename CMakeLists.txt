@@ -59,6 +59,7 @@ else()
     )
     set(OS_INCLUDE
             include/LINUXGUI.h
+
     )
 endif()
 
@@ -72,6 +73,7 @@ add_executable(WikiAnalyser
         src/core/unwanted.c
         src/GUI.c
         src/welcomeGUI.c
+        src/mainGUI.c
 
         include/core/articleParser.h
         include/core/article.h
@@ -79,6 +81,7 @@ add_executable(WikiAnalyser
         include/core/unwanted.h
         include/GUI.h
         include/welcomeGUI.h
+        include/mainGUI.h
 
 
 )

@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../include/mainGUI.h"
 #include "../include/welcomeGUI.h"
 
 #ifdef __WIN32__
@@ -82,9 +83,9 @@ GUI_IMAGE* DrawPermanentImage(GUI_IMAGE image, Window* wnd) {
     return &wnd->paintStacks.images[wnd->paintStacks.imagesSize-1];
 }
 
-Window* DrawPermanentWindow(Window wnd, Window* parentWnd) {
+Window **DrawPermanentWindow(const Window *wnd, Window *parentWnd) {
     parentWnd->paintStacks.windowsSize++;
-    Window* tmp = realloc(parentWnd->paintStacks.windows, parentWnd->paintStacks.windowsSize*sizeof(Window));
+    Window* tmp = realloc(parentWnd->paintStacks.windows, parentWnd->paintStacks.windowsSize*sizeof(Window*));
     if (!tmp) { return NULL; }
     parentWnd->paintStacks.windows = tmp;
     parentWnd->paintStacks.windows[parentWnd->paintStacks.windowsSize-1] = wnd;
@@ -112,8 +113,10 @@ void ClearGUI(PaintStacks* paintStacks, DO_AFTER_ENTRY* doAfters[5], BUTTON_COMM
     *buttonCommands = NULL;
 }
 
+
+
 void GUIStart(Window* wnd) {
-    WelcomeGUI(wnd);
+    WelcomeGUI(wnd, MainGUIStart);
 }
 
 void GUILoop() {
