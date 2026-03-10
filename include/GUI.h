@@ -6,6 +6,7 @@
 #define GUI_H
 
 #include <stdlib.h>
+#include "config.h"
 
 
 #define IDT_DO_AFTER 2
@@ -13,6 +14,8 @@
 #define IDT_DO_AFTER_3 4
 #define IDT_DO_AFTER_4 5
 #define IDT_DO_AFTER_5 6
+
+#define MAX_FILE_SIZE 260
 
 
 

@@ -63,6 +63,13 @@ int main() {
         zigPrintTest(&articles[i]);
     }
 
+    //Create user data
+    OSCreateDirectory("UserData");
+    FILE* data = fopen("UserData/data.ini", "w");
+    fprintf(data, dataINI);
+    fclose(data);
+
+
     Window window = {0,0,100,100};
 
 

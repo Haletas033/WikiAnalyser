@@ -59,6 +59,7 @@ void destroyWelcomeGUI(Window* wnd) {
 }
 
 void downloadFullWikipediaDump(Window* wnd) {
+
     performCheckText(wnd);
 }
 
@@ -71,7 +72,11 @@ void downloadCustomWikipediaDump(Window* wnd) {
 }
 
 void openWikipediaDump(Window* wnd) {
-    performCheckText(wnd);
+    const char* path = OSGetFilePath();
+    if (path[0] != '\0') {
+        SetINIField("UserData/data.ini", "DumpPath", path);
+        performCheckText(wnd);
+    }
 }
 
 void downloadZig(Window* wnd) {

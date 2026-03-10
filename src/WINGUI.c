@@ -344,9 +344,36 @@ void OSDestroyButtonById(const Window* wnd, const unsigned int id) {
     DestroyWindow(GetDlgItem(wnd->wndHwnd, id));
 }
 
+const char* OSGetFilePath() {
+    OPENFILENAME ofn;
+
+    char* tmp = calloc(1, MAX_FILE_SIZE);
+    if (!tmp) { return NULL; }
+    char* szFile = tmp;
+
+    HWND hwnd = rootHwnd;
+
+    ZeroMemory(&ofn, sizeof(ofn));
+    ofn.lStructSize = sizeof(ofn);
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = MAX_FILE_SIZE;
+
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_EXPLORER;
+
+    GetOpenFileName(&ofn);
+
+    return szFile;
+}
+
+void OSCreateDirectory(const char* dirName) {
+    _mkdir(dirName);
+}
+
 int GetRefreshRate() {
     DEVMODE dev = {};
     dev.dmSize = sizeof(dev);
     EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dev);
     return dev.dmDisplayFrequency;
 }
+

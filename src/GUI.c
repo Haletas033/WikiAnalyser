@@ -113,8 +113,6 @@ void ClearGUI(PaintStacks* paintStacks, DO_AFTER_ENTRY* doAfters[5], BUTTON_COMM
     *buttonCommands = NULL;
 }
 
-
-
 void GUIStart(Window* wnd) {
     WelcomeGUI(wnd, MainGUIStart);
 }
