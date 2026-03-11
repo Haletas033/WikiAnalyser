@@ -11,6 +11,7 @@
 #endif
 #include "../include/GUI.h"
 #include "../include/welcomeGUI.h"
+#include <curl/curl.h>
 
 int main() {
     UNWANTED unwanted = {0};
@@ -76,9 +77,13 @@ int main() {
     OSCreateWindowClass();
     OSCreateWindow(&window);
 
+    curl_global_init(CURL_GLOBAL_ALL);
+
     GUIStart(&window);
 
     OSMessageLoop();
+
+    curl_global_cleanup();
 
     return 0;
 }

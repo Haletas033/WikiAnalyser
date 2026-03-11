@@ -7,6 +7,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../include/curl.h"
+
+
 void(*callback)(Window* wnd);
 
 GUI_TEXT* greetingText;
@@ -59,8 +62,13 @@ void destroyWelcomeGUI(Window* wnd) {
 }
 
 void downloadFullWikipediaDump(Window* wnd) {
-
-    performCheckText(wnd);
+    const char* path = OSGetDirectoryPath();
+    if (path == NULL) return;
+    CurlDownloadTo("https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles-multistream.xml.bz2", path);
+    if (path[0] != '\0') {
+        SetINIField("UserData/data.ini", "DumpPath", path);
+        performCheckText(wnd);
+    }
 }
 
 void downloadTopNWikipediaDump(Window* wnd) {

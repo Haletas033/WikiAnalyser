@@ -8,6 +8,8 @@ endif()
 
 set(CMAKE_C_STANDARD 90)
 
+find_package(CURL REQUIRED)
+
 set(ZIG_SRC ${CMAKE_CURRENT_SOURCE_DIR}/zig/src/main.zig)
 
 if (WIN32)
@@ -60,6 +62,7 @@ else()
     set(OS_INCLUDE
             include/LINUXGUI.h
             include/config.h
+            src/curl.c
 
     )
 endif()
@@ -84,6 +87,8 @@ add_executable(WikiAnalyser
         include/welcomeGUI.h
         include/mainGUI.h
         src/config.c
+        include/curl.h
+        src/curl.c
 
 
 )
@@ -107,12 +112,14 @@ if (UNIX)
             ${XFT_INCLUDE_DIRS}
             ${FREETYPE_INCLUDE_DIRS}
     )
-    target_link_libraries(WikiAnalyser PRIVATE
-            ${XFT_LIBRARIES}
-            ${FREETYPE_LIBRARIES}
-    )
     target_compile_options(WikiAnalyser PRIVATE
             ${XFT_CFLAGS_OTHER}
             ${FREETYPE_CFLAGS_OTHER}
     )
 endif()
+
+target_link_libraries(WikiAnalyser PRIVATE
+        ${XFT_LIBRARIES}
+        ${FREETYPE_LIBRARIES}
+        CURL::libcurl
+)

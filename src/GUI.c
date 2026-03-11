@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../include/curl.h"
 #include "../include/mainGUI.h"
 #include "../include/welcomeGUI.h"
 

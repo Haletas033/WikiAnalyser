@@ -366,6 +366,24 @@ const char* OSGetFilePath() {
     return szFile;
 }
 
+const char* OSGetDirectoryPath() {
+    BROWSEINFO info = {0};
+    info.hwndOwner = rootHwnd;
+    info.lpszTitle = "Where do you want to download to?";
+    info.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
+
+    LPITEMIDLIST pidl = SHBrowseForFolder(&info);
+    if (pidl == NULL) {
+        CoTaskMemFree(NULL);
+        return NULL;
+    }
+
+    char* path = calloc(1, 512);
+    SHGetPathFromIDList(pidl, path);
+    CoTaskMemFree(pidl);
+    return path;
+}
+
 void OSCreateDirectory(const char* dirName) {
     _mkdir(dirName);
 }

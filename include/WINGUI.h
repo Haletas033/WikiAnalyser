@@ -9,6 +9,7 @@
 #include <windows.h>
 #include <commdlg.h>
 #include <direct.h>
+#include <shlobj.h>
 
 
 #include "GUI.h"
@@ -45,6 +46,7 @@ void OSDoAfterMillis(Window* wnd, unsigned int id, unsigned int millis, void (*f
 void OSKillTimer(const Window* wnd,  unsigned int id);
 void OSDestroyButtonById(const Window* wnd,  unsigned int id);
 const char* OSGetFilePath();
+const char* OSGetDirectoryPath();
 void OSCreateDirectory(const char* dirName);
 int GetRefreshRate();
 
