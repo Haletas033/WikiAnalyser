@@ -359,7 +359,7 @@ const char* OSGetFilePath() {
     ofn.lpstrFile = szFile;
     ofn.nMaxFile = MAX_FILE_SIZE;
 
-    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_EXPLORER;
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_EXPLORER | OFN_NOCHANGEDIR;
 
     GetOpenFileName(&ofn);
 
