@@ -12,6 +12,7 @@
 
 #include "../include/curl.h"
 #include "../include/mainGUI.h"
+#include "../include/topN.h"
 #include "../include/welcomeGUI.h"
 
 #ifdef __WIN32__
@@ -115,7 +116,8 @@ void ClearGUI(PaintStacks* paintStacks, DO_AFTER_ENTRY* doAfters[5], BUTTON_COMM
 }
 
 void GUIStart(Window* wnd) {
-    WelcomeGUI(wnd, MainGUIStart);
+    CreateTopNFile();
+    //WelcomeGUI(wnd, MainGUIStart);
 }
 
 void GUILoop() {

@@ -9,6 +9,7 @@ endif()
 set(CMAKE_C_STANDARD 90)
 
 find_package(CURL REQUIRED)
+find_package(ZLIB REQUIRED)
 
 set(ZIG_SRC ${CMAKE_CURRENT_SOURCE_DIR}/zig/src/main.zig)
 
@@ -63,6 +64,7 @@ else()
             include/LINUXGUI.h
             include/config.h
             src/curl.c
+            src/topN.c
 
     )
 endif()
@@ -89,6 +91,8 @@ add_executable(WikiAnalyser
         src/config.c
         include/curl.h
         src/curl.c
+        include/topN.h
+        src/topN.c
 
 
 )
@@ -122,4 +126,5 @@ target_link_libraries(WikiAnalyser PRIVATE
         ${XFT_LIBRARIES}
         ${FREETYPE_LIBRARIES}
         CURL::libcurl
+        ZLIB::ZLIB
 )

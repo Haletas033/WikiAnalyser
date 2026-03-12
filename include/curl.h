@@ -5,6 +5,8 @@
 #ifndef CURL_H
 #define CURL_H
 
-void CurlDownloadTo(const char* url, const char* filePath);
+#include <curl/curl.h>
+
+void CurlDownloadTo(const char* url, const char* filePath, const char* fileName);
 
 #endif //CURL_H

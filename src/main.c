@@ -66,6 +66,8 @@ int main() {
 
     //Create user data
     OSCreateDirectory("UserData");
+    OSCreateDirectory("UserData/tmp");
+
     FILE* data = fopen("UserData/data.ini", "w");
     fprintf(data, dataINI);
     fclose(data);

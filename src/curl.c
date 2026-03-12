@@ -2,7 +2,6 @@
 // Created by halet on 3/11/2026.
 //
 
-#include <curl/curl.h>
 #include "../include/curl.h"
 
 //Write callback
@@ -11,14 +10,14 @@ size_t WriteData(void *ptr, size_t size, size_t nmemb, FILE *stream) {
     return written;
 }
 
-void CurlDownloadTo(const char* url, const char* filePath) {
+void CurlDownloadTo(const char* url, const char* filePath, const char* fileName) {
     CURL* handle = curl_easy_init();
     if (handle == NULL)
         return;
 
-    char* tmp = malloc(strlen(filePath) + strlen("/wikiDump.bz2") + 1);
+    char* tmp = malloc(strlen(filePath) + strlen(fileName) + 1);
     strcpy(tmp, filePath);
-    strcat(tmp, "/wikiDump.bz2");
+    strcat(tmp, fileName);
 
     FILE* wikiDumpZip = fopen(tmp, "wb");
     if (wikiDumpZip == NULL) {
