@@ -4,18 +4,25 @@
 
 #include "../include/topN.h"
 #include <zlib.h>
-#include "../external/uthash.h"
+#include "../include/core/article.h"
 
-typedef struct {
-    char name[256];
-    int views;
-    UT_hash_handle hh;
-} ArticleViews;
+unsigned int SkipNoise(const char* name) {
+    return (
+        strncmp(name, "Talk:", 5) == 0 ||
+        strncmp(name, "File:", 5) == 0 ||
+        strncmp(name, "Help:", 5) == 0 ||
+        strncmp(name, "Portal:", 7) == 0 ||
+        strncmp(name, "Special:", 8) == 0 ||
+        strncmp(name, "Template:", 9) == 0 ||
+        strncmp(name, "Wikipedia:", 10) == 0 ||
+        strcmp(name, "-") == 0
+    );
+}
 
-void HandleTopNFile(const char* pageviews, const char* pageViewsName) {
-    CurlDownloadTo(pageviews, "UserData/tmp/", pageViewsName);
-    char* fullPath = malloc(strlen("UserData/tmp/")+strlen(pageViewsName)+1);
-    strcpy(fullPath, "UserData/tmp/");
+ArticleViews* HandleTopNFile(const char* pageviews, const char* pageViewsName) {
+    CurlDownloadTo(pageviews, "SystemData/tmp/", pageViewsName);
+    char* fullPath = malloc(strlen("SystemData/tmp/")+strlen(pageViewsName)+1);
+    strcpy(fullPath, "SystemData/tmp/");
     strcat(fullPath, pageViewsName);
     gzFile file = gzopen(fullPath, "rb");
 
@@ -35,6 +42,8 @@ void HandleTopNFile(const char* pageviews, const char* pageViewsName) {
         const char* name = strtok(NULL, " ");
         int views = atoi(strtok(NULL, " "));
 
+        if (SkipNoise(name)) continue;
+
         ArticleViews* entry;
         HASH_FIND_STR(hashmap, name, entry);
         if (entry == NULL) {
@@ -47,12 +56,42 @@ void HandleTopNFile(const char* pageviews, const char* pageViewsName) {
         }
     }
 
-    ArticleViews* entry;
-    HASH_FIND_STR(hashmap, "C++", entry);
-    printf("%d\n", entry->views);
-
     gzclose(file);
+
+    remove(fullPath);
+
     free(fullPath);
+
+    return hashmap;
+}
+
+int cmp(ArticleViews* a, ArticleViews* b) {
+    return b->views - a->views;
+}
+
+ArticleViews* MergeAndSortHashmaps(ArticleViews* topN[12], unsigned int months) {
+    ArticleViews* master = NULL;
+
+    int i;
+    for (i = 0; i < months; i++) {
+        ArticleViews *entry, *tmp;
+        HASH_ITER(hh, topN[i], entry, tmp) {
+            ArticleViews* existing;
+            HASH_FIND_STR(master, entry->name, existing);
+            if (existing == NULL) {
+                ArticleViews* newEntry = malloc(sizeof(ArticleViews));
+                strcpy(newEntry->name, entry->name);
+                newEntry->views = entry->views;
+                HASH_ADD_STR(master, name, newEntry);
+            } else {
+                existing->views += entry->views;
+            }
+        }
+    }
+
+    HASH_SORT(master, cmp);
+
+    return master;
 }
 
 void CreateTopNFile(){
@@ -60,17 +99,70 @@ void CreateTopNFile(){
     const struct tm* tm = localtime(&t);
 
     const char* pageviewsRoot = "https://dumps.wikimedia.org/other/pageviews";
-    char* pageViewsName = malloc(64);
+    char* pageviewsName = malloc(64);
     char* pageviews = malloc(strlen(pageviewsRoot)+64);
 
-    //Loop over every day in the current year
+    ArticleViews* topN[12];
+
+    //Loop over every month in the current year
     int i;
     for (i = 0; i < tm->tm_mon+1; i++) {
-        sprintf(pageViewsName, "pageviews-%d%02d01-000000.gz", tm->tm_year + 1900, i+1);
-        sprintf(pageviews, "%s/%d/%d-%02d/%s", pageviewsRoot, tm->tm_year + 1900, tm->tm_year + 1900, i+1, pageViewsName);
-        HandleTopNFile(pageviews, pageViewsName);
+        sprintf(pageviewsName, "pageviews-%d%02d01-000000.gz", tm->tm_year + 1900, i+1);
+        sprintf(pageviews, "%s/%d/%d-%02d/%s", pageviewsRoot, tm->tm_year + 1900, tm->tm_year + 1900, i+1, pageviewsName);
+        topN[i] = HandleTopNFile(pageviews, pageviewsName);
+    }
+
+    ArticleViews* master = MergeAndSortHashmaps(topN, tm->tm_mon+1);
+    for (i = 0; i < tm->tm_mon+1; i++) {
+         ArticleViews *entry, *tmp;
+         HASH_ITER(hh, topN[i], entry, tmp) {
+             HASH_DEL(topN[i], entry);
+             free(entry);
+         }
     }
 
     free(pageviews);
+    free(pageviewsName);
+
+    //Write to binary file
+    FILE* topNFile = fopen("SystemData/topN.topn", "wb");
+
+    ArticleViews *entry, *tmp;
+    HASH_ITER(hh, master, entry, tmp) {
+        fwrite(entry, sizeof(ArticleViews), 1, topNFile);
+    }
+
+    fclose(topNFile);
 }
 
+ArticleViews* LoadTopNFile(const char* path) {
+    FILE* topNFile = fopen(path, "rb");
+    if (topNFile == NULL)
+        return NULL;
+
+
+    ArticleViews* hashmap = NULL;
+    ArticleViews* article = malloc(sizeof(ArticleViews));
+    while (fread(article, sizeof(ArticleViews),1, topNFile) == 1) {
+        HASH_ADD_STR(hashmap, name, article);
+        article = malloc(sizeof(ArticleViews));
+    }
+
+    free(article);
+    fclose(topNFile);
+    return hashmap;
+}
+
+const char** GetTop(const unsigned int n, ArticleViews* hashmap) {
+    char** topN = malloc(sizeof(char*)*n);
+
+    unsigned int counter = 0;
+    ArticleViews *entry, *tmp;
+    HASH_ITER(hh, hashmap, entry, tmp) {
+        if (counter == n) break;
+        topN[counter] = entry->name;
+        counter++;
+    }
+
+    return topN;
+}

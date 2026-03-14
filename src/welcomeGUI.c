@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "../include/curl.h"
+#include "../include/topN.h"
 
 
 void(*callback)(Window* wnd);
@@ -72,7 +73,12 @@ void downloadFullWikipediaDump(Window* wnd) {
 }
 
 void downloadTopNWikipediaDump(Window* wnd) {
-    performCheckText(wnd);
+    const char* path = OSGetDirectoryPath();
+    if (path != NULL) {
+        ArticleViews* hashmap = LoadTopNFile("SystemData/topN.topn");
+        CurlDownloadWithSpecialExportTo(GetTop(100, hashmap), 100, path, "/top100.xml");
+        performCheckText(wnd);
+    }
 }
 
 void downloadCustomWikipediaDump(Window* wnd) {

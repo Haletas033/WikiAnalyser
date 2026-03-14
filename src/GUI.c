@@ -116,8 +116,8 @@ void ClearGUI(PaintStacks* paintStacks, DO_AFTER_ENTRY* doAfters[5], BUTTON_COMM
 }
 
 void GUIStart(Window* wnd) {
-    CreateTopNFile();
-    //WelcomeGUI(wnd, MainGUIStart);
+    //CreateTopNFile();
+    WelcomeGUI(wnd, MainGUIStart);
 }
 
 void GUILoop() {
