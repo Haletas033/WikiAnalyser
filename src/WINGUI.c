@@ -195,6 +195,21 @@ void* OSCreateCheckBox(const unsigned int id, void (*func)(Window* wnd), Window*
     return buttonHwnd;
 }
 
+void* OSCreateInputBox(const unsigned int id, Window* wnd) {
+    HWND inputBox = CreateWindowEx(
+        0,
+        "EDIT",
+        "",
+        WS_TABSTOP | WS_CHILD | WS_VISIBLE | WS_DLGFRAME,
+        0,0,0,0,
+        wnd->wndHwnd,
+        (HMENU)id,
+        wc.hInstance,
+        NULL
+    );
+    return inputBox;
+}
+
 void* OSCreateImage(const char* imgPath) {
     void* img = (HBITMAP)LoadImage(NULL, imgPath, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     if (!img) return NULL;
@@ -326,7 +341,10 @@ void OSDrawButtonLike(GUI_BUTTON_LIKE button, int scrW, int scrH) {
     const GUI_POINT end = (GUI_POINT){button.rect.w * scrW / 100, button.rect.h * scrH / 100};
 
     MoveWindow(buttonHwnd, start.x, start.y, end.x, end.y, TRUE);
-    SetWindowText(buttonHwnd, button.text);
+    char buff[16];
+    GetClassName(buttonHwnd, buff, 16);
+    if (strcmp(buff, "Edit") != 0)
+        SetWindowText(buttonHwnd, button.text);
     ShowWindow(buttonHwnd, 1);
 }
 
@@ -342,6 +360,14 @@ void OSKillTimer(const Window* wnd, const unsigned int id) {
 
 void OSDestroyButtonById(const Window* wnd, const unsigned int id) {
     DestroyWindow(GetDlgItem(wnd->wndHwnd, id));
+}
+
+const char* OSGetInputBoxTextById(const Window* wnd, const unsigned int id) {
+    HWND hwnd = GetDlgItem(wnd->wndHwnd, id);
+    const unsigned int textLength = GetWindowTextLength(hwnd);
+    char* text = malloc(textLength);
+    GetWindowText(hwnd, text, textLength);
+    return text;
 }
 
 const char* OSGetFilePath() {

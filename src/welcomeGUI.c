@@ -73,6 +73,13 @@ void downloadFullWikipediaDump(Window* wnd) {
 }
 
 void downloadTopNWikipediaDump(Window* wnd) {
+    Window* childWnd = malloc(sizeof(Window));
+    *childWnd = (Window){25, 25, 50, 50};
+    OSCreateChildWindow(41, "Input", childWnd);
+
+    DrawPermanentWindow(childWnd, wnd);
+    DrawPermanentText((GUI_TEXT){"Input the amount of articles you want", 50, 25, 18}, childWnd);
+    DrawPermanentButton((GUI_BUTTON_LIKE){"Input", 40, 40, 20, 20, OSCreateInputBox(42, childWnd)},childWnd);
     const char* path = OSGetDirectoryPath();
     if (path == NULL) return;
     if (path[0] != '\0') {
@@ -84,6 +91,14 @@ void downloadTopNWikipediaDump(Window* wnd) {
 }
 
 void downloadCustomWikipediaDump(Window* wnd) {
+    Window* childWnd = malloc(sizeof(Window));
+    *childWnd = (Window){25, 25, 50, 50};
+    OSCreateChildWindow(42, "Input", childWnd);
+
+    DrawPermanentWindow(childWnd, wnd);
+    DrawPermanentText((GUI_TEXT){"Input a list of comma seperated article names", 50, 5, 18}, childWnd);
+    DrawPermanentText((GUI_TEXT){"with underscores for spaces:", 50, 10, 18}, childWnd);
+    DrawPermanentButton((GUI_BUTTON_LIKE){"Input", 0, 25, 100, 75, OSCreateInputBox(42, childWnd)},childWnd);
     performCheckText(wnd);
 }
 

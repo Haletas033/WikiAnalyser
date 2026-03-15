@@ -30,6 +30,7 @@ void* OSCreateImage(const char* imgPath);
 void* OSCreateChildWindow(unsigned int id, const char* name, Window* wnd);
 void* OSCreateButton(unsigned int id, void (*func)(Window* wnd), Window* wnd);
 void* OSCreateCheckBox(unsigned int id, void (*func)(Window* wnd), Window* wnd);
+void* OSCreateInputBox(unsigned int id, Window* wnd);
 
 //Drawing functions
 void OSDrawRect(HDC hdc, COLOUR_RECT colourRect, int scrW, int scrH);
@@ -45,6 +46,7 @@ void OSDrawButtonLike(GUI_BUTTON_LIKE button, int scrW, int scrH);
 void OSDoAfterMillis(Window* wnd, unsigned int id, unsigned int millis, void (*func)(Window* wnd));
 void OSKillTimer(const Window* wnd,  unsigned int id);
 void OSDestroyButtonById(const Window* wnd,  unsigned int id);
+const char* OSGetInputBoxTextById(const Window* wnd, unsigned int id);
 const char* OSGetFilePath();
 const char* OSGetDirectoryPath();
 void OSCreateDirectory(const char* dirName);
