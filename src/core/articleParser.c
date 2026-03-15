@@ -34,7 +34,7 @@ char* getAutomaticField(const unsigned char* uszBuffer, ssize_t* i, const char* 
 }
 
 int ParseArticles(PCSTRFILEPATH szFilePath, Article **articles, Article *baseArticle, unsigned int *articleCount) {
-    unsigned int nextPos = -1;
+    int nextPos = -1;
 
     int iFileDir = open(szFilePath, O_RDWR);
     if (iFileDir < 0) return -1;

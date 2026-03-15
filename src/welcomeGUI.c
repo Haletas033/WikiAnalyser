@@ -74,9 +74,11 @@ void downloadFullWikipediaDump(Window* wnd) {
 
 void downloadTopNWikipediaDump(Window* wnd) {
     const char* path = OSGetDirectoryPath();
-    if (path != NULL) {
+    if (path == NULL) return;
+    if (path[0] != '\0') {
         ArticleViews* hashmap = LoadTopNFile("SystemData/topN.topn");
-        CurlDownloadWithSpecialExportTo(GetTop(100, hashmap), 100, path, "/top100.xml");
+        CurlDownloadWithSpecialExportTo(GetTop(10000, hashmap), 10000, path, "/top100.xml");
+        SetINIField("UserData/data.ini", "DumpPath", path);
         performCheckText(wnd);
     }
 }
