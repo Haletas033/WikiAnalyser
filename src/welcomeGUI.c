@@ -72,6 +72,17 @@ void downloadFullWikipediaDump(Window* wnd) {
     }
 }
 
+void handleTopNWikiDump(Window* wnd) {
+    printf(OSGetInputBoxTextById(wnd, 42));
+    const char* path = OSGetDirectoryPath();
+    if (path == NULL) return;
+    if (path[0] != '\0') {
+        ArticleViews* hashmap = LoadTopNFile("SystemData/topN.topn");
+        CurlDownloadWithSpecialExportTo(GetTop(10000, hashmap), 10000, path, "/top100.xml");
+        SetINIField("UserData/data.ini", "DumpPath", path);
+    }
+}
+
 void downloadTopNWikipediaDump(Window* wnd) {
     Window* childWnd = malloc(sizeof(Window));
     *childWnd = (Window){25, 25, 50, 50};
@@ -80,14 +91,12 @@ void downloadTopNWikipediaDump(Window* wnd) {
     DrawPermanentWindow(childWnd, wnd);
     DrawPermanentText((GUI_TEXT){"Input the amount of articles you want", 50, 25, 18}, childWnd);
     DrawPermanentButton((GUI_BUTTON_LIKE){"Input", 40, 40, 20, 20, OSCreateInputBox(42, childWnd)},childWnd);
-    const char* path = OSGetDirectoryPath();
-    if (path == NULL) return;
-    if (path[0] != '\0') {
-        ArticleViews* hashmap = LoadTopNFile("SystemData/topN.topn");
-        CurlDownloadWithSpecialExportTo(GetTop(10000, hashmap), 10000, path, "/top100.xml");
-        SetINIField("UserData/data.ini", "DumpPath", path);
-        performCheckText(wnd);
-    }
+    DrawPermanentButton((GUI_BUTTON_LIKE){"OK", 0, 75, 100, 25, OSCreateButton(10, handleTopNWikiDump, childWnd)},childWnd);
+}
+
+void handleCustomWikiDump(Window* wnd) {
+    printf(OSGetInputBoxTextById(wnd, 42));
+    performCheckText(wnd);
 }
 
 void downloadCustomWikipediaDump(Window* wnd) {
@@ -98,8 +107,8 @@ void downloadCustomWikipediaDump(Window* wnd) {
     DrawPermanentWindow(childWnd, wnd);
     DrawPermanentText((GUI_TEXT){"Input a list of comma seperated article names", 50, 5, 18}, childWnd);
     DrawPermanentText((GUI_TEXT){"with underscores for spaces:", 50, 10, 18}, childWnd);
-    DrawPermanentButton((GUI_BUTTON_LIKE){"Input", 0, 25, 100, 75, OSCreateInputBox(42, childWnd)},childWnd);
-    performCheckText(wnd);
+    DrawPermanentButton((GUI_BUTTON_LIKE){"Input", 0, 25, 100, 50, OSCreateInputBox(42, childWnd)},childWnd);
+    DrawPermanentButton((GUI_BUTTON_LIKE){"OK", 0, 75, 100, 25, OSCreateButton(10, handleCustomWikiDump, childWnd)},childWnd);
 }
 
 void openWikipediaDump(Window* wnd) {

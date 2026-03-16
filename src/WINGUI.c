@@ -35,6 +35,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                 buttonCommands[wParam-1].buttonCommand(buttonCommands[wParam-1].wnd);
             }
             return 0;
+        case WM_KEYDOWN:
+            if (wParam==VK_RETURN) {
+                printf("eeeee");
+            }
         case WM_PAINT: {
             RECT windowRect;
             GetClientRect(hwnd, &windowRect);
@@ -364,7 +368,7 @@ void OSDestroyButtonById(const Window* wnd, const unsigned int id) {
 
 const char* OSGetInputBoxTextById(const Window* wnd, const unsigned int id) {
     HWND hwnd = GetDlgItem(wnd->wndHwnd, id);
-    const unsigned int textLength = GetWindowTextLength(hwnd);
+    const unsigned int textLength = GetWindowTextLength(hwnd)+1;
     char* text = malloc(textLength);
     GetWindowText(hwnd, text, textLength);
     return text;
