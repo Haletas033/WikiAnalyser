@@ -145,7 +145,7 @@ void* OSCreateChildWindow(const unsigned int id, const char* name, Window* wnd) 
         0,
         CLASS_NAME,
         name,
-        WS_CHILD | WS_VISIBLE | WS_DLGFRAME,
+        WS_CHILD | WS_VISIBLE | WS_DLGFRAME | WS_CLIPCHILDREN,
         0, 0, 0, 0,
         rootHwnd,
         (HMENU)id,
