@@ -85,6 +85,8 @@ void handleExitButton(Window* wnd) {
 }
 
 void handleTopNWikiDump(Window* wnd) {
+    handleExitButton(wnd);
+    showButtons(rootWindow, 0);
     printf(OSGetInputBoxTextById(wnd, 9));
     const char* path = OSGetDirectoryPath();
     if (path == NULL) return;
@@ -93,6 +95,7 @@ void handleTopNWikiDump(Window* wnd) {
         CurlDownloadWithSpecialExportTo(GetTop(10000, hashmap), 10000, path, "/top100.xml");
         SetINIField("UserData/data.ini", "DumpPath", path);
     }
+    performCheckText(rootWindow);
 }
 
 void downloadTopNWikipediaDump(Window* wnd) {
@@ -110,8 +113,10 @@ void downloadTopNWikipediaDump(Window* wnd) {
 }
 
 void handleCustomWikiDump(Window* wnd) {
+    handleExitButton(wnd);
+    showButtons(rootWindow, 0);
     printf(OSGetInputBoxTextById(wnd, 9));
-    performCheckText(wnd);
+    performCheckText(rootWindow);
 }
 
 void downloadCustomWikipediaDump(Window* wnd) {
@@ -172,6 +177,7 @@ void createButtons(Window* wnd) {
             break;
         case FINISH_SETUP: DrawPermanentButton((GUI_BUTTON_LIKE){"OK", GetButtonPos(1,
             (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 1), OSCreateButton(1, openMainGUI, wnd)}, wnd);
+
             break;
         default: break;
     }
