@@ -204,7 +204,7 @@ void* OSCreateInputBox(const unsigned int id, Window* wnd) {
         0,
         "EDIT",
         "",
-        WS_TABSTOP | WS_CHILD | WS_VISIBLE | WS_DLGFRAME,
+        WS_TABSTOP | WS_CHILD | WS_VISIBLE | WS_DLGFRAME | ES_MULTILINE | ES_AUTOVSCROLL,
         0,0,0,0,
         wnd->wndHwnd,
         (HMENU)id,
