@@ -349,7 +349,7 @@ void OSDrawButtonLike(GUI_BUTTON_LIKE button, int scrW, int scrH) {
     GetClassName(buttonHwnd, buff, 16);
     if (strcmp(buff, "Edit") != 0)
         SetWindowText(buttonHwnd, button.text);
-    ShowWindow(buttonHwnd, 1);
+    ShowWindow(buttonHwnd, button.shouldShow);
 }
 
 void OSDoAfterMillis(Window* wnd, const unsigned int id, const unsigned int millis, void (*func)(Window* wnd)) {

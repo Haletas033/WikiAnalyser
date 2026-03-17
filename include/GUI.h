@@ -31,7 +31,7 @@ typedef struct GUI_TEXT {const char* text; GUI_POINT pos; int size;} GUI_TEXT;
 
 typedef struct GUI_IMAGE {GUI_RECT rect; void* imgLoc;} GUI_IMAGE;
 
-typedef struct GUI_BUTTON_LIKE {const char* text; GUI_RECT rect; void* buttonLoc;} GUI_BUTTON_LIKE;
+typedef struct GUI_BUTTON_LIKE {const char* text; GUI_RECT rect; void* buttonLoc; unsigned int shouldShow;} GUI_BUTTON_LIKE;
 
 typedef struct COLOUR{ int r, g, b; } COLOUR;
 
@@ -98,9 +98,11 @@ GUI_IMAGE* DrawPermanentImage(GUI_IMAGE image, Window* wnd);
 
 Window **DrawPermanentWindow(const Window *wnd, Window *parentWnd);
 GUI_BUTTON_LIKE* DrawPermanentButton(GUI_BUTTON_LIKE button, Window* wnd);
+void ShowButtonLike(GUI_BUTTON_LIKE* button, unsigned int shouldShow);
 GUI_RECT GetButtonPos(int totalButtons, GUI_POINT center, int buttonSize, int buttonNumber);
 
-void ClearGUI(PaintStacks* paintStacks, DO_AFTER_ENTRY* doAfters[5], BUTTON_COMMAND_ENTRY* buttonCommands[32]);
+void ClearGUIFull(PaintStacks* paintStacks, DO_AFTER_ENTRY* doAfters[5], BUTTON_COMMAND_ENTRY* buttonCommands[32]);
+void ClearGUI(PaintStacks* paintStacks);
 
 void GUIStart(Window* wnd);
 

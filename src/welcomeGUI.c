@@ -9,7 +9,7 @@
 
 #include "../include/curl.h"
 #include "../include/topN.h"
-
+Window* rootWindow = NULL;
 
 void(*callback)(Window* wnd);
 
@@ -57,9 +57,10 @@ void failureOptions(Window* wnd);
 void success(Window* wnd);
 
 void deleteButtons(Window* wnd);
+void showButtons(Window* wnd, unsigned int shouldShow);
 void destroyWelcomeGUI(Window* wnd) {
     deleteButtons(wnd);
-    ClearGUI(&wnd->paintStacks, doAfters, buttonCommands);
+    ClearGUIFull(&wnd->paintStacks, doAfters, buttonCommands);
 }
 
 void downloadFullWikipediaDump(Window* wnd) {
@@ -72,8 +73,19 @@ void downloadFullWikipediaDump(Window* wnd) {
     }
 }
 
+void handleExitButton(Window* wnd) {
+    ClearGUI(&wnd->paintStacks);
+    wnd->windowRect = (GUI_RECT){0};
+
+    OSDestroyButtonById(wnd, 9);
+    OSDestroyButtonById(wnd, 10);
+    OSDestroyButtonById(wnd, 11);
+
+    showButtons(rootWindow, 1);
+}
+
 void handleTopNWikiDump(Window* wnd) {
-    printf(OSGetInputBoxTextById(wnd, 42));
+    printf(OSGetInputBoxTextById(wnd, 9));
     const char* path = OSGetDirectoryPath();
     if (path == NULL) return;
     if (path[0] != '\0') {
@@ -88,14 +100,17 @@ void downloadTopNWikipediaDump(Window* wnd) {
     *childWnd = (Window){25, 25, 50, 50};
     OSCreateChildWindow(41, "Input", childWnd);
 
+    showButtons(wnd, 0);
+
     DrawPermanentWindow(childWnd, wnd);
     DrawPermanentText((GUI_TEXT){"Input the amount of articles you want", 50, 25, 18}, childWnd);
-    DrawPermanentButton((GUI_BUTTON_LIKE){"Input", 40, 40, 20, 20, OSCreateInputBox(42, childWnd)},childWnd);
-    DrawPermanentButton((GUI_BUTTON_LIKE){"OK", 0, 75, 100, 25, OSCreateButton(10, handleTopNWikiDump, childWnd)},childWnd);
+    DrawPermanentButton((GUI_BUTTON_LIKE){"Input", 40, 40, 20, 20, OSCreateInputBox(9, childWnd)},childWnd);
+    DrawPermanentButton((GUI_BUTTON_LIKE){"EXIT", 0, 75, 50, 25, OSCreateButton(10, handleExitButton, childWnd)},childWnd);
+    DrawPermanentButton((GUI_BUTTON_LIKE){"OK", 50, 75, 50, 25, OSCreateButton(11, handleTopNWikiDump, childWnd)},childWnd);
 }
 
 void handleCustomWikiDump(Window* wnd) {
-    printf(OSGetInputBoxTextById(wnd, 42));
+    printf(OSGetInputBoxTextById(wnd, 9));
     performCheckText(wnd);
 }
 
@@ -104,11 +119,14 @@ void downloadCustomWikipediaDump(Window* wnd) {
     *childWnd = (Window){25, 25, 50, 50};
     OSCreateChildWindow(42, "Input", childWnd);
 
+    showButtons(wnd, 0);
+
     DrawPermanentWindow(childWnd, wnd);
     DrawPermanentText((GUI_TEXT){"Input a list of comma seperated article names", 50, 5, 18}, childWnd);
     DrawPermanentText((GUI_TEXT){"with underscores for spaces:", 50, 10, 18}, childWnd);
-    DrawPermanentButton((GUI_BUTTON_LIKE){"Input", 0, 25, 100, 50, OSCreateInputBox(42, childWnd)},childWnd);
-    DrawPermanentButton((GUI_BUTTON_LIKE){"OK", 0, 75, 100, 25, OSCreateButton(10, handleCustomWikiDump, childWnd)},childWnd);
+    DrawPermanentButton((GUI_BUTTON_LIKE){"Input", 0, 25, 100, 50, OSCreateInputBox(9, childWnd)},childWnd);
+    DrawPermanentButton((GUI_BUTTON_LIKE){"EXIT", 0, 75, 50, 25, OSCreateButton(10, handleExitButton, childWnd)},childWnd);
+    DrawPermanentButton((GUI_BUTTON_LIKE){"OK", 50, 75, 50, 25, OSCreateButton(11, handleCustomWikiDump, childWnd)},childWnd);
 }
 
 void openWikipediaDump(Window* wnd) {
@@ -232,6 +250,13 @@ void deleteButtons(Window* wnd) {
     OSDestroyButtonById(wnd, 4);
 }
 
+void showButtons(Window* wnd, const unsigned int shouldShow) {
+    ShowButtonLike(&wnd->paintStacks.buttons[0], shouldShow);
+    ShowButtonLike(&wnd->paintStacks.buttons[1], shouldShow);
+    ShowButtonLike(&wnd->paintStacks.buttons[2], shouldShow);
+    ShowButtonLike(&wnd->paintStacks.buttons[3], shouldShow);
+}
+
 void failureOptions(Window* wnd) {
     animDone = 1;
     dialoguePos = ZIG_OPTIONS_TEXT_START;
@@ -255,6 +280,7 @@ void performCheckText(Window* wnd) {
 }
 
 void WelcomeGUI(Window* wnd, void(*funcCallback)(Window* wnd)) {
+    rootWindow = wnd;
     callback = funcCallback;
     greetingText = DrawPermanentText((GUI_TEXT){"", 50, 50, 14}, wnd);
     changeGreetingText(wnd);

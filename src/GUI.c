@@ -95,6 +95,7 @@ Window **DrawPermanentWindow(const Window *wnd, Window *parentWnd) {
 }
 
 GUI_BUTTON_LIKE* DrawPermanentButton(GUI_BUTTON_LIKE button, Window* wnd){
+    button.shouldShow = 1; //Show by default
     wnd->paintStacks.buttonsSize++;
     GUI_BUTTON_LIKE* tmp = realloc(wnd->paintStacks.buttons, wnd->paintStacks.buttonsSize*sizeof(GUI_BUTTON_LIKE));
     if (!tmp) { return NULL; }
@@ -103,16 +104,24 @@ GUI_BUTTON_LIKE* DrawPermanentButton(GUI_BUTTON_LIKE button, Window* wnd){
     return &wnd->paintStacks.buttons[wnd->paintStacks.buttonsSize-1];
 }
 
+void ShowButtonLike(GUI_BUTTON_LIKE* button, const unsigned int shouldShow) {
+    button->shouldShow = shouldShow;
+}
+
 GUI_RECT GetButtonPos(const int totalButtons, const GUI_POINT center, const int buttonSize, const int buttonNumber) {
     const int t = totalButtons*buttonSize;
     const GUI_POINT start = (GUI_POINT){center.x-t/2, center.y}; 
     return (GUI_RECT){start.x+(buttonNumber*buttonSize)-buttonSize, start.y, buttonSize, buttonSize};
 }
 
-void ClearGUI(PaintStacks* paintStacks, DO_AFTER_ENTRY* doAfters[5], BUTTON_COMMAND_ENTRY* buttonCommands[32]) {
+void ClearGUIFull(PaintStacks* paintStacks, DO_AFTER_ENTRY* doAfters[5], BUTTON_COMMAND_ENTRY* buttonCommands[32]) {
     *paintStacks = (PaintStacks){0};
     *doAfters = NULL;
     *buttonCommands = NULL;
+}
+
+void ClearGUI(PaintStacks* paintStacks) {
+    *paintStacks = (PaintStacks){0};
 }
 
 void GUIStart(Window* wnd) {
