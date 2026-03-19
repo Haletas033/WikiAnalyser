@@ -66,8 +66,9 @@ void CleanUpContainers(const UNWANTED* unwanted, bool* isUnwanted, const unsigne
 }
 
 int CleanUpData(PCSTRFILEPATH szFilePath, const UNWANTED unwanted) {
-    int iFileDir = open(szFilePath, O_RDWR);
-    if (iFileDir < 0) return -1;
+    int iFileDir = open(szFilePath, O_RDWR | O_BINARY);
+    if (iFileDir < 0) { perror("open failed"); return -1; }
+
 
     unsigned char* uszBuffer = malloc(MEGA_BYTES(32));
     if (!uszBuffer) {
