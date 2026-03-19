@@ -34,10 +34,14 @@ char* getAutomaticField(const unsigned char* uszBuffer, ssize_t* i, const char* 
 }
 
 int ParseArticles(PCSTRFILEPATH szFilePath, Article **articles, Article *baseArticle, unsigned int *articleCount) {
+    printf(szFilePath);
     int nextPos = -1;
 
-    int iFileDir = open(szFilePath, O_RDWR);
-    if (iFileDir < 0) return -1;
+    int iFileDir = open(szFilePath, O_RDONLY);
+    if (iFileDir < 0) {
+        perror("open failed");
+        return -1;
+    }
 
     unsigned char* uszBuffer = malloc(MEGA_BYTES(32));
     if (!uszBuffer) {

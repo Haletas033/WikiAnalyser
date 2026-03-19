@@ -85,14 +85,15 @@ void handleExitButton(Window* wnd) {
 }
 
 void handleTopNWikiDump(Window* wnd) {
+    const char* inputText = OSGetInputBoxTextById(wnd, 9);
     handleExitButton(wnd);
     showButtons(rootWindow, 0);
-    printf(OSGetInputBoxTextById(wnd, 9));
+    printf(inputText);
     const char* path = OSGetDirectoryPath();
     if (path == NULL) return;
     if (path[0] != '\0') {
         ArticleViews* hashmap = LoadTopNFile("SystemData/topN.topn");
-        CurlDownloadWithSpecialExportTo(GetTop(10000, hashmap), 10000, path, "/top100.xml");
+        CurlDownloadWithSpecialExportTo(GetTop(atoi(inputText), hashmap), atoi(inputText), path, "/top100.xml");
         SetINIField("UserData/data.ini", "DumpPath", path);
     }
     performCheckText(rootWindow);
@@ -112,10 +113,55 @@ void downloadTopNWikipediaDump(Window* wnd) {
     DrawPermanentButton((GUI_BUTTON_LIKE){"OK", 50, 75, 50, 25, OSCreateButton(11, handleTopNWikiDump, childWnd)},childWnd);
 }
 
+void saveName(char*** names, char* name, unsigned int* namesPos, unsigned int* namePos) {
+    name[*namePos] = '\0';
+    (*names)[*namesPos] = strdup(name);
+    (*namesPos)++;
+    *names = realloc(*names, sizeof(char*)*(*namesPos+1));
+    *namePos = 0;
+}
+
+const char** parseCustomWikipediaDump(const char* inputText) {
+    char** names = malloc(sizeof(char*));
+    unsigned int namesPos = 0;
+    unsigned int namePos = 0;
+    const unsigned int len = strlen(inputText);
+    char name[256];
+    int i;
+    for (i = 0; i < len; i++) {
+
+        const char c = inputText[i];
+        if (c == ',') {
+            saveName(&names, name, &namesPos, &namePos);
+        }
+        else if (c == ' '){} //Skip spaces
+        else {
+            name[namePos] = c;
+            namePos++;
+        }
+    }
+    if (namePos > 0) {
+        saveName(&names, name, &namesPos, &namePos);
+    }
+    names[namesPos] = NULL;
+    return names;
+}
+
 void handleCustomWikiDump(Window* wnd) {
+    const char* inputText = OSGetInputBoxTextById(wnd, 9);
     handleExitButton(wnd);
     showButtons(rootWindow, 0);
-    printf(OSGetInputBoxTextById(wnd, 9));
+    printf(inputText);
+    const char* path = OSGetDirectoryPath();
+    if (path == NULL) return;
+    if (path[0] != '\0') {
+        const char** names = parseCustomWikipediaDump(inputText);
+        //Get length of names
+        int len = 0;
+        while (names[len] != NULL) len++;
+        CurlDownloadWithSpecialExportTo(names, len, path, "/top100.xml");
+        SetINIField("UserData/data.ini", "DumpPath", path);
+    }
     performCheckText(rootWindow);
 }
 
