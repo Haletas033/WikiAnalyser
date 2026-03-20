@@ -9,6 +9,7 @@
 
 #include "../include/curl.h"
 #include "../include/topN.h"
+#include "../include/core/articleParser.h"
 Window* rootWindow = NULL;
 
 void(*callback)(Window* wnd);
@@ -113,39 +114,7 @@ void downloadTopNWikipediaDump(Window* wnd) {
     DrawPermanentButton((GUI_BUTTON_LIKE){"OK", 50, 75, 50, 25, OSCreateButton(11, handleTopNWikiDump, childWnd)},childWnd);
 }
 
-void saveName(char*** names, char* name, unsigned int* namesPos, unsigned int* namePos) {
-    name[*namePos] = '\0';
-    (*names)[*namesPos] = strdup(name);
-    (*namesPos)++;
-    *names = realloc(*names, sizeof(char*)*(*namesPos+1));
-    *namePos = 0;
-}
 
-const char** parseCustomWikipediaDump(const char* inputText) {
-    char** names = malloc(sizeof(char*));
-    unsigned int namesPos = 0;
-    unsigned int namePos = 0;
-    const unsigned int len = strlen(inputText);
-    char name[256];
-    int i;
-    for (i = 0; i < len; i++) {
-
-        const char c = inputText[i];
-        if (c == ',') {
-            saveName(&names, name, &namesPos, &namePos);
-        }
-        else if (c == ' '){} //Skip spaces
-        else {
-            name[namePos] = c;
-            namePos++;
-        }
-    }
-    if (namePos > 0) {
-        saveName(&names, name, &namesPos, &namePos);
-    }
-    names[namesPos] = NULL;
-    return names;
-}
 
 void handleCustomWikiDump(Window* wnd) {
     const char* inputText = OSGetInputBoxTextById(wnd, 9);
@@ -155,7 +124,7 @@ void handleCustomWikiDump(Window* wnd) {
     const char* path = OSGetDirectoryPath();
     if (path == NULL) return;
     if (path[0] != '\0') {
-        const char** names = parseCustomWikipediaDump(inputText);
+        const char** names = parseCommaSeperated(inputText);
         //Get length of names
         int len = 0;
         while (names[len] != NULL) len++;

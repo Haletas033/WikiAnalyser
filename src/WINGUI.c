@@ -362,6 +362,10 @@ void OSKillTimer(const Window* wnd, const unsigned int id) {
     KillTimer(wnd->wndHwnd, id);
 }
 
+void OSShowButtonById(const Window* wnd, const unsigned int id, const unsigned int shouldShow) {
+    ShowWindow(GetDlgItem(wnd->wndHwnd, id), shouldShow);
+}
+
 void OSDestroyButtonById(const Window* wnd, const unsigned int id) {
     DestroyWindow(GetDlgItem(wnd->wndHwnd, id));
 }

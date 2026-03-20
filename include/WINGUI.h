@@ -45,6 +45,7 @@ void OSDrawButtonLike(GUI_BUTTON_LIKE button, int scrW, int scrH);
 //Misc
 void OSDoAfterMillis(Window* wnd, unsigned int id, unsigned int millis, void (*func)(Window* wnd));
 void OSKillTimer(const Window* wnd,  unsigned int id);
+void OSShowButtonById(const Window* wnd, unsigned int id, unsigned int shouldShow);
 void OSDestroyButtonById(const Window* wnd,  unsigned int id);
 const char* OSGetInputBoxTextById(const Window* wnd, unsigned int id);
 const char* OSGetFilePath();

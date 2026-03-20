@@ -4,6 +4,40 @@
 
 #include "../include/core/articleParser.h"
 
+void saveName(char*** names, char* name, unsigned int* namesPos, unsigned int* namePos) {
+    name[*namePos] = '\0';
+    (*names)[*namesPos] = strdup(name);
+    (*namesPos)++;
+    *names = realloc(*names, sizeof(char*)*(*namesPos+1));
+    *namePos = 0;
+}
+
+const char** parseCommaSeperated(const char* inputText) {
+    char** names = malloc(sizeof(char*));
+    unsigned int namesPos = 0;
+    unsigned int namePos = 0;
+    const unsigned int len = strlen(inputText);
+    char name[256];
+    int i;
+    for (i = 0; i < len; i++) {
+
+        const char c = inputText[i];
+        if (c == ',') {
+            saveName(&names, name, &namesPos, &namePos);
+        }
+        else if (c == ' '){} //Skip spaces
+        else {
+            name[namePos] = c;
+            namePos++;
+        }
+    }
+    if (namePos > 0) {
+        saveName(&names, name, &namesPos, &namePos);
+    }
+    names[namesPos] = NULL;
+    return names;
+}
+
 char* getAutomaticField(const unsigned char* uszBuffer, ssize_t* i, const char* fieldStart, const char* fieldEnd) {
     if (strncmp((const char*)uszBuffer + *i, fieldStart, strlen(fieldStart)) == 0) {
         *i+=strlen(fieldStart);

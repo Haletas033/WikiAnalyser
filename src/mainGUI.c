@@ -4,6 +4,8 @@
 
 #include <stdlib.h>
 #include "../include/mainGUI.h"
+#include "../include/core/unwanted.h"
+#include "../include/core/cleanup.h"
 
 #include <stdio.h>
 
@@ -12,6 +14,35 @@ PaintStacks fieldsPaintStacks = {0};
 PaintStacks parsePaintStacks = {0};
 
 Window* properties;
+
+void ApplyCleanup(Window* _) {
+    UNWANTED unwanted = {0}; //Clear
+
+    //Get unwanted chars
+    ModifyUnwanted_CHAR(&unwanted, UNWANTED_ADD, OSGetInputBoxTextById(properties, 10));
+
+    //Get unwanted Strings
+    const char** unwantedStrings = parseCommaSeperated(OSGetInputBoxTextById(properties, 11));
+    int unwantedStringsLen = 0;
+    while (unwantedStrings[unwantedStringsLen] != NULL) unwantedStringsLen++;
+    ModifyUnwanted_STRING(&unwanted, UNWANTED_ADD, unwantedStrings, unwantedStringsLen);
+
+    //Get unwanted heads
+    const char** unwantedHeads = parseCommaSeperated(OSGetInputBoxTextById(properties, 12));
+    int unwantedHeadsLen = 0;
+    while (unwantedHeads[unwantedHeadsLen] != NULL) unwantedHeadsLen++;
+
+    //Get unwanted tails
+    const char** unwantedTails = parseCommaSeperated(OSGetInputBoxTextById(properties, 13));
+    int unwantedTailsLen = 0;
+    while (unwantedTails[unwantedTailsLen] != NULL) unwantedTailsLen++;
+
+    const unsigned int containerLen = unwantedHeadsLen < unwantedTailsLen ? unwantedHeadsLen : unwantedTailsLen;
+    ModifyUnwanted_CONTAINER(&unwanted, UNWANTED_ADD, unwantedHeads, unwantedTails, containerLen);
+
+    //Run cleanup
+    CleanUpData(GetINIField("UserData/data.ini", "DumpPath"), unwanted);
+}
 
 void SetupCleanupPaintStacks(PaintStacks* ps, Window* wnd) {
     DrawPermanentTextToPaintStacks((GUI_TEXT){"Unwanted Characters:", 50, 5, 35}, ps);
@@ -30,7 +61,15 @@ void SetupCleanupPaintStacks(PaintStacks* ps, Window* wnd) {
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Input unwanted container tails here...",
         (GUI_RECT){10,37, 80, 5},  OSCreateInputBox(13, wnd)}, ps);
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Apply",
-        (GUI_RECT){10,45, 80, 10},  OSCreateButton(14, NULL, wnd)}, ps);
+        (GUI_RECT){10,45, 80, 10},  OSCreateButton(14, ApplyCleanup, wnd)}, ps);
+}
+
+void HideCleanupButtons() {
+    OSShowButtonById(properties, 10, 0);
+    OSShowButtonById(properties, 11, 0);
+    OSShowButtonById(properties, 12, 0);
+    OSShowButtonById(properties, 13, 0);
+    OSShowButtonById(properties, 14, 0);
 }
 
 void SwitchWindowPaintStacksToCleanup(Window* _) {
@@ -39,10 +78,12 @@ void SwitchWindowPaintStacksToCleanup(Window* _) {
 
 void SwitchWindowPaintStacksToFields(Window* _) {
     properties->paintStacks = (PaintStacks){0};
+    HideCleanupButtons();
 }
 
 void SwitchWindowPaintStacksToParse(Window* _) {
     properties->paintStacks = (PaintStacks){0};
+    HideCleanupButtons();
 }
 
 void StartPropertiesModeSelector(Window* wnd) {

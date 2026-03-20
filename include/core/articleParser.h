@@ -23,6 +23,8 @@ typedef const char* PCSTRFILEPATH;
 typedef const char* PCSTRDATA;
 typedef char* PSTRDATA;
 
+const char** parseCommaSeperated(const char* inputText);
+
 int ParseArticles(PCSTRFILEPATH szFilePath, Article **articles, Article *baseArticle, unsigned int *articleCount);
 //Zig functions ahead
 void OnArticle(unsigned char* currentChar, Article article);
