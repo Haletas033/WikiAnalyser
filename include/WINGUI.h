@@ -10,6 +10,7 @@
 #include <commdlg.h>
 #include <direct.h>
 #include <shlobj.h>
+#include <shlwapi.h>
 
 
 #include "GUI.h"
@@ -28,6 +29,7 @@ void OSMessageLoop();
 //Creation functions
 void* OSCreateImage(const char* imgPath);
 void* OSCreateChildWindow(unsigned int id, const char* name, Window* wnd);
+void* OSCreateChildWindowOnChildWindow(unsigned int id, const char* name, Window* wnd, const Window* parentWindow);
 void* OSCreateButton(unsigned int id, void (*func)(Window* wnd), Window* wnd);
 void* OSCreateCheckBox(unsigned int id, void (*func)(Window* wnd), Window* wnd);
 void* OSCreateInputBox(unsigned int id, Window* wnd);
@@ -50,7 +52,12 @@ void OSDestroyButtonById(const Window* wnd,  unsigned int id);
 const char* OSGetInputBoxTextById(const Window* wnd, unsigned int id);
 const char* OSGetFilePath();
 const char* OSGetDirectoryPath();
+void OSGetEXEDir(char* buffer, int size);
+const char* OSGetDirectoryPathInsideWikiAnalyser(const char* localPath);
+void OSOpenAs(const char* projectDir, const char* filename);
+int OSShellExecute(const char* projectDir, const char* command);
 void OSCreateDirectory(const char* dirName);
+void* OSLoadLibrary(const char* libPath, const char* funcName);
 int GetRefreshRate();
 
 

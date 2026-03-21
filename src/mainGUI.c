@@ -7,6 +7,11 @@
 #include "../include/core/unwanted.h"
 #include "../include/core/cleanup.h"
 
+#include "../rawZigForC/build_zig.h"
+#include "../rawZigForC/build_zig_zon.h"
+#include "../rawZigForC/zig_root.h"
+#include "../rawZigForC/zig_main.h"
+
 #include <stdio.h>
 
 PaintStacks cleanupPaintStacks = {0};
@@ -14,6 +19,8 @@ PaintStacks fieldsPaintStacks = {0};
 PaintStacks parsePaintStacks = {0};
 
 Window* properties;
+
+char* currentProjectPath;
 
 void ApplyCleanup(Window* _) {
     UNWANTED unwanted = {0}; //Clear
@@ -65,6 +72,7 @@ void SetupCleanupPaintStacks(PaintStacks* ps, Window* wnd) {
 }
 
 void HideCleanupButtons() {
+    //Can be hidden this way as the paintStacks has changed and when it changed back it will automatically show the buttons again
     OSShowButtonById(properties, 10, 0);
     OSShowButtonById(properties, 11, 0);
     OSShowButtonById(properties, 12, 0);
@@ -72,17 +80,120 @@ void HideCleanupButtons() {
     OSShowButtonById(properties, 14, 0);
 }
 
+void HideParseButtons() {
+    //Can be hidden this way as the paintStacks has changed and when it changed back it will automatically show the buttons again
+    OSShowButtonById(properties, 15, 0);
+    OSShowButtonById(properties, 16, 0);
+    OSShowButtonById(properties, 17, 0);
+    OSShowButtonById(properties, 18, 0);
+    OSShowButtonById(properties, 19, 0);
+}
+
 void SwitchWindowPaintStacksToCleanup(Window* _) {
     properties->paintStacks = cleanupPaintStacks;
+    HideParseButtons();
 }
 
 void SwitchWindowPaintStacksToFields(Window* _) {
     properties->paintStacks = (PaintStacks){0};
     HideCleanupButtons();
+    HideParseButtons();
+}
+
+void ExitNamePrompt(Window* wnd) {
+    properties->paintStacks = parsePaintStacks;
+    OSDestroyButtonById(properties, 9);
+    OSDestroyButtonById(wnd, 20);
+    OSDestroyButtonById(wnd, 21);
+    OSDestroyButtonById(wnd, 22);
+}
+
+void HandleNamePrompt(Window* wnd) {
+    const char* name = OSGetInputBoxTextById(wnd, 20);
+    if (name[0] == '\0') return;
+
+    char namePath[256]; sprintf(namePath, "%s/%s", "UserData/Projects", name);
+    OSCreateDirectory(namePath);
+    char namePathSrc[256]; sprintf(namePathSrc, "%s/%s/%s", "UserData/Projects", name, "src");
+    OSCreateDirectory(namePathSrc);
+
+    char buildPath[256]; sprintf(buildPath, "%s/%s", namePath, "build.zig");
+    char buildZonPath[256]; sprintf(buildZonPath, "%s/%s", namePath, "build.zig.zon");
+    char rootPath[256]; sprintf(rootPath, "%s/%s", namePath, "src/root.zig");
+    char mainPath[256]; sprintf(mainPath, "%s/%s", namePath, "src/main.zig");
+
+    //Zig files
+    //Open
+    FILE* build = fopen(buildPath, "w");
+    FILE* buildZon = fopen(buildZonPath, "w");
+    FILE* root = fopen(rootPath, "w");
+    FILE* main = fopen(mainPath, "w");
+    //Write
+    fwrite(zig_build_zig, 1, zig_build_zig_len, build);
+    fwrite(zig_build_zig_zon, 1, zig_build_zig_zon_len, buildZon);
+    fwrite(zig_src_root_zig, 1, zig_src_root_zig_len, root);
+    fwrite(zig_src_main_zig, 1, zig_src_main_zig_len, main);
+    //Close
+    fclose(build);
+    fclose(buildZon);
+    fclose(root);
+    fclose(main);
+
+    ExitNamePrompt(wnd);
+}
+
+void NewProject (Window* _) {
+    properties->paintStacks = (PaintStacks){0};
+    HideParseButtons();
+    //Name prompt
+    Window* namePrompt = malloc(sizeof(Window));
+    *namePrompt = (Window){10, 40, 80, 20};
+    OSCreateChildWindowOnChildWindow(9, "NamePrompt", namePrompt, properties);
+    DrawPermanentWindow(namePrompt, properties);
+    DrawPermanentText((GUI_TEXT){"Enter the Project Name:", 50, 5, 50}, namePrompt);
+    DrawPermanentButton((GUI_BUTTON_LIKE){"Enter Project Name...", 0, 25, 100, 50, OSCreateInputBox(20, namePrompt)}, namePrompt);
+    DrawPermanentButton((GUI_BUTTON_LIKE){"EXIT", 0, 75, 50, 25, OSCreateButton(21, ExitNamePrompt, namePrompt)}, namePrompt);
+    DrawPermanentButton((GUI_BUTTON_LIKE){"OK", 50, 75, 50, 25, OSCreateButton(22, HandleNamePrompt, namePrompt)}, namePrompt);
+}
+
+void OpenProject(Window* _) {
+    currentProjectPath = OSGetDirectoryPathInsideWikiAnalyser("UserData\\Projects");
+    OSOpenAs(currentProjectPath, "src\\main.zig");
+}
+
+void BuildProject(Window* _) {
+    char exeDir[512]; OSGetEXEDir(exeDir, 512);
+    char fullCommand[1024]; sprintf(fullCommand, "%s %s\\src\\main.zig %s=%s\\main.dll", "zig build-lib", currentProjectPath, "-dynamic -O ReleaseSmall -femit-h -femit-bin", exeDir);
+
+    if (OSShellExecute(currentProjectPath, fullCommand) != 0) return;
+
+    char libPath[512]; sprintf(libPath, "%s\\%s", exeDir, "main.dll");
+    OnArticle = OSLoadLibrary(libPath, "OnArticle");
+    Article *articles = NULL;
+    unsigned int articleCount = 0;
+    Article article = {0};
+    AddField(&article, FIELD_INT, "e_Count");
+    AddField(&article, FIELD_FLOAT, "Float Test");
+    AddField(&article, FIELD_BOOL, "Bool Test");
+    AddField(&article, FIELD_STRING, "String Test");
+    ParseArticles("C:/Users/halet/Downloads/top100.xml", &articles, &article, &articleCount);
+}
+
+void SetupParsePaintStacks(PaintStacks* ps, Window* wnd) {
+    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"New Project",
+        (GUI_RECT){10,5, 80, 10},  OSCreateButton(15, NewProject, wnd)}, ps);
+    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Open Project",
+        (GUI_RECT){10,15, 80, 10},  OSCreateButton(16, OpenProject, wnd)}, ps);
+    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Build",
+        (GUI_RECT){10,25, 80, 10},  OSCreateButton(17, BuildProject, wnd)}, ps);
+    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Parse",
+        (GUI_RECT){10,35, 80, 10},  OSCreateButton(18, ApplyCleanup, wnd)}, ps);
+    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Run Analyser (advanced)",
+        (GUI_RECT){10,45, 80, 10},  OSCreateButton(19, ApplyCleanup, wnd)}, ps);
 }
 
 void SwitchWindowPaintStacksToParse(Window* _) {
-    properties->paintStacks = (PaintStacks){0};
+    properties->paintStacks = parsePaintStacks;
     HideCleanupButtons();
 }
 
@@ -125,6 +236,7 @@ void MainGUIStart(Window* wnd) {
     DrawPermanentText((GUI_TEXT){"Nothing to display yet...", 50, 50, 20}, visualiserScreen);
 
     SetupCleanupPaintStacks(&cleanupPaintStacks, properties);
+    SetupParsePaintStacks(&parsePaintStacks, properties);
     properties->paintStacks = cleanupPaintStacks;
     StartPropertiesModeSelector(propertiesModeSelector);
 }

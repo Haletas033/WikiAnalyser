@@ -27,6 +27,7 @@ const char** parseCommaSeperated(const char* inputText);
 
 int ParseArticles(PCSTRFILEPATH szFilePath, Article **articles, Article *baseArticle, unsigned int *articleCount);
 //Zig functions ahead
-void OnArticle(unsigned char* currentChar, Article article);
+typedef void (*OnArticleFn)(unsigned char* currentChar, Article article);
+extern OnArticleFn OnArticle;
 
 #endif //PARSER_H

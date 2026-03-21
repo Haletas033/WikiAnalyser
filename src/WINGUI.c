@@ -9,6 +9,7 @@
 const wchar_t CLASS_NAME[] = L"WINDOW CLASS";
 WNDCLASS wc = {};
 HWND rootHwnd;
+HMODULE zigLib = NULL;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
@@ -35,10 +36,6 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                 buttonCommands[wParam-1].buttonCommand(buttonCommands[wParam-1].wnd);
             }
             return 0;
-        case WM_KEYDOWN:
-            if (wParam==VK_RETURN) {
-                printf("eeeee");
-            }
         case WM_PAINT: {
             RECT windowRect;
             GetClientRect(hwnd, &windowRect);
@@ -152,6 +149,27 @@ void* OSCreateChildWindow(const unsigned int id, const char* name, Window* wnd) 
         WS_CHILD | WS_VISIBLE | WS_DLGFRAME | WS_CLIPCHILDREN,
         0, 0, 0, 0,
         rootHwnd,
+        (HMENU)id,
+        wc.hInstance,
+        NULL
+    );
+
+    SetWindowLongPtr(windowHwnd, GWLP_USERDATA, (LONG_PTR)&wnd->paintStacks);
+
+    SetTimer(windowHwnd, 1, min(1000 / 120, 1000 / GetRefreshRate()), NULL);
+
+    wnd->wndHwnd = windowHwnd;
+    return windowHwnd;
+}
+
+void* OSCreateChildWindowOnChildWindow(const unsigned int id, const char* name, Window* wnd, const Window* parentWindow) {
+    HWND windowHwnd = CreateWindowEx(
+        0,
+        CLASS_NAME,
+        name,
+        WS_CHILD | WS_VISIBLE | WS_DLGFRAME | WS_CLIPCHILDREN,
+        0, 0, 0, 0,
+        parentWindow->wndHwnd,
         (HMENU)id,
         wc.hInstance,
         NULL
@@ -418,8 +436,83 @@ const char* OSGetDirectoryPath() {
     return path;
 }
 
+void OSGetEXEDir(char* buffer, const int size) {
+    GetModuleFileName(NULL, buffer, size);
+    PathRemoveFileSpec(buffer);
+}
+
+const char* OSGetDirectoryPathInsideWikiAnalyser(const char* localPath) {
+    //Get base dir
+    char basePath[512]; OSGetEXEDir(basePath, 512);
+    char projectsPath[768];
+
+    sprintf(projectsPath, "%s\\%s", basePath, localPath);
+
+    BROWSEINFO info = {0};
+    info.hwndOwner = rootHwnd;
+    info.lpszTitle = "Where do you want to download to?";
+    info.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
+    LPITEMIDLIST pidlRoot = ILCreateFromPath(projectsPath);
+    info.pidlRoot = (LPCITEMIDLIST)pidlRoot;
+
+    LPITEMIDLIST pidl = SHBrowseForFolder(&info);
+    if (pidl == NULL) {
+        CoTaskMemFree(NULL);
+        return NULL;
+    }
+
+    char* path = calloc(1, 1024);
+    SHGetPathFromIDList(pidl, path);
+    CoTaskMemFree(pidl);
+
+    ILFree(pidlRoot);
+    return path;
+}
+
+void OSOpenAs(const char* projectDir, const char* filename) {
+    char fullPath[512]; sprintf(fullPath, "%s\\%s", projectDir, filename);
+    ShellExecute(NULL, "openas", fullPath, NULL, NULL, SW_SHOWNORMAL);
+}
+
+int OSShellExecute(const char* projectDir, const char* command) {
+    STARTUPINFO si = {0};
+    si.cb = sizeof(STARTUPINFO);
+    PROCESS_INFORMATION pi = {0};
+
+    char cmd[512]; strcpy(cmd, command);
+
+    CreateProcess(
+        NULL,
+        cmd,
+        NULL,
+        NULL,
+        FALSE,
+        0,
+        NULL,
+        projectDir,
+        &si,
+        &pi
+    );
+
+    WaitForSingleObject(pi.hProcess, INFINITE);
+    DWORD exitCode;
+    GetExitCodeProcess(pi.hProcess, &exitCode);
+
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+
+    return (int)exitCode;
+}
+
 void OSCreateDirectory(const char* dirName) {
     _mkdir(dirName);
+}
+
+void* OSLoadLibrary(const char* libPath, const char* funcName) {
+    if (zigLib != NULL)
+        FreeLibrary(zigLib);
+    zigLib = LoadLibrary(libPath);
+    return GetProcAddress(zigLib, funcName);
 }
 
 int GetRefreshRate() {

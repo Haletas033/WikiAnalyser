@@ -4,6 +4,8 @@
 
 #include "../include/core/articleParser.h"
 
+OnArticleFn OnArticle = NULL;
+
 void saveName(char*** names, char* name, unsigned int* namesPos, unsigned int* namePos) {
     name[*namePos] = '\0';
     (*names)[*namesPos] = strdup(name);

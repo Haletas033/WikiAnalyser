@@ -42,30 +42,9 @@ int main() {
     AddField(&article, FIELD_BOOL, "Bool Test");
     AddField(&article, FIELD_STRING, "String Test");
 
-    //Ignore (for testing on both linux and windows)
-    #ifdef __WIN32__
-
-    //CleanUpData("C:/Users/halet/Downloads/top100.xml", unwanted);
-
-    //ParseArticles("C:/Users/halet/Downloads/top100.xml", &articles, &article, &articleCount);
-
-    #endif
-
-    #ifdef __linux__
-
-    CleanUpData("/home/haletas/Dev/wikianalyserTest.xml", unwanted);
-
-    ParseArticles("/home/haletas/Dev/wikianalyserTest.xml", &articles, &article, &articleCount);
-
-    #endif
-
-    int i;
-    for (i = 0; i < articleCount; i++) {
-        zigPrintTest(&articles[i]);
-    }
-
     //Create user data
     OSCreateDirectory("UserData");
+    OSCreateDirectory("UserData/Projects");
     OSCreateDirectory("SystemData");
     OSCreateDirectory("SystemData/tmp");
 

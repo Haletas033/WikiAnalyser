@@ -11,44 +11,6 @@ set(CMAKE_C_STANDARD 90)
 find_package(CURL REQUIRED)
 find_package(ZLIB REQUIRED)
 
-set(ZIG_SRC ${CMAKE_CURRENT_SOURCE_DIR}/zig/src/main.zig)
-
-if (WIN32)
-    set(ZIG_DLL ${CMAKE_BINARY_DIR}/main.dll)
-    set(ZIG_LIB ${CMAKE_BINARY_DIR}/main.lib)
-else ()
-    set(ZIG_DLL)
-    set(ZIG_LIB ${CMAKE_BINARY_DIR}/libmain.so)
-endif()
-
-add_custom_command(
-        OUTPUT ${ZIG_LIB} ${ZIG_DLL} ${CMAKE_BINARY_DIR}/main.h
-        COMMAND zig build-lib ${ZIG_SRC}
-        -dynamic
-        -O ReleaseSmall
-        -femit-h
-        DEPENDS ${ZIG_SRC}
-        COMMENT "Building Zig library"
-        VERBATIM
-)
-
-add_custom_target(ZigTarget ALL
-        DEPENDS ${ZIG_LIB}
-)
-
-add_library(ZigLib SHARED IMPORTED)
-
-if (WIN32)
-    set_target_properties(ZigLib PROPERTIES
-            IMPORTED_LOCATION ${ZIG_DLL}
-            IMPORTED_IMPLIB ${ZIG_LIB}
-    )
-else ()
-    set_target_properties(ZigLib PROPERTIES
-            IMPORTED_LOCATION ${ZIG_LIB}
-    )
-endif()
-
 if (WIN32)
     set(OS_SRC
             src/WINGUI.c
@@ -93,17 +55,14 @@ add_executable(WikiAnalyser
         src/curl.c
         include/topN.h
         src/topN.c
-
-
 )
 
-add_dependencies(WikiAnalyser ZigTarget)
 target_include_directories(WikiAnalyser PRIVATE ${CMAKE_BINARY_DIR})
 
 if (WIN32)
-    target_link_libraries(WikiAnalyser PRIVATE ZigLib)
+    target_link_libraries(WikiAnalyser PRIVATE -lshlwapi)
 else ()
-    target_link_libraries(WikiAnalyser PRIVATE ZigLib X11 m)
+    target_link_libraries(WikiAnalyser PRIVATE X11 m)
 endif()
 
 if (UNIX)
