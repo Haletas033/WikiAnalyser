@@ -48,9 +48,19 @@ int main() {
     OSCreateDirectory("SystemData");
     OSCreateDirectory("SystemData/tmp");
 
-    FILE* data = fopen("UserData/data.ini", "w");
-    fprintf(data, dataINI);
-    fclose(data);
+    unsigned int shouldOpen = 0;
+    FILE* data = fopen("UserData/data.ini", "r");
+    if (data == NULL) shouldOpen = 1;
+    if (data != NULL) {
+        fseek(data, 0, SEEK_END);
+        if (ftell(data) == 0) shouldOpen = 1;
+        fclose(data);
+    }
+    if (shouldOpen) {
+        data = fopen("UserData/data.ini", "w");
+        fprintf(data, dataINI);
+        fclose(data);
+    }
 
 
     Window window = {0,0,100,100};
