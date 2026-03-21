@@ -17,6 +17,7 @@ if (WIN32)
     )
     set(OS_INCLUDE
             include/WINGUI.h
+            include/funcStructs.h
     )
 else()
     set(OS_SRC

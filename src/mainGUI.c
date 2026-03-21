@@ -169,14 +169,17 @@ void BuildProject(Window* _) {
 
     char libPath[512]; sprintf(libPath, "%s\\%s", exeDir, "main.dll");
     OnArticle = OSLoadLibrary(libPath, "OnArticle");
-    Article *articles = NULL;
-    unsigned int articleCount = 0;
-    Article article = {0};
-    AddField(&article, FIELD_INT, "e_Count");
-    AddField(&article, FIELD_FLOAT, "Float Test");
-    AddField(&article, FIELD_BOOL, "Bool Test");
-    AddField(&article, FIELD_STRING, "String Test");
-    ParseArticles("C:/Users/halet/Downloads/top100.xml", &articles, &article, &articleCount);
+}
+
+void RunParser(Window* _) {
+    Article **articles = malloc(sizeof(Article*));
+    unsigned int* articleCount = malloc(sizeof(int));
+    Article* article = calloc(1, sizeof(Article));
+    AddField(article, FIELD_INT, "e_Count");
+    AddField(article, FIELD_FLOAT, "Float Test");
+    AddField(article, FIELD_BOOL, "Bool Test");
+    AddField(article, FIELD_STRING, "String Test");
+    OSCreateThreadForParse(GetINIField("UserData/data.ini", "DumpPath"), articles, article, &articleCount);
 }
 
 void SetupParsePaintStacks(PaintStacks* ps, Window* wnd) {
@@ -187,7 +190,7 @@ void SetupParsePaintStacks(PaintStacks* ps, Window* wnd) {
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Build",
         (GUI_RECT){10,25, 80, 10},  OSCreateButton(17, BuildProject, wnd)}, ps);
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Parse",
-        (GUI_RECT){10,35, 80, 10},  OSCreateButton(18, ApplyCleanup, wnd)}, ps);
+        (GUI_RECT){10,35, 80, 10},  OSCreateButton(18, RunParser, wnd)}, ps);
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Run Analyser (advanced)",
         (GUI_RECT){10,45, 80, 10},  OSCreateButton(19, ApplyCleanup, wnd)}, ps);
 }

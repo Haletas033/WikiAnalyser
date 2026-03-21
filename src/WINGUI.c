@@ -6,6 +6,8 @@
 
 #include <stdio.h>
 
+#include "../include/curl.h"
+
 const wchar_t CLASS_NAME[] = L"WINDOW CLASS";
 WNDCLASS wc = {};
 HWND rootHwnd;
@@ -513,6 +515,59 @@ void* OSLoadLibrary(const char* libPath, const char* funcName) {
         FreeLibrary(zigLib);
     zigLib = LoadLibrary(libPath);
     return GetProcAddress(zigLib, funcName);
+}
+
+DWORD WINAPI DownloadToThread(LPVOID param) {
+    DownloadToStruct* downloadToStruct = param;
+    CurlDownloadTo(downloadToStruct->url, downloadToStruct->filePath, downloadToStruct->fileName);
+    free(downloadToStruct);
+    return 0;
+}
+
+DWORD WINAPI DownloadSpecialExportToThread(LPVOID param) {
+    DownloadSpecialExportToStruct* downloadSpecialExportToStruct = param;
+    CurlDownloadWithSpecialExportTo(downloadSpecialExportToStruct->name, downloadSpecialExportToStruct->count,
+        downloadSpecialExportToStruct->filePath, downloadSpecialExportToStruct->fileName);
+    free(downloadSpecialExportToStruct);
+    return 0;
+}
+
+DWORD WINAPI ParseThread(LPVOID param) {
+    ParseStruct* parseStruct = param;
+    ParseArticles(parseStruct->szFilePath, parseStruct->articles, parseStruct->baseArticle, parseStruct->articleCount);
+    free(parseStruct->baseArticle);
+    free(parseStruct);
+    return 0;
+}
+
+void OSCreateThreadForFunction(const LPTHREAD_START_ROUTINE function, const LPVOID funcStruct) {
+    CreateThread(
+        NULL,
+        0,
+        function,
+        funcStruct,
+        0,
+        NULL
+    );
+}
+
+void OSCreateThreadForDownloadTo(const char* url, const char* filePath, const char* fileName) {
+    DownloadToStruct* downloadToStruct = malloc(sizeof(DownloadToStruct));
+    downloadToStruct->url = url; downloadToStruct->filePath = filePath; downloadToStruct->fileName = fileName;
+    OSCreateThreadForFunction(DownloadToThread, downloadToStruct);
+}
+
+void OSCreateThreadForDownloadSpecialExportTo(const char** name, unsigned int count, const char* filePath, const char* fileName) {
+    DownloadSpecialExportToStruct* downloadSpecialExportToStruct = malloc(sizeof(DownloadSpecialExportToStruct));
+    downloadSpecialExportToStruct->name = name; downloadSpecialExportToStruct->count = count;
+    downloadSpecialExportToStruct->filePath = filePath; downloadSpecialExportToStruct->fileName = fileName;
+    OSCreateThreadForFunction(DownloadSpecialExportToThread, downloadSpecialExportToStruct);
+}
+
+void OSCreateThreadForParse(PCSTRFILEPATH szFilePath, Article **articles, Article *baseArticle, unsigned int *articleCount) {
+    ParseStruct* parseStruct = malloc(sizeof(ParseStruct));
+    parseStruct->szFilePath = szFilePath; parseStruct->articles = articles; parseStruct->baseArticle = baseArticle; parseStruct->articleCount = articleCount;
+    OSCreateThreadForFunction(ParseThread, parseStruct);
 }
 
 int GetRefreshRate() {

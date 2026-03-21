@@ -11,6 +11,7 @@
 #include <direct.h>
 #include <shlobj.h>
 #include <shlwapi.h>
+#include "../include/funcStructs.h"
 
 
 #include "GUI.h"
@@ -58,6 +59,9 @@ void OSOpenAs(const char* projectDir, const char* filename);
 int OSShellExecute(const char* projectDir, const char* command);
 void OSCreateDirectory(const char* dirName);
 void* OSLoadLibrary(const char* libPath, const char* funcName);
+void OSCreateThreadForDownloadTo(const char* url, const char* filePath, const char* fileName);
+void OSCreateThreadForDownloadSpecialExportTo(const char** name, unsigned int count, const char* filePath, const char* fileName);
+void OSCreateThreadForParse(PCSTRFILEPATH szFilePath, Article **articles, Article *baseArticle, unsigned int *articleCount);
 int GetRefreshRate();
 
 

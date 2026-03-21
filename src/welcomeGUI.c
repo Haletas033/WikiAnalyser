@@ -67,7 +67,7 @@ void destroyWelcomeGUI(Window* wnd) {
 void downloadFullWikipediaDump(Window* wnd) {
     const char* path = OSGetDirectoryPath();
     if (path == NULL) return;
-    CurlDownloadTo("https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles-multistream.xml.bz2", path, "/wikiDump.bz2");
+    OSCreateThreadForDownloadTo("https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles-multistream.xml.bz2", path, "/wikiDump.bz2");
     if (path[0] != '\0') {
         SetINIField("UserData/data.ini", "DumpPath", path);
         performCheckText(wnd);
@@ -94,8 +94,10 @@ void handleTopNWikiDump(Window* wnd) {
     if (path == NULL) return;
     if (path[0] != '\0') {
         ArticleViews* hashmap = LoadTopNFile("SystemData/topN.topn");
-        CurlDownloadWithSpecialExportTo(GetTop(atoi(inputText), hashmap), atoi(inputText), path, "/top100.xml");
-        SetINIField("UserData/data.ini", "DumpPath", path);
+        OSCreateThreadForDownloadSpecialExportTo(GetTop(atoi(inputText), hashmap), atoi(inputText), path, "/top100.xml");
+
+        char fullPath[512]; sprintf(fullPath, "%s/top100.xml", path);
+        SetINIField("UserData/data.ini", "DumpPath", fullPath);
     }
     performCheckText(rootWindow);
 }
