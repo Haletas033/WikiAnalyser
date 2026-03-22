@@ -53,7 +53,7 @@ enum buttons {
     ZIG_OPEN
 };
 
-void performCheckText(Window* wnd);
+void performCheckText(Window* wnd, int indeterminate);
 void failureOptions(Window* wnd);
 void success(Window* wnd);
 
@@ -70,7 +70,7 @@ void downloadFullWikipediaDump(Window* wnd) {
     OSCreateThreadForDownloadTo("https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles-multistream.xml.bz2", path, "/wikiDump.bz2");
     if (path[0] != '\0') {
         SetINIField("UserData/data.ini", "DumpPath", path);
-        performCheckText(wnd);
+        performCheckText(wnd, 1);
     }
 }
 
@@ -99,7 +99,7 @@ void handleTopNWikiDump(Window* wnd) {
         char fullPath[512]; sprintf(fullPath, "%s/top100.xml", path);
         SetINIField("UserData/data.ini", "DumpPath", fullPath);
     }
-    performCheckText(rootWindow);
+    performCheckText(rootWindow, 0);
 }
 
 void downloadTopNWikipediaDump(Window* wnd) {
@@ -133,7 +133,7 @@ void handleCustomWikiDump(Window* wnd) {
         CurlDownloadWithSpecialExportTo(names, len, path, "/top100.xml");
         SetINIField("UserData/data.ini", "DumpPath", path);
     }
-    performCheckText(rootWindow);
+    performCheckText(rootWindow, 0);
 }
 
 void downloadCustomWikipediaDump(Window* wnd) {
@@ -155,7 +155,7 @@ void openWikipediaDump(Window* wnd) {
     const char* path = OSGetFilePath();
     if (path[0] != '\0') {
         SetINIField("UserData/data.ini", "DumpPath", path);
-        performCheckText(wnd);
+        performCheckText(wnd, -1);
     }
 }
 
@@ -295,11 +295,20 @@ void success(Window* wnd) {
     changeSuccessText(wnd);
 }
 
-void performCheckText(Window* wnd) {
+GUI_BUTTON_LIKE* progressBar;
+
+void handleProgressBarCompletion() {
+    progressBar = NULL;
+    OSDestroyButtonById(rootWindow, 29);
+    changeTextFunc = changePerformCheckText;
+    changePerformCheckText(rootWindow);
+}
+
+void performCheckText(Window* wnd, const int indeterminate) {
     animDone = 1;
     deleteButtons(wnd);
-    changeTextFunc = changePerformCheckText;
-    changePerformCheckText(wnd);
+    if (indeterminate != -1)
+        progressBar = DrawPermanentButton((GUI_BUTTON_LIKE){"Download Progress", 10, 40, 80, 20, OSCreateProgressBar(29, handleProgressBarCompletion, wnd, indeterminate)}, wnd);
 }
 
 void WelcomeGUI(Window* wnd, void(*funcCallback)(Window* wnd)) {

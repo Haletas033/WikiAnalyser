@@ -12,6 +12,7 @@ find_package(CURL REQUIRED)
 find_package(ZLIB REQUIRED)
 
 if (WIN32)
+    file(COPY WikiAnalyser.exe.manifest DESTINATION ${CMAKE_BINARY_DIR}/)
     set(OS_SRC
             src/WINGUI.c
     )
@@ -61,7 +62,7 @@ add_executable(WikiAnalyser
 target_include_directories(WikiAnalyser PRIVATE ${CMAKE_BINARY_DIR})
 
 if (WIN32)
-    target_link_libraries(WikiAnalyser PRIVATE -lshlwapi)
+    target_link_libraries(WikiAnalyser PRIVATE -lshlwapi -lcomctl32 -luxtheme)
 else ()
     target_link_libraries(WikiAnalyser PRIVATE X11 m)
 endif()

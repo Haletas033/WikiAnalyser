@@ -4,6 +4,8 @@
 
 #include "../include/core/articleParser.h"
 
+#include "../../include/GUI.h"
+
 OnArticleFn OnArticle = NULL;
 
 void saveName(char*** names, char* name, unsigned int* namesPos, unsigned int* namePos) {
@@ -119,5 +121,8 @@ int ParseArticles(PCSTRFILEPATH szFilePath, Article **articles, Article *baseArt
 
     close(iFileDir);
     free(uszBuffer);
+
+    progress = -1;
+
     return 0;
 }

@@ -4,6 +4,8 @@
 
 #include "../include/curl.h"
 
+#include "../include/GUI.h"
+
 //Write callback
 size_t WriteData(void *ptr, size_t size, size_t nmemb, FILE *stream) {
     size_t written = fwrite(ptr, size, nmemb, stream);
@@ -56,9 +58,13 @@ void CurlDownloadTo(const char* url, const char* filePath, const char* fileName)
     free(tmp);
     fclose(wikiDumpZip);
     curl_easy_cleanup(handle);
+
+    progress = -1;
 }
 
 void CurlDownloadWithSpecialExportTo(const char** name, unsigned int count, const char* filePath, const char* fileName) {
+    maxProgress = count;
+
     CURL* handle = curl_easy_init();
     if (handle == NULL)
         return;
@@ -87,10 +93,13 @@ void CurlDownloadWithSpecialExportTo(const char** name, unsigned int count, cons
         free(body);
         body = malloc(strlen(bodyRoot) + 512*100 + strlen(bodyTail));
         strcpy(body, bodyRoot);
+        progress += 100;
     }
 
-    if (count % 100 != 0)
+    if (count % 100 != 0) {
         GetPageXML(handle, count % 100, i, body, name, bodyTail, url, wikiDump);
+        progress+= count % 100;
+    }
 
     curl_easy_cleanup(handle);
 

@@ -23,6 +23,11 @@ PaintStacks paintStacks = {0};
 DO_AFTER_ENTRY doAfters[5] = {0};
 BUTTON_COMMAND_ENTRY buttonCommands[32] = {0};
 
+volatile int progress = 0;
+int maxProgress = 1;
+void(*progressDoneFunc)(void) = NULL;
+int indeterminate = 0;
+
 //Draw functions that add themselves to paintStacks until manually removed
 COLOUR_RECT* DrawPermanentRectToPaintStacks(COLOUR_RECT colourRect, PaintStacks* ps) {
     ps->colourRectsSize++;

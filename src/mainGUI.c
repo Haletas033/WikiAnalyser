@@ -234,7 +234,7 @@ void MainGUIStart(Window* wnd) {
     OSCreateChildWindow(5, "VisualiserScreen", visualiserScreen);
     DrawPermanentWindow(visualiserScreen, wnd);
 
-    DrawPermanentText((GUI_TEXT){"No properties to display.", 50, 50, 30}, properties);
+    //DrawPermanentButton((GUI_BUTTON_LIKE){"Download Progress", 10, 40, 80, 20, OSCreateProgressBar(29, NULL, visualiserScreen, 1)}, visualiserScreen);
     DrawPermanentText((GUI_TEXT){"Console Initialized:", 17, 17, 20}, console);
     DrawPermanentText((GUI_TEXT){"Nothing to display yet...", 50, 50, 20}, visualiserScreen);
 

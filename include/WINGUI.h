@@ -11,6 +11,7 @@
 #include <direct.h>
 #include <shlobj.h>
 #include <shlwapi.h>
+#include <uxtheme.h>
 #include "../include/funcStructs.h"
 
 
@@ -34,6 +35,8 @@ void* OSCreateChildWindowOnChildWindow(unsigned int id, const char* name, Window
 void* OSCreateButton(unsigned int id, void (*func)(Window* wnd), Window* wnd);
 void* OSCreateCheckBox(unsigned int id, void (*func)(Window* wnd), Window* wnd);
 void* OSCreateInputBox(unsigned int id, Window* wnd);
+void* OSCreateProgressBar(unsigned int id, void(*progressFunc)(void), Window* wnd, unsigned int isIndeterminate);
+void OSUpdateProgress();
 
 //Drawing functions
 void OSDrawRect(HDC hdc, COLOUR_RECT colourRect, int scrW, int scrH);

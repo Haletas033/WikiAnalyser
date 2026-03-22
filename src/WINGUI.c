@@ -13,6 +13,8 @@ WNDCLASS wc = {};
 HWND rootHwnd;
 HMODULE zigLib = NULL;
 
+HWND progressBarHwnd;
+
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
         case WM_DESTROY: {
@@ -29,6 +31,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         case WM_TIMER:
             if (wParam == 1) {
                 InvalidateRect(hwnd, NULL, FALSE);
+                OSUpdateProgress();
             } else {
                 doAfters[wParam - 1].doAfterFunc(doAfters[wParam - 1].wnd);
             }
@@ -98,12 +101,17 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 }
 
 void OSCreateWindowClass() {
+    INITCOMMONCONTROLSEX icc = {0};
+    icc.dwSize = sizeof(INITCOMMONCONTROLSEX);
+    icc.dwICC = ICC_PROGRESS_CLASS;
+
+    InitCommonControlsEx(&icc);
+
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = GetModuleHandle(NULL);
     wc.lpszClassName = CLASS_NAME;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.hbrBackground = NULL;
-
 
     RegisterClass(&wc);
 }
@@ -148,7 +156,7 @@ void* OSCreateChildWindow(const unsigned int id, const char* name, Window* wnd) 
         0,
         CLASS_NAME,
         name,
-        WS_CHILD | WS_VISIBLE | WS_DLGFRAME | WS_CLIPCHILDREN,
+        WS_CHILD | WS_VISIBLE | WS_BORDER | WS_CLIPCHILDREN,
         0, 0, 0, 0,
         rootHwnd,
         (HMENU)id,
@@ -169,7 +177,7 @@ void* OSCreateChildWindowOnChildWindow(const unsigned int id, const char* name, 
         0,
         CLASS_NAME,
         name,
-        WS_CHILD | WS_VISIBLE | WS_DLGFRAME | WS_CLIPCHILDREN,
+        WS_CHILD | WS_VISIBLE | WS_BORDER | WS_CLIPCHILDREN,
         0, 0, 0, 0,
         parentWindow->wndHwnd,
         (HMENU)id,
@@ -197,6 +205,7 @@ void* OSCreateButton(const unsigned int id, void (*func)(Window* wnd), Window* w
         wc.hInstance,
         NULL
     );
+
     buttonCommands[id-1].buttonCommand = func;
     buttonCommands[id-1].wnd = wnd;
     return buttonHwnd;
@@ -214,6 +223,7 @@ void* OSCreateCheckBox(const unsigned int id, void (*func)(Window* wnd), Window*
         wc.hInstance,
         NULL
     );
+
     buttonCommands[id-1].buttonCommand = func;
     buttonCommands[id-1].wnd = wnd;
     return buttonHwnd;
@@ -221,17 +231,68 @@ void* OSCreateCheckBox(const unsigned int id, void (*func)(Window* wnd), Window*
 
 void* OSCreateInputBox(const unsigned int id, Window* wnd) {
     HWND inputBox = CreateWindowEx(
-        0,
+        WS_EX_CLIENTEDGE,
         "EDIT",
         "",
-        WS_TABSTOP | WS_CHILD | WS_VISIBLE | WS_DLGFRAME | ES_MULTILINE | ES_AUTOVSCROLL,
+        WS_TABSTOP | WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_AUTOVSCROLL,
         0,0,0,0,
         wnd->wndHwnd,
         (HMENU)id,
         wc.hInstance,
         NULL
     );
+
     return inputBox;
+}
+
+void* OSCreateProgressBar(const unsigned int id, void(*progressFunc)(void), Window* wnd, const unsigned int isIndeterminate) {
+    HWND progressBar = CreateWindowEx(
+        0,
+        "msctls_progress32",
+        "",
+        WS_TABSTOP | WS_CHILD | WS_VISIBLE | (isIndeterminate ? PBS_MARQUEE : 0),
+        0,0,0,0,
+        wnd->wndHwnd,
+        (HMENU)id,
+        wc.hInstance,
+        NULL
+    );
+    indeterminate = isIndeterminate;
+    progressDoneFunc = progressFunc;
+    progressBarHwnd = progressBar;
+
+    if (indeterminate) {
+        SendMessage(progressBarHwnd, PBM_SETMARQUEE, 1, 50);
+    }
+
+    return progressBar;
+}
+
+void OSUpdateProgress() {
+    if (!indeterminate) {
+        SendMessage(progressBarHwnd, PBM_SETRANGE32, 0, maxProgress);
+        SendMessage(progressBarHwnd, PBM_SETPOS, progress, 0);
+
+        if (progress >= maxProgress) {
+            if (progressDoneFunc != NULL) progressDoneFunc();
+            //Cleanup
+            progress = 0;
+            maxProgress = 0;
+            indeterminate = 0;
+            progressDoneFunc = NULL;
+        }
+    } else {
+        if (progress == -1) {
+            if (progressDoneFunc != NULL) progressDoneFunc();
+            //Cleanup
+            progress = 0;
+            maxProgress = 0;
+            indeterminate = 0;
+            progressDoneFunc = NULL;
+        }
+    }
+
+
 }
 
 void* OSCreateImage(const char* imgPath) {
