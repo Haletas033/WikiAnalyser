@@ -214,6 +214,8 @@ void StartPropertiesModeSelector(Window* wnd) {
         OSCreateButton(8, SwitchWindowPaintStacksToParse, wnd)}, wnd);
 }
 
+const char* items[] = {"foo", "bar", "baz"};
+
 void MainGUIStart(Window* wnd) {
     Window* propertiesModeSelector = malloc(sizeof(Window));
     properties = malloc(sizeof(Window));
@@ -235,8 +237,8 @@ void MainGUIStart(Window* wnd) {
     DrawPermanentWindow(visualiserScreen, wnd);
 
     //DrawPermanentButton((GUI_BUTTON_LIKE){"Download Progress", 10, 40, 80, 20, OSCreateProgressBar(29, NULL, visualiserScreen, 1)}, visualiserScreen);
+    DrawPermanentButton((GUI_BUTTON_LIKE){"Select an option...", 10, 50, 80, 20, OSCreateDropdown(28, visualiserScreen, items, 3)}, visualiserScreen);
     DrawPermanentText((GUI_TEXT){"Console Initialized:", 17, 17, 20}, console);
-    DrawPermanentText((GUI_TEXT){"Nothing to display yet...", 50, 50, 20}, visualiserScreen);
 
     SetupCleanupPaintStacks(&cleanupPaintStacks, properties);
     SetupParsePaintStacks(&parsePaintStacks, properties);

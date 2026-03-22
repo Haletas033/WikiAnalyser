@@ -30,7 +30,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         }
         case WM_TIMER:
             if (wParam == 1) {
-                InvalidateRect(hwnd, NULL, FALSE);
+                char classname[32];
+                GetClassName(GetFocus(), classname, 32);
+                if (strcmp(classname, "ComboBox") != 0 && strcmp(classname, "ComboLBox") != 0)
+                    InvalidateRect(hwnd, NULL, FALSE);
                 OSUpdateProgress();
             } else {
                 doAfters[wParam - 1].doAfterFunc(doAfters[wParam - 1].wnd);
@@ -245,6 +248,26 @@ void* OSCreateInputBox(const unsigned int id, Window* wnd) {
     return inputBox;
 }
 
+void* OSCreateDropdown(const unsigned int id, Window* wnd, const char** items, const unsigned int count) {
+    HWND comboBox = CreateWindowEx(
+        WS_EX_CLIENTEDGE,
+        "COMBOBOX",
+        "",
+        WS_TABSTOP | WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST,
+        0,0,0,0,
+        wnd->wndHwnd,
+        (HMENU)id,
+        wc.hInstance,
+        NULL
+    );
+
+    int i;
+    for (i = 0; i < count; i++)
+        SendMessage(comboBox, CB_ADDSTRING, 0, (LPARAM)items[i]);
+
+    return comboBox;
+}
+
 void* OSCreateProgressBar(const unsigned int id, void(*progressFunc)(void), Window* wnd, const unsigned int isIndeterminate) {
     HWND progressBar = CreateWindowEx(
         0,
@@ -408,29 +431,37 @@ void OSDrawImage(HDC hdc, GUI_IMAGE image, int scrW, int scrH) {
 }
 
 void OSDrawChildWindow(Window* wnd, int scrW, int scrH) {
-    HWND buttonHwnd = wnd->wndHwnd;
+    char classname[32];
+    GetClassName(GetFocus(), classname, 32);
+    if (strcmp(classname, "ComboBox") != 0 && strcmp(classname, "ComboLBox") != 0) {
+        HWND buttonHwnd = wnd->wndHwnd;
 
-    //Get percentage based x,y,w,h
-    const GUI_POINT start = (GUI_POINT){wnd->windowRect.x * scrW / 100, wnd->windowRect.y * scrH / 100};
-    const GUI_POINT end = (GUI_POINT){wnd->windowRect.w * scrW / 100, wnd->windowRect.h * scrH / 100};
+        //Get percentage based x,y,w,h
+        const GUI_POINT start = (GUI_POINT){wnd->windowRect.x * scrW / 100, wnd->windowRect.y * scrH / 100};
+        const GUI_POINT end = (GUI_POINT){wnd->windowRect.w * scrW / 100, wnd->windowRect.h * scrH / 100};
 
-    MoveWindow(buttonHwnd, start.x, start.y, end.x, end.y, TRUE);
-    ShowWindow(buttonHwnd, 1);
+        MoveWindow(buttonHwnd, start.x, start.y, end.x, end.y, TRUE);
+        ShowWindow(buttonHwnd, 1);
+    }
 }
 
 void OSDrawButtonLike(GUI_BUTTON_LIKE button, int scrW, int scrH) {
-    HWND buttonHwnd = button.buttonLoc;
+    char classname[32];
+    GetClassName(GetFocus(), classname, 32);
+    if (strcmp(classname, "ComboBox") != 0 && strcmp(classname, "ComboLBox") != 0) {
+        HWND buttonHwnd = button.buttonLoc;
 
-    //Get percentage based x,y,w,h
-    const GUI_POINT start = (GUI_POINT){button.rect.x * scrW / 100, button.rect.y * scrH / 100};
-    const GUI_POINT end = (GUI_POINT){button.rect.w * scrW / 100, button.rect.h * scrH / 100};
+        //Get percentage based x,y,w,h
+        const GUI_POINT start = (GUI_POINT){button.rect.x * scrW / 100, button.rect.y * scrH / 100};
+        const GUI_POINT end = (GUI_POINT){button.rect.w * scrW / 100, button.rect.h * scrH / 100};
 
-    MoveWindow(buttonHwnd, start.x, start.y, end.x, end.y, TRUE);
-    char buff[16];
-    GetClassName(buttonHwnd, buff, 16);
-    if (strcmp(buff, "Edit") != 0)
-        SetWindowText(buttonHwnd, button.text);
-    ShowWindow(buttonHwnd, button.shouldShow);
+        MoveWindow(buttonHwnd, start.x, start.y, end.x, end.y, TRUE);
+        char buff[16];
+        GetClassName(buttonHwnd, buff, 16);
+        if (strcmp(buff, "Edit") != 0)
+            SetWindowText(buttonHwnd, button.text);
+        ShowWindow(buttonHwnd, button.shouldShow);
+    }
 }
 
 void OSDoAfterMillis(Window* wnd, const unsigned int id, const unsigned int millis, void (*func)(Window* wnd)) {
