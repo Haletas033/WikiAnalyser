@@ -30,10 +30,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         }
         case WM_TIMER:
             if (wParam == 1) {
-                char classname[32];
-                GetClassName(GetFocus(), classname, 32);
-                if (strcmp(classname, "ComboBox") != 0 && strcmp(classname, "ComboLBox") != 0)
-                    InvalidateRect(hwnd, NULL, FALSE);
+                InvalidateRect(hwnd, NULL, FALSE);
                 OSUpdateProgress();
             } else {
                 doAfters[wParam - 1].doAfterFunc(doAfters[wParam - 1].wnd);
@@ -431,9 +428,6 @@ void OSDrawImage(HDC hdc, GUI_IMAGE image, int scrW, int scrH) {
 }
 
 void OSDrawChildWindow(Window* wnd, int scrW, int scrH) {
-    char classname[32];
-    GetClassName(GetFocus(), classname, 32);
-    if (strcmp(classname, "ComboBox") != 0 && strcmp(classname, "ComboLBox") != 0) {
         HWND buttonHwnd = wnd->wndHwnd;
 
         //Get percentage based x,y,w,h
@@ -442,26 +436,30 @@ void OSDrawChildWindow(Window* wnd, int scrW, int scrH) {
 
         MoveWindow(buttonHwnd, start.x, start.y, end.x, end.y, TRUE);
         ShowWindow(buttonHwnd, 1);
-    }
 }
 
 void OSDrawButtonLike(GUI_BUTTON_LIKE button, int scrW, int scrH) {
-    char classname[32];
-    GetClassName(GetFocus(), classname, 32);
-    if (strcmp(classname, "ComboBox") != 0 && strcmp(classname, "ComboLBox") != 0) {
-        HWND buttonHwnd = button.buttonLoc;
 
-        //Get percentage based x,y,w,h
-        const GUI_POINT start = (GUI_POINT){button.rect.x * scrW / 100, button.rect.y * scrH / 100};
-        const GUI_POINT end = (GUI_POINT){button.rect.w * scrW / 100, button.rect.h * scrH / 100};
+    HWND buttonHwnd = button.buttonLoc;
 
+    //Get percentage based x,y,w,h
+    const GUI_POINT start = (GUI_POINT){button.rect.x * scrW / 100, button.rect.y * scrH / 100};
+    const GUI_POINT end = (GUI_POINT){button.rect.w * scrW / 100, button.rect.h * scrH / 100};
+
+    char buff[32];
+    GetClassName(buttonHwnd, buff, 32);
+
+    RECT rect;
+    GetWindowRect(buttonHwnd, &rect);
+    MapWindowPoints(HWND_DESKTOP, GetParent(buttonHwnd), (POINT*)&rect, 2);
+
+    //Only move if needed
+    if (start.x != rect.left || start.y != rect.top)
         MoveWindow(buttonHwnd, start.x, start.y, end.x, end.y, TRUE);
-        char buff[16];
-        GetClassName(buttonHwnd, buff, 16);
-        if (strcmp(buff, "Edit") != 0)
-            SetWindowText(buttonHwnd, button.text);
-        ShowWindow(buttonHwnd, button.shouldShow);
-    }
+
+    if (strcmp(buff, "Edit") != 0)
+        SetWindowText(buttonHwnd, button.text);
+    ShowWindow(buttonHwnd, button.shouldShow);
 }
 
 void OSDoAfterMillis(Window* wnd, const unsigned int id, const unsigned int millis, void (*func)(Window* wnd)) {
