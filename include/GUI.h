@@ -27,7 +27,7 @@ typedef struct GUI_LINE { GUI_POINT p1, p2; int thickness; } GUI_LINE;
 
 typedef struct GUI_LINE_CHAIN { GUI_POINT* points; unsigned int pointsSize; int thickness; } GUI_LINE_CHAIN;
 
-typedef struct GUI_TEXT {const char* text; GUI_POINT pos; int size;} GUI_TEXT;
+typedef struct GUI_TEXT {char* text; GUI_POINT pos; int size;} GUI_TEXT;
 
 typedef struct GUI_IMAGE {GUI_RECT rect; void* imgLoc;} GUI_IMAGE;
 

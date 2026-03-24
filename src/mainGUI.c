@@ -20,6 +20,8 @@ PaintStacks parsePaintStacks = {0};
 
 Window* properties;
 
+int memPerArticle = sizeof(Article);
+
 char* currentProjectPath;
 
 void ApplyCleanup(Window* _) {
@@ -113,15 +115,19 @@ Field boolFields = {0};
 Field stringFields = {0};
 
 void DrawFieldWidgets(PaintStacks* ps, Field* field) {
-    //Clear fields from paintStacks
+    //Update memory per article
+    char memPerArticleString[32];
+    sprintf(memPerArticleString, "Memory per Article: %d bytes", memPerArticle);
+    ps->texts[1].text = strdup(memPerArticleString);
 
+    //Clear fields from paintStacks
     int i;
     for (i = 2; i < ps->buttonsSize; i++)
         ps->buttons[i].shouldShow = 0;
 
-    for (i = 1; i < ps->textsSize; i++)
+    for (i = 2; i < ps->textsSize; i++)
         memset(&ps->texts[i], 0, sizeof(GUI_TEXT));
-    ps->textsSize-=(i-1);
+    ps->textsSize-=(i-2);
 
     int pos = 0;
     for (i = 0; i < field->fieldsSize; i++) {
@@ -144,10 +150,10 @@ void RemoveField(Window* wnd) {
     Field *field;
 
     switch (index) {
-        case 0: field = &intFields; break;
-        case 1: field = &floatFields; break;
-        case 2: field = &boolFields; break;
-        case 3: field = &stringFields; break;
+        case 0: field = &intFields;    memPerArticle-=sizeof(int);   break;
+        case 1: field = &floatFields;  memPerArticle-=sizeof(float); break;
+        case 2: field = &boolFields;   memPerArticle-=sizeof(int);   break;
+        case 3: field = &stringFields; memPerArticle-=sizeof(char*); break;
         default: return;
     }
 
@@ -160,6 +166,8 @@ void RemoveField(Window* wnd) {
     field->freeSlots[field->freeSlotsSize] = currentButtonId/(index+1);
     field->freeSlotsSize++;
 
+
+
     DrawFieldWidgets(&fieldsPaintStacks, field);
 }
 
@@ -168,10 +176,10 @@ void AddFieldInput(Window* wnd) {
     Field *field;
 
     switch (index) {
-        case 0: field = &intFields; break;
-        case 1: field = &floatFields; break;
-        case 2: field = &boolFields; break;
-        case 3: field = &stringFields; break;
+        case 0: field = &intFields;    memPerArticle+=sizeof(int);   break;
+        case 1: field = &floatFields;  memPerArticle+=sizeof(float); break;
+        case 2: field = &boolFields;   memPerArticle+=sizeof(int);   break;
+        case 3: field = &stringFields; memPerArticle+=sizeof(char*); break;
         default: return;
     }
 
@@ -204,6 +212,7 @@ void SetupFieldsPaintStacks(PaintStacks* ps, Window* wnd) {
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Select an option...", 10, 7, 70, 3, OSCreateDropdown(28, wnd, items, 4)}, ps);
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"+",
         (GUI_RECT){80,7, 10, 3},  OSCreateButton(27, AddFieldInput, wnd)}, ps);
+    DrawPermanentTextToPaintStacks((GUI_TEXT){"Memory per Article: 88 bytes", 50, 12, 35}, ps);
 }
 
 void SwitchWindowPaintStacksToFields(Window* _) {
