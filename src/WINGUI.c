@@ -37,7 +37,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             }
             return 0;
         case WM_COMMAND:
-            if (wParam <= 32) {
+            if (wParam <= 512) {
+                currentButtonId = wParam;
                 buttonCommands[wParam-1].buttonCommand(buttonCommands[wParam-1].wnd);
             }
             return 0;
@@ -658,6 +659,10 @@ void OSCreateThreadForParse(PCSTRFILEPATH szFilePath, Article **articles, Articl
     ParseStruct* parseStruct = malloc(sizeof(ParseStruct));
     parseStruct->szFilePath = szFilePath; parseStruct->articles = articles; parseStruct->baseArticle = baseArticle; parseStruct->articleCount = articleCount;
     OSCreateThreadForFunction(ParseThread, parseStruct);
+}
+
+int OSGetDropdownCurrentlySelected(const unsigned int id, Window* wnd) {
+    return SendMessage(GetDlgItem(wnd->wndHwnd, id), CB_GETCURSEL, 0, 0);
 }
 
 int GetRefreshRate() {

@@ -66,6 +66,7 @@ void* OSLoadLibrary(const char* libPath, const char* funcName);
 void OSCreateThreadForDownloadTo(const char* url, const char* filePath, const char* fileName);
 void OSCreateThreadForDownloadSpecialExportTo(const char** name, unsigned int count, const char* filePath, const char* fileName);
 void OSCreateThreadForParse(PCSTRFILEPATH szFilePath, Article **articles, Article *baseArticle, unsigned int *articleCount);
+int OSGetDropdownCurrentlySelected(unsigned int id, Window* wnd);
 int GetRefreshRate();
 
 

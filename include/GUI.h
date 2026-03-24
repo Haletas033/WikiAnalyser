@@ -83,12 +83,13 @@ typedef struct BUTTON_COMMAND_ENTRY {
 
 extern PaintStacks paintStacks;
 extern DO_AFTER_ENTRY doAfters[5];
-extern BUTTON_COMMAND_ENTRY buttonCommands[32];
+extern BUTTON_COMMAND_ENTRY buttonCommands[512];
 
 extern volatile int progress;
 extern int maxProgress;
 extern void(*progressDoneFunc)(void);
 extern int indeterminate;
+extern int currentButtonId;
 
 typedef struct Layout {
     Window* windows;

@@ -94,8 +94,120 @@ void SwitchWindowPaintStacksToCleanup(Window* _) {
     HideParseButtons();
 }
 
+const char* items[] = {"Int Fields", "Float Fields", "Bool Fields", "String Fields"};
+
+
+
+typedef struct Field {
+    int fieldsSize;
+    void* ifieldNameInputs[128];
+    void* fieldXButtons[128];
+    int fieldNameInputsGUI[128];
+    int fieldXButtonsGUI[128];
+    int freeSlots[128]; int freeSlotsSize;
+} Field;
+
+Field intFields = {0};
+Field floatFields = {0};
+Field boolFields = {0};
+Field stringFields = {0};
+
+void DrawFieldWidgets(PaintStacks* ps, Field* field) {
+    //Clear fields from paintStacks
+
+    int i;
+    for (i = 2; i < ps->buttonsSize; i++)
+        ps->buttons[i].shouldShow = 0;
+
+    for (i = 1; i < ps->textsSize; i++)
+        memset(&ps->texts[i], 0, sizeof(GUI_TEXT));
+    ps->textsSize-=(i-1);
+
+    int pos = 0;
+    for (i = 0; i < field->fieldsSize; i++) {
+        if (field->fieldXButtons[i] != NULL) {
+            pos++;
+            DrawPermanentTextToPaintStacks((GUI_TEXT){"Name:", 20, 12+(4*pos), 35}, ps);
+
+            ps->buttons[field->fieldNameInputsGUI[i]] = (GUI_BUTTON_LIKE){"Input field name...",
+                (GUI_RECT){30,10+4*pos, 50, 4},  ps->buttons[field->fieldNameInputsGUI[i]].buttonLoc, 1};
+            ps->buttons[field->fieldXButtonsGUI[i]] = (GUI_BUTTON_LIKE){"X",
+                (GUI_RECT){80,10+4*pos, 10, 4},  ps->buttons[field->fieldXButtonsGUI[i]].buttonLoc, 1};
+        }
+    }
+
+    properties->paintStacks = fieldsPaintStacks;
+}
+
+void RemoveField(Window* wnd) {
+    const int index = OSGetDropdownCurrentlySelected(28, wnd);
+    Field *field;
+
+    switch (index) {
+        case 0: field = &intFields; break;
+        case 1: field = &floatFields; break;
+        case 2: field = &boolFields; break;
+        case 3: field = &stringFields; break;
+        default: return;
+    }
+
+    OSDestroyButtonById(wnd, currentButtonId+48);
+    OSDestroyButtonById(wnd, currentButtonId);
+
+    field->ifieldNameInputs[currentButtonId/(index+1)-80] = NULL;
+    field->fieldXButtons[currentButtonId/(index+1)-32] = NULL;
+
+    field->freeSlots[field->freeSlotsSize] = currentButtonId/(index+1);
+    field->freeSlotsSize++;
+
+    DrawFieldWidgets(&fieldsPaintStacks, field);
+}
+
+void AddFieldInput(Window* wnd) {
+    const int index = OSGetDropdownCurrentlySelected(28, wnd);
+    Field *field;
+
+    switch (index) {
+        case 0: field = &intFields; break;
+        case 1: field = &floatFields; break;
+        case 2: field = &boolFields; break;
+        case 3: field = &stringFields; break;
+        default: return;
+    }
+
+    int chosenNameInputPos = field->fieldsSize + 80;
+    int chosenXButtonsPos = field->fieldsSize + 32;
+
+    if (field->freeSlotsSize > 0) {
+        chosenNameInputPos = field->freeSlots[field->freeSlotsSize-1] + 48;
+        chosenXButtonsPos = field->freeSlots[field->freeSlotsSize-1];
+        field->freeSlotsSize--;
+    }
+
+    field->ifieldNameInputs[chosenNameInputPos-80] = OSCreateInputBox(chosenNameInputPos*(index+1), wnd);
+    field->fieldXButtons[chosenXButtonsPos-32] = OSCreateButton(chosenXButtonsPos*(index+1), RemoveField, wnd);
+
+    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Input field name...",
+        (GUI_RECT){0},  field->ifieldNameInputs[chosenNameInputPos-80]}, &fieldsPaintStacks);
+    field->fieldNameInputsGUI[chosenNameInputPos-80] = fieldsPaintStacks.buttonsSize-1;
+    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"X",
+        (GUI_RECT){0},  field->fieldXButtons[chosenXButtonsPos-32]}, &fieldsPaintStacks);
+    field->fieldXButtonsGUI[chosenXButtonsPos-32] = fieldsPaintStacks.buttonsSize-1;
+
+    if (field->freeSlotsSize == 0) field->fieldsSize++;
+
+    DrawFieldWidgets(&fieldsPaintStacks, field);
+}
+
+void SetupFieldsPaintStacks(PaintStacks* ps, Window* wnd) {
+    DrawPermanentTextToPaintStacks((GUI_TEXT){"Field Type", 50, 5, 35}, ps);
+    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Select an option...", 10, 7, 70, 3, OSCreateDropdown(28, wnd, items, 4)}, ps);
+    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"+",
+        (GUI_RECT){80,7, 10, 3},  OSCreateButton(27, AddFieldInput, wnd)}, ps);
+}
+
 void SwitchWindowPaintStacksToFields(Window* _) {
-    properties->paintStacks = (PaintStacks){0};
+    properties->paintStacks = fieldsPaintStacks;
     HideCleanupButtons();
     HideParseButtons();
 }
@@ -214,8 +326,6 @@ void StartPropertiesModeSelector(Window* wnd) {
         OSCreateButton(8, SwitchWindowPaintStacksToParse, wnd)}, wnd);
 }
 
-const char* items[] = {"foo", "bar", "baz"};
-
 void MainGUIStart(Window* wnd) {
     Window* propertiesModeSelector = malloc(sizeof(Window));
     properties = malloc(sizeof(Window));
@@ -237,10 +347,10 @@ void MainGUIStart(Window* wnd) {
     DrawPermanentWindow(visualiserScreen, wnd);
 
     //DrawPermanentButton((GUI_BUTTON_LIKE){"Download Progress", 10, 40, 80, 20, OSCreateProgressBar(29, NULL, visualiserScreen, 1)}, visualiserScreen);
-    DrawPermanentButton((GUI_BUTTON_LIKE){"Select an option...", 10, 50, 80, 20, OSCreateDropdown(28, visualiserScreen, items, 3)}, visualiserScreen);
     DrawPermanentText((GUI_TEXT){"Console Initialized:", 17, 17, 20}, console);
 
     SetupCleanupPaintStacks(&cleanupPaintStacks, properties);
+    SetupFieldsPaintStacks(&fieldsPaintStacks, properties);
     SetupParsePaintStacks(&parsePaintStacks, properties);
     properties->paintStacks = cleanupPaintStacks;
     StartPropertiesModeSelector(propertiesModeSelector);
