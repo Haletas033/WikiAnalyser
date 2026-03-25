@@ -82,6 +82,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             for (i = 0; i < hwndPaintStacks->colourPointsSize; i++)
                 OSDrawPoint(memDC, hwndPaintStacks->colourPoints[i], windowWidth, windowHeight);
 
+            for (i = 0; i < hwndPaintStacks->colourPieSlicesSize; i++)
+                OSDrawPieSlice(memDC, hwndPaintStacks->colourPieSlices[i], windowWidth, windowHeight);
+
             for (i = 0; i < hwndPaintStacks->textsSize; i++)
                 OSDrawText(memDC, hwndPaintStacks->texts[i], windowWidth, windowHeight);
 
@@ -378,6 +381,35 @@ void OSDrawPoint(HDC hdc, COLOUR_POINT colourPoint, int scrW, int scrH) {
     HBRUSH oldBrush = SelectObject(hdc, brush);
 
     Ellipse(hdc, p.x - radius, p.y - radius, p.x + radius, p.y + radius);
+
+    SelectObject(hdc, oldPen);
+    SelectObject(hdc, oldBrush);
+    DeleteObject(pen);
+    DeleteObject(brush);
+}
+
+void OSDrawPieSlice(HDC hdc, COLOUR_PIE_SLICE colourPieSlice, int scrW, int scrH) {
+    const COLOUR col = colourPieSlice.colour;
+    const GUI_POINT center = (GUI_POINT){colourPieSlice.pieSlice.center.x * scrW / 100, colourPieSlice.pieSlice.center.y * scrH / 100};
+    const int radius = colourPieSlice.pieSlice.radius/2 * min(scrW, scrH) / 100;
+    const GUI_RECT boundingBox = (GUI_RECT){center.x-radius, center.y-radius, center.x+radius, center.y+radius};
+
+    const GUI_POINT startDeg = (GUI_POINT){
+        center.x+cos(DEG_TO_RAD(-colourPieSlice.pieSlice.startDegrees))*radius,
+        center.y-sin(DEG_TO_RAD(-colourPieSlice.pieSlice.startDegrees))*radius
+    };
+
+    const GUI_POINT endDeg = (GUI_POINT){
+        center.x+cos(DEG_TO_RAD(-colourPieSlice.pieSlice.endDegrees))*radius,
+        center.y-sin(DEG_TO_RAD(-colourPieSlice.pieSlice.endDegrees))*radius
+    };
+
+    HPEN pen = CreatePen(PS_SOLID, 1,RGB(col.r, col.g, col.b));
+    HBRUSH brush = CreateSolidBrush(RGB(col.r, col.g, col.b));
+    HPEN oldPen = SelectObject(hdc, pen);
+    HBRUSH oldBrush = SelectObject(hdc, brush);
+
+    Pie(hdc, boundingBox.x, boundingBox.y, boundingBox.w, boundingBox.h,endDeg.x, endDeg.y,  startDeg.x, startDeg.y);
 
     SelectObject(hdc, oldPen);
     SelectObject(hdc, oldBrush);

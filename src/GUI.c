@@ -73,6 +73,15 @@ COLOUR_POINT* DrawPermanentPointToPaintStacks(COLOUR_POINT colourPoint, PaintSta
     return &ps->colourPoints[ps->colourPointsSize-1];
 }
 
+COLOUR_PIE_SLICE* DrawPermanentPieSliceToPaintStacks(COLOUR_PIE_SLICE colourPieSlice, PaintStacks* ps) {
+    ps->colourPieSlicesSize++;
+    COLOUR_PIE_SLICE* tmp = realloc(ps->colourPieSlices, ps->colourPieSlicesSize*sizeof(COLOUR_PIE_SLICE));
+    if (!tmp) { return NULL; }
+    ps->colourPieSlices = tmp;
+    ps->colourPieSlices[ps->colourPieSlicesSize-1] = colourPieSlice;
+    return &ps->colourPieSlices[ps->colourPieSlicesSize-1];
+}
+
 GUI_TEXT* DrawPermanentTextToPaintStacks(GUI_TEXT text, PaintStacks* ps) {
     ps->textsSize++;
     GUI_TEXT* tmp = realloc(ps->texts, ps->textsSize*sizeof(GUI_TEXT));
@@ -115,6 +124,7 @@ COLOUR_LINE* DrawPermanentLine(COLOUR_LINE colourLine, Window* wnd) {return Draw
 COLOUR_LINE_CHAIN* DrawPermanentLineChain(COLOUR_LINE_CHAIN colourLineChain, Window* wnd) {return DrawPermanentLineChainToPaintStacks(colourLineChain, &wnd->paintStacks);}
 GUI_TEXT* DrawPermanentText(GUI_TEXT text, Window* wnd) {return DrawPermanentTextToPaintStacks(text, &wnd->paintStacks);}
 COLOUR_POINT* DrawPermanentPoint(COLOUR_POINT colourPoint, Window* wnd) {return DrawPermanentPointToPaintStacks(colourPoint, &wnd->paintStacks);}
+COLOUR_PIE_SLICE* DrawPermanentPieSlice(COLOUR_PIE_SLICE colourPieSlice, Window* wnd) {return DrawPermanentPieSliceToPaintStacks(colourPieSlice, &wnd->paintStacks);}
 GUI_IMAGE* DrawPermanentImage(GUI_IMAGE image, Window* wnd) {return DrawPermanentImageToPaintStacks(image, &wnd->paintStacks);}
 Window** DrawPermanentWindow(const Window *wnd, Window* parentWnd) {return DrawPermanentWindowToPaintStacks(wnd, &parentWnd->paintStacks);}
 GUI_BUTTON_LIKE* DrawPermanentButton(GUI_BUTTON_LIKE button, Window* wnd) {return DrawPermanentButtonToPaintStacks(button, &wnd->paintStacks);}
@@ -148,7 +158,9 @@ void ClearGUI(PaintStacks* paintStacks) {
 void GUIStart(Window* wnd) {
     //CreateTopNFile();
     //WelcomeGUI(wnd, MainGUIStart);
-    MainGUIStart(wnd);
+    //MainGUIStart(wnd);
+    DrawPermanentPieSlice((COLOUR_PIE_SLICE){50, 50, 50, 0, 270, 255, 0, 0}, wnd);
+    DrawPermanentPieSlice((COLOUR_PIE_SLICE){50, 50, 50, 270, 360, 0, 0, 255}, wnd);
 }
 
 void GUILoop() {

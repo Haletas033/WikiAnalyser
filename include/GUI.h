@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include "config.h"
+#include <math.h>
 
 
 #define IDT_DO_AFTER 2
@@ -17,7 +18,7 @@
 
 #define MAX_FILE_SIZE 260
 
-
+#define DEG_TO_RAD(deg) deg*(M_PI/180)
 
 typedef struct GUI_RECT { int x, y, w, h; } GUI_RECT;
 
@@ -31,6 +32,8 @@ typedef struct GUI_TEXT {char* text; GUI_POINT pos; int size;} GUI_TEXT;
 
 typedef struct GUI_IMAGE {GUI_RECT rect; void* imgLoc;} GUI_IMAGE;
 
+typedef struct GUI_PIE_SLICE {GUI_POINT center; int radius; int startDegrees; int endDegrees;} GUI_PIE_SLICE;
+
 typedef struct GUI_BUTTON_LIKE {const char* text; GUI_RECT rect; void* buttonLoc; unsigned int shouldShow;} GUI_BUTTON_LIKE;
 
 typedef struct COLOUR{ int r, g, b; } COLOUR;
@@ -43,6 +46,8 @@ typedef struct COLOUR_LINE_CHAIN { GUI_LINE_CHAIN linePath; COLOUR colour; } COL
 
 typedef struct COLOUR_POINT { GUI_POINT point; int radius; COLOUR colour; } COLOUR_POINT;
 
+typedef struct COLOUR_PIE_SLICE { GUI_PIE_SLICE pieSlice; COLOUR colour; } COLOUR_PIE_SLICE;
+
 typedef struct Window Window;
 
 typedef struct PaintStacks {
@@ -50,6 +55,7 @@ typedef struct PaintStacks {
     COLOUR_LINE* colourLines;
     COLOUR_LINE_CHAIN* colourLineChains;
     COLOUR_POINT* colourPoints;
+    COLOUR_PIE_SLICE* colourPieSlices;
     GUI_TEXT* texts;
     GUI_IMAGE* images;
     Window** windows;
@@ -59,6 +65,7 @@ typedef struct PaintStacks {
     unsigned int colourLinesSize;
     unsigned int colourLinesChainsSize;
     unsigned int colourPointsSize;
+    unsigned int colourPieSlicesSize;
     unsigned int textsSize;
     unsigned int imagesSize;
     unsigned int windowsSize;

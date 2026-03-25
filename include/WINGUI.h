@@ -44,6 +44,7 @@ void OSDrawRect(HDC hdc, COLOUR_RECT colourRect, int scrW, int scrH);
 void OSDrawLine(HDC hdc, COLOUR_LINE colourLine, int scrW, int scrH);
 void OSDrawLineChain(HDC hdc, COLOUR_LINE_CHAIN colourLineChain, int scrW, int scrH);
 void OSDrawPoint(HDC hdc, COLOUR_POINT colourPoint, int scrW, int scrH);
+void OSDrawPieSlice(HDC hdc, COLOUR_PIE_SLICE colourPieSlice, int scrW, int scrH);
 void OSDrawText(HDC hdc, GUI_TEXT text, int scrW, int scrH);
 void OSDrawImage(HDC hdc, GUI_IMAGE image, int scrWm, int scrH);
 void OSDrawChildWindow(Window* wnd, int scrW, int scrH);
