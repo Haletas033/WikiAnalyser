@@ -18,6 +18,11 @@ PaintStacks cleanupPaintStacks = {0};
 PaintStacks fieldsPaintStacks = {0};
 PaintStacks parsePaintStacks = {0};
 
+Field intFields = {0};
+Field floatFields = {0};
+Field boolFields = {0};
+Field stringFields = {0};
+
 Article article;
 Article* articles = NULL;
 unsigned int articleCount;
@@ -86,6 +91,31 @@ void HideCleanupButtons() {
     OSShowButtonById(properties, 14, 0);
 }
 
+void HideFieldsButtons() {
+    //Hide main buttons
+    OSShowButtonById(properties, 26, 0);
+    OSShowButtonById(properties, 27, 0);
+    OSShowButtonById(properties, 28, 0);
+    //Hide generated Buttons
+    int i;
+    for (i = 0; i < intFields.fieldsSize; i++) {
+        if (intFields.fieldXButtons[i] != NULL) OSShowButtonById(properties, i+32, 0);
+        if (intFields.ifieldNameInputs[i] != NULL) OSShowButtonById(properties, i+80, 0);
+    }
+    for (i = 0; i < floatFields.fieldsSize; i++) {
+        if (floatFields.fieldXButtons[i] != NULL) OSShowButtonById(properties, i+32, 0);
+        if (floatFields.ifieldNameInputs[i] != NULL) OSShowButtonById(properties, i+80, 0);
+    }
+    for (i = 0; i < boolFields.fieldsSize; i++) {
+        if (boolFields.fieldXButtons[i] != NULL) OSShowButtonById(properties, i+32, 0);
+        if (boolFields.ifieldNameInputs[i] != NULL) OSShowButtonById(properties, i+80, 0);
+    }
+    for (i = 0; i < stringFields.fieldsSize; i++) {
+        if (stringFields.fieldXButtons[i] != NULL) OSShowButtonById(properties, i+32, 0);
+        if (stringFields.ifieldNameInputs[i] != NULL) OSShowButtonById(properties, i+80, 0);
+    }
+}
+
 void HideParseButtons() {
     //Can be hidden this way as the paintStacks has changed and when it changed back it will automatically show the buttons again
     OSShowButtonById(properties, 15, 0);
@@ -97,26 +127,11 @@ void HideParseButtons() {
 
 void SwitchWindowPaintStacksToCleanup(Window* _) {
     properties->paintStacks = cleanupPaintStacks;
+    HideFieldsButtons();
     HideParseButtons();
 }
 
 const char* items[] = {"Int Fields", "Float Fields", "Bool Fields", "String Fields"};
-
-
-
-typedef struct Field {
-    int fieldsSize;
-    void* ifieldNameInputs[128];
-    void* fieldXButtons[128];
-    int fieldNameInputsGUI[128];
-    int fieldXButtonsGUI[128];
-    int freeSlots[128]; int freeSlotsSize;
-} Field;
-
-Field intFields = {0};
-Field floatFields = {0};
-Field boolFields = {0};
-Field stringFields = {0};
 
 void DrawFieldWidgets(PaintStacks* ps, Field* field) {
     //Update memory per article
@@ -338,6 +353,7 @@ void SetupParsePaintStacks(PaintStacks* ps, Window* wnd) {
 void SwitchWindowPaintStacksToParse(Window* _) {
     properties->paintStacks = parsePaintStacks;
     HideCleanupButtons();
+    HideFieldsButtons();
 }
 
 void StartPropertiesModeSelector(Window* wnd) {
