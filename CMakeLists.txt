@@ -57,6 +57,8 @@ add_executable(WikiAnalyser
         src/curl.c
         include/topN.h
         src/topN.c
+        src/graphGUI.c
+        include/graphGUI.h
 )
 
 target_include_directories(WikiAnalyser PRIVATE ${CMAKE_BINARY_DIR})

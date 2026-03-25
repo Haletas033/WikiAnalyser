@@ -14,6 +14,8 @@
 
 #include <stdio.h>
 
+#include "../include/graphGUI.h"
+
 PaintStacks cleanupPaintStacks = {0};
 PaintStacks fieldsPaintStacks = {0};
 PaintStacks parsePaintStacks = {0};
@@ -391,6 +393,7 @@ void MainGUIStart(Window* wnd) {
     DrawPermanentWindow(visualiserScreen, wnd);
 
     //DrawPermanentButton((GUI_BUTTON_LIKE){"Download Progress", 10, 40, 80, 20, OSCreateProgressBar(29, NULL, visualiserScreen, 1)}, visualiserScreen);
+    DrawScatterGraph(NULL, NULL, visualiserScreen);
     DrawPermanentText((GUI_TEXT){"Console Initialized:", 17, 17, 20}, console);
 
     SetupCleanupPaintStacks(&cleanupPaintStacks, properties);

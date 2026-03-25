@@ -107,6 +107,7 @@ COLOUR_LINE* DrawPermanentLine(COLOUR_LINE colourLine, Window* wnd);
 COLOUR_LINE_CHAIN* DrawPermanentLineChain(COLOUR_LINE_CHAIN colourLineChain, Window* wnd);
 GUI_TEXT* DrawPermanentText(GUI_TEXT text, Window* wnd);
 COLOUR_POINT* DrawPermanentPoint(COLOUR_POINT colourPoint, Window* wnd);
+COLOUR_PIE_SLICE* DrawPermanentPieSliceToPaintStacks(COLOUR_PIE_SLICE colourPieSlice, PaintStacks* ps);
 GUI_IMAGE* DrawPermanentImage(GUI_IMAGE image, Window* wnd);
 Window** DrawPermanentWindow(const Window *wnd, Window* parentWnd);
 GUI_BUTTON_LIKE* DrawPermanentButton(GUI_BUTTON_LIKE button, Window* wnd);
@@ -115,6 +116,7 @@ COLOUR_RECT* DrawPermanentRectToPaintStacks(COLOUR_RECT colourRect, PaintStacks*
 COLOUR_LINE* DrawPermanentLineToPaintStacks(COLOUR_LINE colourLine, PaintStacks* ps);
 COLOUR_LINE_CHAIN* DrawPermanentLineChainToPaintStacks(COLOUR_LINE_CHAIN colourLineChain, PaintStacks* ps);
 COLOUR_POINT* DrawPermanentPointToPaintStacks(COLOUR_POINT colourPoint, PaintStacks* ps);
+COLOUR_PIE_SLICE* DrawPermanentPieSlice(COLOUR_PIE_SLICE colourPieSlice, Window* wnd);
 GUI_TEXT* DrawPermanentTextToPaintStacks(GUI_TEXT text, PaintStacks* ps);
 GUI_IMAGE* DrawPermanentImageToPaintStacks(GUI_IMAGE image, PaintStacks* ps);
 Window** DrawPermanentWindowToPaintStacks(const Window *wnd, PaintStacks* ps);

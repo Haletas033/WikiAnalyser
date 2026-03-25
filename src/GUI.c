@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include "../include/curl.h"
+#include "../include/graphGUI.h"
 #include "../include/mainGUI.h"
 #include "../include/topN.h"
 #include "../include/welcomeGUI.h"
@@ -158,9 +159,7 @@ void ClearGUI(PaintStacks* paintStacks) {
 void GUIStart(Window* wnd) {
     //CreateTopNFile();
     //WelcomeGUI(wnd, MainGUIStart);
-    //MainGUIStart(wnd);
-    DrawPermanentPieSlice((COLOUR_PIE_SLICE){50, 50, 50, 0, 270, 255, 0, 0}, wnd);
-    DrawPermanentPieSlice((COLOUR_PIE_SLICE){50, 50, 50, 270, 360, 0, 0, 255}, wnd);
+    MainGUIStart(wnd);
 }
 
 void GUILoop() {
