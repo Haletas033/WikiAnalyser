@@ -18,6 +18,10 @@ PaintStacks cleanupPaintStacks = {0};
 PaintStacks fieldsPaintStacks = {0};
 PaintStacks parsePaintStacks = {0};
 
+Article article;
+Article* articles = NULL;
+unsigned int articleCount;
+
 Window* properties;
 
 int memPerArticle = sizeof(Article);
@@ -122,7 +126,7 @@ void DrawFieldWidgets(PaintStacks* ps, Field* field) {
 
     //Clear fields from paintStacks
     int i;
-    for (i = 2; i < ps->buttonsSize; i++)
+    for (i = 3; i < ps->buttonsSize; i++)
         ps->buttons[i].shouldShow = 0;
 
     for (i = 2; i < ps->textsSize; i++)
@@ -133,12 +137,12 @@ void DrawFieldWidgets(PaintStacks* ps, Field* field) {
     for (i = 0; i < field->fieldsSize; i++) {
         if (field->fieldXButtons[i] != NULL) {
             pos++;
-            DrawPermanentTextToPaintStacks((GUI_TEXT){"Name:", 20, 12+(4*pos), 35}, ps);
+            DrawPermanentTextToPaintStacks((GUI_TEXT){"Name:", 20, 17+(4*pos), 35}, ps);
 
             ps->buttons[field->fieldNameInputsGUI[i]] = (GUI_BUTTON_LIKE){"Input field name...",
-                (GUI_RECT){30,10+4*pos, 50, 4},  ps->buttons[field->fieldNameInputsGUI[i]].buttonLoc, 1};
+                (GUI_RECT){30,15+4*pos, 50, 4},  ps->buttons[field->fieldNameInputsGUI[i]].buttonLoc, 1};
             ps->buttons[field->fieldXButtonsGUI[i]] = (GUI_BUTTON_LIKE){"X",
-                (GUI_RECT){80,10+4*pos, 10, 4},  ps->buttons[field->fieldXButtonsGUI[i]].buttonLoc, 1};
+                (GUI_RECT){80,15+4*pos, 10, 4},  ps->buttons[field->fieldXButtonsGUI[i]].buttonLoc, 1};
         }
     }
 
@@ -207,12 +211,34 @@ void AddFieldInput(Window* wnd) {
     DrawFieldWidgets(&fieldsPaintStacks, field);
 }
 
+void ApplyFieldType(Window* wnd, Field field, int offset, enum Type type) {
+    int i;
+    for (i = 0; i < field.fieldsSize; i++) {
+        if (field.ifieldNameInputs[i] != NULL) {
+            printf(OSGetInputBoxTextById(wnd, (i+80)*offset));
+            AddField(&article, type, OSGetInputBoxTextById(wnd, (i+80)*offset));
+        }
+    }
+}
+
+void ApplyFieldInput(Window* wnd) {
+    ApplyFieldType(wnd, intFields, 1, FIELD_INT);
+    ApplyFieldType(wnd, floatFields, 2, FIELD_FLOAT);
+    ApplyFieldType(wnd, boolFields, 3, FIELD_BOOL);
+    ApplyFieldType(wnd, stringFields, 4, FIELD_STRING);
+}
+
 void SetupFieldsPaintStacks(PaintStacks* ps, Window* wnd) {
     DrawPermanentTextToPaintStacks((GUI_TEXT){"Field Type", 50, 5, 35}, ps);
+
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Select an option...", 10, 7, 70, 3, OSCreateDropdown(28, wnd, items, 4)}, ps);
+
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"+",
         (GUI_RECT){80,7, 10, 3},  OSCreateButton(27, AddFieldInput, wnd)}, ps);
     DrawPermanentTextToPaintStacks((GUI_TEXT){"Memory per Article: 88 bytes", 50, 12, 35}, ps);
+
+    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Apply",
+        (GUI_RECT){10,15, 80, 3},  OSCreateButton(26, ApplyFieldInput, wnd)}, ps);
 }
 
 void SwitchWindowPaintStacksToFields(Window* _) {
@@ -293,14 +319,7 @@ void BuildProject(Window* _) {
 }
 
 void RunParser(Window* _) {
-    Article **articles = malloc(sizeof(Article*));
-    unsigned int* articleCount = malloc(sizeof(int));
-    Article* article = calloc(1, sizeof(Article));
-    AddField(article, FIELD_INT, "e_Count");
-    AddField(article, FIELD_FLOAT, "Float Test");
-    AddField(article, FIELD_BOOL, "Bool Test");
-    AddField(article, FIELD_STRING, "String Test");
-    OSCreateThreadForParse(GetINIField("UserData/data.ini", "DumpPath"), articles, article, &articleCount);
+    OSCreateThreadForParse(GetINIField("UserData/data.ini", "DumpPath"), &articles, &article, &articleCount);
 }
 
 void SetupParsePaintStacks(PaintStacks* ps, Window* wnd) {

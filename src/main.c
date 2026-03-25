@@ -14,34 +14,6 @@
 #include <curl/curl.h>
 
 int main() {
-    UNWANTED unwanted = {0};
-    ModifyUnwanted_CHAR(&unwanted, UNWANTED_ADD, "!@#$%^&*()l1234567890 \n");
-    ModifyUnwanted_CHAR(&unwanted, UNWANTED_DELETE, "l");
-
-    ModifyUnwanted_STRING(&unwanted, UNWANTED_ADD, (char*[]){"foo", "bar", "ab"}, 3);
-    ModifyUnwanted_STRING(&unwanted, UNWANTED_DELETE, (char*[]){"ab"}, 1);
-
-    ModifyUnwanted_CONTAINER(
-        &unwanted, UNWANTED_ADD,
-        (char*[]){"<siteinfo>", "{{", "aa"},(char*[]){"</siteinfo>", "}}", "aa"},
-        3
-    );
-
-    ModifyUnwanted_CONTAINER(
-        &unwanted, UNWANTED_DELETE,
-        (char*[]){"aa"},(char*[]){"aa"},
-        1
-    );
-
-    Article *articles = NULL;
-    unsigned int articleCount = 0;
-
-    Article article = {0};
-    AddField(&article, FIELD_INT, "e_Count");
-    AddField(&article, FIELD_FLOAT, "Float Test");
-    AddField(&article, FIELD_BOOL, "Bool Test");
-    AddField(&article, FIELD_STRING, "String Test");
-
     //Create user data
     OSCreateDirectory("UserData");
     OSCreateDirectory("UserData/Projects");
@@ -62,9 +34,7 @@ int main() {
         fclose(data);
     }
 
-
     Window window = {0,0,100,100};
-
 
     OSCreateWindowClass();
     OSCreateWindow(&window);
