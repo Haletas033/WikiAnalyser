@@ -117,6 +117,7 @@ int ParseArticles(PCSTRFILEPATH szFilePath, Article **articles, Article *baseArt
                 (*articles)[nextPos].title = title;
             }
         }
+        printf("%d", *articleCount);
     }
 
     close(iFileDir);

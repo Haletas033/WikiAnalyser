@@ -626,7 +626,6 @@ DWORD WINAPI DownloadSpecialExportToThread(LPVOID param) {
 DWORD WINAPI ParseThread(LPVOID param) {
     ParseStruct* parseStruct = param;
     ParseArticles(parseStruct->szFilePath, parseStruct->articles, parseStruct->baseArticle, parseStruct->articleCount);
-    free(parseStruct->baseArticle);
     free(parseStruct);
     return 0;
 }
