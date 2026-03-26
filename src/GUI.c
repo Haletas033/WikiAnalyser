@@ -23,6 +23,7 @@
 PaintStacks paintStacks = {0};
 DO_AFTER_ENTRY doAfters[5] = {0};
 BUTTON_COMMAND_ENTRY buttonCommands[512] = {0};
+BUTTON_COMMAND_ENTRY dropdownCommands[32] = {0};
 
 volatile int progress = 0;
 int maxProgress = 1;

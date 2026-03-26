@@ -91,6 +91,7 @@ typedef struct BUTTON_COMMAND_ENTRY {
 extern PaintStacks paintStacks;
 extern DO_AFTER_ENTRY doAfters[5];
 extern BUTTON_COMMAND_ENTRY buttonCommands[512];
+extern BUTTON_COMMAND_ENTRY dropdownCommands[32];
 
 extern volatile int progress;
 extern int maxProgress;

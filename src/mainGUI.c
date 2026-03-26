@@ -30,6 +30,7 @@ Article* articles = NULL;
 unsigned int articleCount;
 
 Window* properties;
+Window* visualiserScreen;
 
 int memPerArticle = sizeof(Article);
 
@@ -124,7 +125,8 @@ void HideParseButtons() {
     OSShowButtonById(properties, 16, 0);
     OSShowButtonById(properties, 17, 0);
     OSShowButtonById(properties, 18, 0);
-    OSShowButtonById(properties, 19, 0);
+    OSShowButtonById(properties, 25, 0);
+    OSShowButtonById(properties, 24, 0);
 }
 
 void SwitchWindowPaintStacksToCleanup(Window* _) {
@@ -164,6 +166,21 @@ void DrawFieldWidgets(PaintStacks* ps, Field* field) {
     }
 
     properties->paintStacks = fieldsPaintStacks;
+}
+
+void DrawFieldWidgetsOnDropDownChange(Window* wnd) {
+    const int index = OSGetDropdownCurrentlySelected(28, wnd);
+    Field *field;
+
+    switch (index) {
+        case 0: field = &intFields;    memPerArticle-=sizeof(int);   break;
+        case 1: field = &floatFields;  memPerArticle-=sizeof(float); break;
+        case 2: field = &boolFields;   memPerArticle-=sizeof(int);   break;
+        case 3: field = &stringFields; memPerArticle-=sizeof(char*); break;
+        default: return;
+    }
+
+    DrawFieldWidgets(&fieldsPaintStacks, field);
 }
 
 void RemoveField(Window* wnd) {
@@ -248,7 +265,7 @@ void ApplyFieldInput(Window* wnd) {
 void SetupFieldsPaintStacks(PaintStacks* ps, Window* wnd) {
     DrawPermanentTextToPaintStacks((GUI_TEXT){"Field Type", 50, 5, 35}, ps);
 
-    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Select an option...", 10, 7, 70, 3, OSCreateDropdown(28, wnd, items, 4)}, ps);
+    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Select an option...", 10, 7, 70, 3, OSCreateDropdown(28, DrawFieldWidgetsOnDropDownChange, wnd, items, 4)}, ps);
 
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"+",
         (GUI_RECT){80,7, 10, 3},  OSCreateButton(27, AddFieldInput, wnd)}, ps);
@@ -339,6 +356,22 @@ void RunParser(Window* _) {
     OSCreateThreadForParse(GetINIField("UserData/data.ini", "DumpPath"), &articles, &article, &articleCount);
 }
 
+void Analyse(Window* wnd) {
+    const int index = OSGetDropdownCurrentlySelected(25, wnd);
+
+    ClearGUI(&visualiserScreen->paintStacks);
+    OSDestroyButtonById(visualiserScreen, 2);
+
+    switch (index) {
+        case 0: DrawPieGraph((GraphData){}, visualiserScreen);   break;
+        case 1: DrawPercentageBarGraph((GraphData){}, visualiserScreen); break;
+        case 2: DrawBarGraph((GraphData){}, visualiserScreen);   break;
+        case 3: DrawScatterGraph((GraphData){}, visualiserScreen); break;
+        default: return;
+    }
+}
+
+const char* graphChoices[5] = {"Pie Graph", "Percentage Bar", "Bar Graph", "Scatter Plot", "Text"};
 void SetupParsePaintStacks(PaintStacks* ps, Window* wnd) {
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"New Project",
         (GUI_RECT){10,5, 80, 10},  OSCreateButton(15, NewProject, wnd)}, ps);
@@ -348,8 +381,11 @@ void SetupParsePaintStacks(PaintStacks* ps, Window* wnd) {
         (GUI_RECT){10,25, 80, 10},  OSCreateButton(17, BuildProject, wnd)}, ps);
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Parse",
         (GUI_RECT){10,35, 80, 10},  OSCreateButton(18, RunParser, wnd)}, ps);
-    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Run Analyser (advanced)",
-        (GUI_RECT){10,45, 80, 10},  OSCreateButton(19, ApplyCleanup, wnd)}, ps);
+
+    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Graph Choice",
+        (GUI_RECT){10,50, 80, 5}, OSCreateDropdown(25, NULL, wnd, graphChoices, 5)}, ps);
+    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Analyse",
+        (GUI_RECT){10,55, 80, 10},  OSCreateButton(24, Analyse, wnd)}, ps);
 }
 
 void SwitchWindowPaintStacksToParse(Window* _) {
@@ -376,7 +412,7 @@ void MainGUIStart(Window* wnd) {
     Window* propertiesModeSelector = malloc(sizeof(Window));
     properties = malloc(sizeof(Window));
     Window* console = malloc(sizeof(Window));
-    Window* visualiserScreen = malloc(sizeof(Window));
+    visualiserScreen = malloc(sizeof(Window));
 
     *propertiesModeSelector = (Window){80, 0, 20, 10};
     *properties = (Window){80, 10, 20, 90};
@@ -393,7 +429,6 @@ void MainGUIStart(Window* wnd) {
     DrawPermanentWindow(visualiserScreen, wnd);
 
     //DrawPermanentButton((GUI_BUTTON_LIKE){"Download Progress", 10, 40, 80, 20, OSCreateProgressBar(29, NULL, visualiserScreen, 1)}, visualiserScreen);
-    DrawScatterGraph(NULL, NULL, visualiserScreen);
     DrawPermanentText((GUI_TEXT){"Console Initialized:", 17, 17, 20}, console);
 
     SetupCleanupPaintStacks(&cleanupPaintStacks, properties);

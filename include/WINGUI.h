@@ -35,7 +35,7 @@ void* OSCreateChildWindowOnChildWindow(unsigned int id, const char* name, Window
 void* OSCreateButton(unsigned int id, void (*func)(Window* wnd), Window* wnd);
 void* OSCreateCheckBox(unsigned int id, void (*func)(Window* wnd), Window* wnd);
 void* OSCreateInputBox(unsigned int id, Window* wnd);
-void* OSCreateDropdown(unsigned int id, Window* wnd, const char** items, unsigned int count);
+void* OSCreateDropdown(unsigned int id, void (*func)(Window* wnd), Window* wnd, const char** items, unsigned int count);
 void* OSCreateProgressBar(unsigned int id, void(*progressFunc)(void), Window* wnd, unsigned int isIndeterminate);
 void OSUpdateProgress();
 

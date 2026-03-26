@@ -36,12 +36,16 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                 doAfters[wParam - 1].doAfterFunc(doAfters[wParam - 1].wnd);
             }
             return 0;
-        case WM_COMMAND:
-            if (wParam <= 512) {
-                currentButtonId = wParam;
-                buttonCommands[wParam-1].buttonCommand(buttonCommands[wParam-1].wnd);
+        case WM_COMMAND: {
+            const int id = LOWORD(wParam);
+            const int notification = HIWORD(wParam);
+            if (notification == CBN_SELCHANGE) {
+                dropdownCommands[id-1].buttonCommand(dropdownCommands[id-1].wnd);
+            } else if (notification == BN_CLICKED) {
+                currentButtonId = id;
+                buttonCommands[id-1].buttonCommand(buttonCommands[id-1].wnd);
             }
-            return 0;
+        }
         case WM_PAINT: {
             RECT windowRect;
             GetClientRect(hwnd, &windowRect);
@@ -249,7 +253,7 @@ void* OSCreateInputBox(const unsigned int id, Window* wnd) {
     return inputBox;
 }
 
-void* OSCreateDropdown(const unsigned int id, Window* wnd, const char** items, const unsigned int count) {
+void* OSCreateDropdown(const unsigned int id, void (*func)(Window* wnd), Window* wnd, const char** items, const unsigned int count) {
     HWND comboBox = CreateWindowEx(
         WS_EX_CLIENTEDGE,
         "COMBOBOX",
@@ -265,6 +269,9 @@ void* OSCreateDropdown(const unsigned int id, Window* wnd, const char** items, c
     int i;
     for (i = 0; i < count; i++)
         SendMessage(comboBox, CB_ADDSTRING, 0, (LPARAM)items[i]);
+
+    dropdownCommands[id-1].buttonCommand = func;
+    dropdownCommands[id-1].wnd = wnd;
 
     return comboBox;
 }
@@ -487,7 +494,7 @@ void OSDrawButtonLike(GUI_BUTTON_LIKE button, int scrW, int scrH) {
     MapWindowPoints(HWND_DESKTOP, GetParent(buttonHwnd), (POINT*)&rect, 2);
 
     //Only move if needed
-    if (start.x != rect.left || start.y != rect.top)
+    if (strcmp(buff, "ComboBox") != 0 || (start.x != rect.left || start.y != rect.top))
         MoveWindow(buttonHwnd, start.x, start.y, end.x, end.y, TRUE);
 
     if (strcmp(buff, "Edit") != 0)

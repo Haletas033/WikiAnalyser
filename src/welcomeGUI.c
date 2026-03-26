@@ -309,6 +309,10 @@ void performCheckText(Window* wnd, const int indeterminate) {
     deleteButtons(wnd);
     if (indeterminate != -1)
         progressBar = DrawPermanentButton((GUI_BUTTON_LIKE){"Download Progress", 10, 40, 80, 20, OSCreateProgressBar(29, handleProgressBarCompletion, wnd, indeterminate)}, wnd);
+    else {
+        changeTextFunc = changePerformCheckText;
+        changePerformCheckText(rootWindow);
+    }
 }
 
 void WelcomeGUI(Window* wnd, void(*funcCallback)(Window* wnd)) {

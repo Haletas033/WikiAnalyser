@@ -8,7 +8,7 @@
 
 #include "../include/WINGUI.h"
 
-void DrawPieGraph(const char** fieldNames, Window* wnd) {
+void DrawPieGraph(GraphData graphData, Window* wnd) {
     //testing values
     int values[] = {100, 56, 23, 124, 45};
     COLOUR colours[5];
@@ -52,7 +52,7 @@ void DrawPieGraph(const char** fieldNames, Window* wnd) {
 }
 
 
-void DrawPercentageBarGraph(const char** fieldNames, Window* wnd) {
+void DrawPercentageBarGraph(GraphData graphData, Window* wnd) {
     //testing values
     int values[] = {100, 56, 23, 124, 45};
     COLOUR colours[5];
@@ -102,7 +102,7 @@ void DrawPercentageBarGraph(const char** fieldNames, Window* wnd) {
     }
 }
 
-void DrawBarGraph(const char** fieldNames, Window* wnd) {
+void DrawBarGraph(GraphData graphData, Window* wnd) {
     int values[] = {100, 56, 23, 124, 45};
     int maxValue = MININT;
     COLOUR colours[5];
@@ -144,7 +144,7 @@ void DrawBarGraph(const char** fieldNames, Window* wnd) {
     }
 }
 
-void DrawScatterGraph(const char** XFieldNames, const char** YFieldNames, Window* wnd) {
+void DrawScatterGraph(GraphData graphData, Window* wnd) {
     int XValues[] = {100, 0, 23, 124, 45};
     int YValues[] = {100, 0, 23, 124, 45};
 
