@@ -54,6 +54,7 @@ enum buttons {
 };
 
 void performCheckText(Window* wnd, int indeterminate);
+void performCheck(Window* wnd);
 void failureOptions(Window* wnd);
 void success(Window* wnd);
 
@@ -164,7 +165,11 @@ void downloadZig(Window* wnd) {
 }
 
 void openZig(Window* wnd) {
-    success(wnd);
+    const char* path = OSGetFilePath();
+    if (path[0] != '\0') {
+        SetINIField("UserData/data.ini", "ZigPath", path);
+        performCheck(wnd);
+    }
 }
 
 void openMainGUI(Window* wnd) {
@@ -233,7 +238,13 @@ void changeGreetingText(Window* wnd) {
 }
 
 void performCheck(Window* wnd) {
-    success(wnd);
+    char cmd[512];
+    sprintf(cmd, "\"%s\" version > nul 2>&1", GetINIField("UserData/data.ini", "ZigPath"));
+    printf(cmd);
+    if (system("zig version > nul 2>&1") == 1 || system(cmd) == 0)
+        success(wnd);
+    else
+        failureOptions(wnd);
 }
 
 void changePerformCheckText(Window* wnd) {

@@ -666,9 +666,21 @@ void OSCreateDirectory(const char* dirName) {
     _mkdir(dirName);
 }
 
-void* OSLoadLibrary(const char* libPath, const char* funcName) {
-    if (zigLib != NULL)
+void OSFreeLibrary() {
+    if (zigLib != NULL) {
+        OnArticle = NULL;
         FreeLibrary(zigLib);
+        zigLib = NULL;
+    }
+}
+
+void* OSLoadLibrary(const char* libPath, const char* funcName) {
+    if (zigLib != NULL) {
+        OnArticle = NULL;
+        FreeLibrary(zigLib);
+        zigLib = NULL;
+    }
+    Sleep(1000);
     zigLib = LoadLibrary(libPath);
     return GetProcAddress(zigLib, funcName);
 }

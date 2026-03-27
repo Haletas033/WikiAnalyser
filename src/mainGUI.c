@@ -251,7 +251,6 @@ void ApplyFieldType(Window* wnd, Field field, int offset, enum Type type) {
     int i;
     for (i = 0; i < field.fieldsSize; i++) {
         if (field.ifieldNameInputs[i] != NULL) {
-            printf(OSGetInputBoxTextById(wnd, (i+80)*offset));
             AddField(&article, type, OSGetInputBoxTextById(wnd, (i+80)*offset));
         }
     }
@@ -346,11 +345,26 @@ void OpenProject(Window* _) {
 
 void BuildProject(Window* _) {
     char exeDir[512]; OSGetEXEDir(exeDir, 512);
-    char fullCommand[1024]; sprintf(fullCommand, "%s %s\\src\\main.zig %s=%s\\main.dll", "zig build-lib", currentProjectPath, "-dynamic -O ReleaseSmall -femit-h -femit-bin", exeDir);
+    char fullCommand[2048];
+    char userDataPath[512];
+    sprintf(userDataPath, "%s\\UserData", exeDir);
 
-    if (OSShellExecute(currentProjectPath, fullCommand) != 0) return;
+    // Build to temp
+    sprintf(fullCommand, "zig build-lib %s\\src\\main.zig -dynamic -O ReleaseSmall -femit-h -femit-bin=%s\\main_temp.dll",
+        currentProjectPath, userDataPath);
 
-    char libPath[512]; sprintf(libPath, "%s\\%s", exeDir, "main.dll");
+    if (OSShellExecute(userDataPath, fullCommand) != 0) return;
+
+    // Free old
+    OSFreeLibrary();
+
+    // Replace
+    char oldPath[512]; sprintf(oldPath, "%s\\main.dll", userDataPath);
+    char tempPath[512]; sprintf(tempPath, "%s\\main_temp.dll", userDataPath);
+    DeleteFile(oldPath);
+    MoveFile(tempPath, oldPath);
+
+    char libPath[512]; sprintf(libPath, "%s\\main.dll", userDataPath);
     OnArticle = OSLoadLibrary(libPath, "OnArticle");
 }
 
