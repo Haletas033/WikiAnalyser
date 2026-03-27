@@ -51,7 +51,10 @@ void DrawPieGraph(GraphData graphData, Window* wnd) {
     //Draw key
     for (i = 0; i < graphData.intFieldsCount; i++) {
         DrawPermanentRect((COLOUR_RECT){5, i*11+10, 15, i*11+20, colours[i]}, key);
-        DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i]], 24, i*11+14, 25}, key);
+        if (graphData.stringFieldsCount == 0)
+            DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i]], 24, i*11+14, 25}, key);
+        else
+            DrawPermanentText((GUI_TEXT){articles[0].stringFields[graphData.stringFieldIndices[i]], 24, i*11+14, 25}, key);
     }
 }
 
@@ -100,13 +103,19 @@ void DrawPercentageBarGraph(GraphData graphData, Window* wnd) {
     for (i = 0; i < graphData.intFieldsCount/5; i++) {
         for (j = 0; j < 5; j++) {
             DrawPermanentRect((COLOUR_RECT){5+(5*i)*5, j*12+20, (5*i)*5+10, j*12+30, colours[i*5+j]}, key);
-            DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
+            if (graphData.stringFieldsCount == 0)
+                DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
+            else
+                DrawPermanentText((GUI_TEXT){articles[0].stringFields[graphData.stringFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
         }
     }
 
     for (j = 0; j < graphData.intFieldsCount%5; j++) {
         DrawPermanentRect((COLOUR_RECT){5+(5*i)*5, j*12+20, (5*i)*5+10, j*12+30, colours[i*5+j]}, key);
-        DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
+        if (graphData.stringFieldsCount == 0)
+            DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
+        else
+            DrawPermanentText((GUI_TEXT){articles[0].stringFields[graphData.stringFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
     }
 }
 
@@ -148,13 +157,19 @@ void DrawBarGraph(GraphData graphData, Window* wnd) {
     for (i = 0; i < graphData.intFieldsCount/5; i++) {
         for (j = 0; j < 5; j++) {
             DrawPermanentRect((COLOUR_RECT){5+(5*i)*5, j*12+20, (5*i)*5+10, j*12+30, colours[i*5+j]}, key);
-            DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
+            if (graphData.stringFieldsCount == 0)
+                DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
+            else
+                DrawPermanentText((GUI_TEXT){articles[0].stringFields[graphData.stringFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
         }
     }
 
     for (j = 0; j < graphData.intFieldsCount%5; j++) {
         DrawPermanentRect((COLOUR_RECT){5+(5*i)*5, j*12+20, (5*i)*5+10, j*12+30, colours[i*5+j]}, key);
-        DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
+        if (graphData.stringFieldsCount == 0)
+            DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
+        else
+            DrawPermanentText((GUI_TEXT){articles[0].stringFields[graphData.stringFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
     }
 }
 

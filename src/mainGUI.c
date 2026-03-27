@@ -360,6 +360,7 @@ void RunParser(Window* _) {
 
 GraphData graphData = {0};
 const char* valueFields[128];
+const char* keyFields[128];
 
 void CreateGraphValueData(Window* wnd, const unsigned int id, const unsigned int intSize, const unsigned int floatSize,
     unsigned int* graphIntSize, unsigned int* graphFloatSize,
@@ -383,6 +384,20 @@ void CreateGraphValueData(Window* wnd, const unsigned int id, const unsigned int
     }
 }
 
+void CreateKeyData(Window* wnd, const unsigned int id, const unsigned int keySize,
+    unsigned int* graphKeysSize, int** graphKeysValues
+    ) {
+    int selectedIds[keySize];
+    int currentlySelectedCount = OSGetDropdownMultiSelectCurrentlySelected(id, wnd, selectedIds, keySize);
+
+    int i;
+    for (i = 0; i < currentlySelectedCount; i++) {
+        (*graphKeysSize)++;
+        *graphKeysValues = realloc(*graphKeysValues, sizeof(char*) * *graphKeysSize);
+        (*graphKeysValues)[*graphKeysSize-1] = selectedIds[i];
+    }
+}
+
 void Analyse(Window* wnd) {
     free(graphData.intFieldIndices);
     free(graphData.floatFieldIndices);
@@ -394,8 +409,12 @@ void Analyse(Window* wnd) {
 
     CreateGraphValueData(wnd, 23, articles[0].intFieldsSize, articles[0].floatFieldsSize,
        &graphData.intFieldsCount, &graphData.floatFieldsCount, &graphData.intFieldIndices, &graphData.floatFieldIndices);
-    CreateGraphValueData(wnd, 22, articles[0].intFieldsSize, articles[0].floatFieldsSize,
-        &graphData.YIntFieldsCount, &graphData.YFloatFieldsCount, &graphData.YIntFieldIndices, &graphData.YFloatFieldIndices);
+    if (index == 3) {
+        CreateGraphValueData(wnd, 22, articles[0].intFieldsSize, articles[0].floatFieldsSize,
+            &graphData.YIntFieldsCount, &graphData.YFloatFieldsCount, &graphData.YIntFieldIndices, &graphData.YFloatFieldIndices);
+    } else {
+        CreateKeyData(wnd, 22, articles[0].stringFieldsSize, &graphData.stringFieldsCount, &graphData.stringFieldIndices);
+    }
 
     ClearGUI(&visualiserScreen->paintStacks);
 
@@ -420,14 +439,20 @@ void CreateStandardGraphInputs(Window* wnd) {
     for (j = 0; j < article.floatFieldsSize; j++, i++)
         valueFields[i] = article.floatFieldNames[j];
 
+    const int numberFieldsCount = i+j;
+
+    for (i = 0; i < article.stringFieldsSize; i++) {
+        keyFields[i] = article.stringFieldNames[i];
+    }
+
     DrawPermanentTextToPaintStacks((GUI_TEXT){"X Fields", 30, 58 ,25}, &parsePaintStacks);
     DrawPermanentTextToPaintStacks((GUI_TEXT){"Key Names (Optional)", 70, 58 ,25}, &parsePaintStacks);
 
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"X Fields",
-        (GUI_RECT){10,60, 40, 25}, OSCreateMultiSelectDropdown(23, wnd, valueFields, i+j)}, &parsePaintStacks);
+        (GUI_RECT){10,60, 40, 25}, OSCreateMultiSelectDropdown(23, wnd, valueFields, numberFieldsCount)}, &parsePaintStacks);
 
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Key Names (Optional)",
-        (GUI_RECT){50,60, 40, 25}, OSCreateMultiSelectDropdown(22, wnd, valueFields, i+j)}, &parsePaintStacks);
+        (GUI_RECT){50,60, 40, 25}, OSCreateMultiSelectDropdown(22, wnd, keyFields, i)}, &parsePaintStacks);
 
     properties->paintStacks = parsePaintStacks;
 }
