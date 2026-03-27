@@ -36,6 +36,7 @@ void* OSCreateButton(unsigned int id, void (*func)(Window* wnd), Window* wnd);
 void* OSCreateCheckBox(unsigned int id, void (*func)(Window* wnd), Window* wnd);
 void* OSCreateInputBox(unsigned int id, Window* wnd);
 void* OSCreateDropdown(unsigned int id, void (*func)(Window* wnd), Window* wnd, const char** items, unsigned int count);
+void* OSCreateMultiSelectDropdown(unsigned int id, Window* wnd, const char** items, unsigned int count);
 void* OSCreateProgressBar(unsigned int id, void(*progressFunc)(void), Window* wnd, unsigned int isIndeterminate);
 void OSUpdateProgress();
 
@@ -68,6 +69,7 @@ void OSCreateThreadForDownloadTo(const char* url, const char* filePath, const ch
 void OSCreateThreadForDownloadSpecialExportTo(const char** name, unsigned int count, const char* filePath, const char* fileName);
 void OSCreateThreadForParse(PCSTRFILEPATH szFilePath, Article **articles, Article *baseArticle, unsigned int *articleCount);
 int OSGetDropdownCurrentlySelected(unsigned int id, Window* wnd);
+int OSGetDropdownMultiSelectCurrentlySelected(unsigned int id, Window* wnd, int* buffer, int bufferSize);
 int GetRefreshRate();
 
 

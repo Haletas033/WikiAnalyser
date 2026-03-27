@@ -22,6 +22,10 @@ extern PaintStacks cleanupPaintStacks;
 extern PaintStacks fieldsPaintStacks;
 extern PaintStacks parsePaintStacks;
 
+extern Article article;
+extern Article* articles;
+extern unsigned int articleCount;
+
 void MainGUIStart(Window* wnd);
 
 #endif //MAINGUI_H

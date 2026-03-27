@@ -39,12 +39,18 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
         case WM_COMMAND: {
             const int id = LOWORD(wParam);
             const int notification = HIWORD(wParam);
-            if (notification == CBN_SELCHANGE) {
+            HWND control = (HWND)lParam;
+
+            char className[32];
+            GetClassName(control, className, 32);
+
+            if (strcmp(className, "ComboBox") == 0 && notification == CBN_SELCHANGE) {
                 dropdownCommands[id-1].buttonCommand(dropdownCommands[id-1].wnd);
-            } else if (notification == BN_CLICKED) {
+            } else if (strcmp(className, "Button") == 0 && notification == BN_CLICKED) {
                 currentButtonId = id;
                 buttonCommands[id-1].buttonCommand(buttonCommands[id-1].wnd);
             }
+            return 0;
         }
         case WM_PAINT: {
             RECT windowRect;
@@ -276,6 +282,26 @@ void* OSCreateDropdown(const unsigned int id, void (*func)(Window* wnd), Window*
     return comboBox;
 }
 
+void* OSCreateMultiSelectDropdown(const unsigned int id, Window* wnd, const char** items, const unsigned int count) {
+    HWND listBox = CreateWindowEx(
+        WS_EX_CLIENTEDGE,
+        "LISTBOX",
+        "",
+        WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_MULTIPLESEL | LBS_NOTIFY,
+        0,0,0,0,
+        wnd->wndHwnd,
+        (HMENU)id,
+        wc.hInstance,
+        NULL
+    );
+
+    int i;
+    for (i = 0; i < count; i++)
+        SendMessage(listBox, LB_ADDSTRING, 0, (LPARAM)items[i]);
+
+    return listBox;
+}
+
 void* OSCreateProgressBar(const unsigned int id, void(*progressFunc)(void), Window* wnd, const unsigned int isIndeterminate) {
     HWND progressBar = CreateWindowEx(
         0,
@@ -494,7 +520,7 @@ void OSDrawButtonLike(GUI_BUTTON_LIKE button, int scrW, int scrH) {
     MapWindowPoints(HWND_DESKTOP, GetParent(buttonHwnd), (POINT*)&rect, 2);
 
     //Only move if needed
-    if (strcmp(buff, "ComboBox") != 0 || (start.x != rect.left || start.y != rect.top))
+    if ((strcmp(buff, "ComboBox") != 0 && strcmp(buff, "ListBox") != 0) || (start.x != rect.left || start.y != rect.top))
         MoveWindow(buttonHwnd, start.x, start.y, end.x, end.y, TRUE);
 
     if (strcmp(buff, "Edit") != 0)
@@ -701,6 +727,18 @@ void OSCreateThreadForParse(PCSTRFILEPATH szFilePath, Article **articles, Articl
 
 int OSGetDropdownCurrentlySelected(const unsigned int id, Window* wnd) {
     return SendMessage(GetDlgItem(wnd->wndHwnd, id), CB_GETCURSEL, 0, 0);
+}
+
+int OSGetDropdownMultiSelectCurrentlySelected(const unsigned int id, Window* wnd, int* buffer, const int bufferSize) {
+    HWND list = GetDlgItem(wnd->wndHwnd, id);
+
+    int count = SendMessage(list, LB_GETSELCOUNT, 0, 0);
+    if (count <= 0) return 0;
+    if (count > bufferSize) count = bufferSize;
+
+    SendMessage(list, LB_GETSELITEMS, (WPARAM)count, (LPARAM)buffer);
+
+    return count;
 }
 
 int GetRefreshRate() {

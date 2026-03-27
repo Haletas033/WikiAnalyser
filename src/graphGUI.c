@@ -6,31 +6,34 @@
 
 #include <time.h>
 
+#include "../include/mainGUI.h"
 #include "../include/WINGUI.h"
 
 void DrawPieGraph(GraphData graphData, Window* wnd) {
     //testing values
-    int values[] = {100, 56, 23, 124, 45};
-    COLOUR colours[5];
+    int values[graphData.intFieldsCount];
+    COLOUR colours[graphData.intFieldsCount];
     srand(time(NULL));
 
     int lastEndDeg = 0;
     int sum = 0;
     int cumulativeSum = 0;
 
-    //Draw MainWheel
     int i;
+    for (i = 0; i < graphData.intFieldsCount; i++)
+        values[i] = articles[0].intFields[graphData.intFieldIndices[i]];
 
-    for (i = 0; i < 5; i++)
+    //Draw MainWheel
+    for (i = 0; i < graphData.intFieldsCount; i++)
         sum += values[i];
 
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < graphData.intFieldsCount; i++) {
         colours[i].r = rand() % 255;
         colours[i].g = rand() % 255;
         colours[i].b = rand() % 255;
     }
 
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < graphData.intFieldsCount; i++) {
 
         cumulativeSum += values[i];
         int endDeg = ((float)cumulativeSum / sum) * 360;
@@ -46,35 +49,38 @@ void DrawPieGraph(GraphData graphData, Window* wnd) {
     DrawPermanentText((GUI_TEXT){"Key:", 12, 5, 35}, key);
 
     //Draw key
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < graphData.intFieldsCount; i++) {
         DrawPermanentRect((COLOUR_RECT){5, i*11+10, 15, i*11+20, colours[i]}, key);
+        DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i]], 24, i*11+14, 25}, key);
     }
 }
 
 
 void DrawPercentageBarGraph(GraphData graphData, Window* wnd) {
     //testing values
-    int values[] = {100, 56, 23, 124, 45};
-    COLOUR colours[5];
+    int values[graphData.intFieldsCount];
+    COLOUR colours[graphData.intFieldsCount];
     srand(time(NULL));
 
     int lastEndPos = 0;
     int sum = 0;
     int cumulativeSum = 0;
 
-    //Draw MainWheel
+    //Draw bars
     int i;
+    for (i = 0; i < graphData.intFieldsCount; i++)
+        values[i] = articles[0].intFields[graphData.intFieldIndices[i]];
 
-    for (i = 0; i < 5; i++)
+    for (i = 0; i < graphData.intFieldsCount; i++)
         sum += values[i];
 
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < graphData.intFieldsCount; i++) {
         colours[i].r = rand() % 255;
         colours[i].g = rand() % 255;
         colours[i].b = rand() % 255;
     }
 
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < graphData.intFieldsCount; i++) {
 
         cumulativeSum += values[i];
         int endPos = ((float)cumulativeSum / sum) * 80;
@@ -91,37 +97,43 @@ void DrawPercentageBarGraph(GraphData graphData, Window* wnd) {
 
     //Draw key
     int j;
-    for (i = 0; i < 5/5; i++) {
+    for (i = 0; i < graphData.intFieldsCount/5; i++) {
         for (j = 0; j < 5; j++) {
             DrawPermanentRect((COLOUR_RECT){5+(5*i)*5, j*12+20, (5*i)*5+10, j*12+30, colours[i*5+j]}, key);
+            DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
         }
     }
 
-    for (j = 0; j < 5%5; j++) {
+    for (j = 0; j < graphData.intFieldsCount%5; j++) {
         DrawPermanentRect((COLOUR_RECT){5+(5*i)*5, j*12+20, (5*i)*5+10, j*12+30, colours[i*5+j]}, key);
+        DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
     }
 }
 
 void DrawBarGraph(GraphData graphData, Window* wnd) {
-    int values[] = {100, 56, 23, 124, 45};
+    int values[graphData.intFieldsCount];
     int maxValue = MININT;
-    COLOUR colours[5];
-    srand(time(NULL));
 
     int i;
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < graphData.intFieldsCount; i++)
+        values[i] = articles[0].intFields[graphData.intFieldIndices[i]];
+
+    COLOUR colours[graphData.intFieldsCount];
+    srand(time(NULL));
+
+    for (i = 0; i < graphData.intFieldsCount; i++) {
         maxValue = values[i] > maxValue ? values[i] : maxValue;
     }
 
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < graphData.intFieldsCount; i++) {
         colours[i].r = rand() % 255;
         colours[i].g = rand() % 255;
         colours[i].b = rand() % 255;
     }
 
-    int baseWidth = 80/5;
+    int baseWidth = 80/graphData.intFieldsCount;
     int gap = baseWidth / 10;
-    for (i = 0; i < 5; i++)
+    for (i = 0; i < graphData.intFieldsCount; i++)
         DrawPermanentRect((COLOUR_RECT){i*baseWidth+10, 50 -((float)values[i] / maxValue) * 40, i*baseWidth+baseWidth+10-gap, 60, colours[i]}, wnd);
 
     //Draw key window
@@ -133,31 +145,41 @@ void DrawBarGraph(GraphData graphData, Window* wnd) {
 
     //Draw key
     int j;
-    for (i = 0; i < 5/5; i++) {
+    for (i = 0; i < graphData.intFieldsCount/5; i++) {
         for (j = 0; j < 5; j++) {
             DrawPermanentRect((COLOUR_RECT){5+(5*i)*5, j*12+20, (5*i)*5+10, j*12+30, colours[i*5+j]}, key);
+            DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
         }
     }
 
-    for (j = 0; j < 5%5; j++) {
+    for (j = 0; j < graphData.intFieldsCount%5; j++) {
         DrawPermanentRect((COLOUR_RECT){5+(5*i)*5, j*12+20, (5*i)*5+10, j*12+30, colours[i*5+j]}, key);
+        DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
     }
 }
 
 void DrawScatterGraph(GraphData graphData, Window* wnd) {
-    int XValues[] = {100, 0, 23, 124, 45};
-    int YValues[] = {100, 0, 23, 124, 45};
+    int XValues[graphData.intFieldsCount];
+
+    int i;
+    for (i = 0; i < graphData.intFieldsCount; i++)
+        XValues[i] = articles[0].intFields[graphData.intFieldIndices[i]];
+
+
+    int YValues[graphData.intFieldsCount];
+    for (i = 0; i < graphData.intFieldsCount; i++)
+        YValues[i] = articles[0].intFields[graphData.YIntFieldIndices[i]];
+
 
     int maxXValue = INT_MIN;
     int maxYValue = INT_MIN;
 
-    int i;
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < graphData.intFieldsCount; i++) {
         maxXValue = XValues[i] > maxXValue ? XValues[i] : maxXValue;
         maxYValue = YValues[i] > maxYValue ? YValues[i] : maxYValue;
     }
 
-    for (i = 0; i < 5; i++)
+    for (i = 0; i < graphData.intFieldsCount; i++)
         DrawPermanentPoint((COLOUR_POINT){20+((float)XValues[i] / maxXValue)*65, 80-((float)YValues[i] / maxYValue)*65, 5, 255, 122, 0}, wnd);
 
     //Draw bounding box

@@ -8,13 +8,15 @@
 #include "core/article.h"
 
 typedef struct GraphData {
-    const char** intFieldNames;
-    const char** floatFieldNames;
-    const char** boolFieldNames;
-    const char** stringFieldNames;
+    int* intFieldIndices;
+    int* floatFieldIndices;
+    int* boolFieldIndices;
+    int* stringFieldIndices;
 
-    const char** YIntFieldNames;
-    const char** YFloatFieldNames;
+    int* YIntFieldIndices;
+    int* YFloatFieldIndices;
+    unsigned int YIntFieldsCount;
+    unsigned int YFloatFieldsCount;
 
     unsigned int intFieldsCount;
     unsigned int floatFieldsCount;

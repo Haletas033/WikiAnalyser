@@ -127,6 +127,8 @@ void HideParseButtons() {
     OSShowButtonById(properties, 18, 0);
     OSShowButtonById(properties, 25, 0);
     OSShowButtonById(properties, 24, 0);
+    OSShowButtonById(properties, 22, 0);
+    OSShowButtonById(properties, 23, 0);
 }
 
 void SwitchWindowPaintStacksToCleanup(Window* _) {
@@ -173,10 +175,10 @@ void DrawFieldWidgetsOnDropDownChange(Window* wnd) {
     Field *field;
 
     switch (index) {
-        case 0: field = &intFields;    memPerArticle-=sizeof(int);   break;
-        case 1: field = &floatFields;  memPerArticle-=sizeof(float); break;
-        case 2: field = &boolFields;   memPerArticle-=sizeof(int);   break;
-        case 3: field = &stringFields; memPerArticle-=sizeof(char*); break;
+        case 0: field = &intFields;    break;
+        case 1: field = &floatFields;  break;
+        case 2: field = &boolFields;   break;
+        case 3: field = &stringFields; break;
         default: return;
     }
 
@@ -356,17 +358,118 @@ void RunParser(Window* _) {
     OSCreateThreadForParse(GetINIField("UserData/data.ini", "DumpPath"), &articles, &article, &articleCount);
 }
 
+GraphData graphData = {0};
+const char* valueFields[128];
+
+void CreateGraphValueData(Window* wnd, const unsigned int id, const unsigned int intSize, const unsigned int floatSize,
+    unsigned int* graphIntSize, unsigned int* graphFloatSize,
+    int** graphIntValues, int** graphFloatValues
+    ) {
+    const unsigned int maxValueFields = intSize+floatSize;
+    int selectedIds[maxValueFields];
+    int currentlySelectedCount = OSGetDropdownMultiSelectCurrentlySelected(id, wnd, selectedIds, maxValueFields);
+
+    int i;
+    for (i = 0; i < currentlySelectedCount; i++) {
+        if (selectedIds[i] < intSize) {
+            (*graphIntSize)++;
+            *graphIntValues = realloc(*graphIntValues, sizeof(int) * *graphIntSize);
+            (*graphIntValues)[*graphIntSize-1] = selectedIds[i];
+        } else {
+            (*graphFloatSize)++;
+            *graphFloatValues = realloc(*graphFloatValues, sizeof(int) * *graphFloatSize);
+            (*graphFloatValues)[*graphFloatSize-1] = selectedIds[i];
+        }
+    }
+}
+
 void Analyse(Window* wnd) {
+    free(graphData.intFieldIndices);
+    free(graphData.floatFieldIndices);
+    free(graphData.boolFieldIndices);
+    free(graphData.stringFieldIndices);
+    graphData = (GraphData){0};
+
     const int index = OSGetDropdownCurrentlySelected(25, wnd);
 
+    CreateGraphValueData(wnd, 23, articles[0].intFieldsSize, articles[0].floatFieldsSize,
+       &graphData.intFieldsCount, &graphData.floatFieldsCount, &graphData.intFieldIndices, &graphData.floatFieldIndices);
+    CreateGraphValueData(wnd, 22, articles[0].intFieldsSize, articles[0].floatFieldsSize,
+        &graphData.YIntFieldsCount, &graphData.YFloatFieldsCount, &graphData.YIntFieldIndices, &graphData.YFloatFieldIndices);
+
     ClearGUI(&visualiserScreen->paintStacks);
-    OSDestroyButtonById(visualiserScreen, 2);
+
+    if (index != 3)
+        OSDestroyButtonById(visualiserScreen, 2);
 
     switch (index) {
-        case 0: DrawPieGraph((GraphData){}, visualiserScreen);   break;
-        case 1: DrawPercentageBarGraph((GraphData){}, visualiserScreen); break;
-        case 2: DrawBarGraph((GraphData){}, visualiserScreen);   break;
-        case 3: DrawScatterGraph((GraphData){}, visualiserScreen); break;
+        case 0: DrawPieGraph(graphData, visualiserScreen);   break;
+        case 1: DrawPercentageBarGraph(graphData, visualiserScreen); break;
+        case 2: DrawBarGraph(graphData, visualiserScreen);   break;
+        case 3: DrawScatterGraph(graphData, visualiserScreen); break;
+        default: return;
+    }
+}
+
+void CreateStandardGraphInputs(Window* wnd) {
+    int i = 0;
+    for (; i < article.intFieldsSize; i++)
+        valueFields[i] = article.intFieldNames[i];
+
+    int j;
+    for (j = 0; j < article.floatFieldsSize; j++, i++)
+        valueFields[i] = article.floatFieldNames[j];
+
+    DrawPermanentTextToPaintStacks((GUI_TEXT){"X Fields", 30, 58 ,25}, &parsePaintStacks);
+    DrawPermanentTextToPaintStacks((GUI_TEXT){"Key Names (Optional)", 70, 58 ,25}, &parsePaintStacks);
+
+    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"X Fields",
+        (GUI_RECT){10,60, 40, 25}, OSCreateMultiSelectDropdown(23, wnd, valueFields, i+j)}, &parsePaintStacks);
+
+    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Key Names (Optional)",
+        (GUI_RECT){50,60, 40, 25}, OSCreateMultiSelectDropdown(22, wnd, valueFields, i+j)}, &parsePaintStacks);
+
+    properties->paintStacks = parsePaintStacks;
+}
+
+void CreateScatterGraphInputs(Window* wnd) {
+    int i = 0;
+    for (; i < article.intFieldsSize; i++)
+        valueFields[i] = article.intFieldNames[i];
+
+    int j;
+    for (j = 0; j < article.floatFieldsSize; j++, i++)
+        valueFields[i] = article.floatFieldNames[j];
+
+    DrawPermanentTextToPaintStacks((GUI_TEXT){"X Fields", 30, 58 ,25}, &parsePaintStacks);
+    DrawPermanentTextToPaintStacks((GUI_TEXT){"Y Fields", 70, 58 ,25}, &parsePaintStacks);
+
+    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"X Fields",
+        (GUI_RECT){10,60, 40, 25}, OSCreateMultiSelectDropdown(23, wnd, valueFields, i+j)}, &parsePaintStacks);
+
+    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Y Fields",
+        (GUI_RECT){50,60, 40, 25}, OSCreateMultiSelectDropdown(22, wnd, valueFields, i+j)}, &parsePaintStacks);
+
+    properties->paintStacks = parsePaintStacks;
+}
+
+void CreateGraphInputs(Window* wnd) {
+    OSDestroyButtonById(wnd, 23);
+    OSDestroyButtonById(wnd, 22);
+    int i;
+    for (i = 0; i < parsePaintStacks.textsSize; i++)
+        memset(&parsePaintStacks.texts[i], 0, sizeof(GUI_TEXT));
+    parsePaintStacks.textsSize-=i;
+    wnd->paintStacks = parsePaintStacks;
+
+
+    const int index = OSGetDropdownCurrentlySelected(25, wnd);
+
+    switch (index) {
+        case 0: CreateStandardGraphInputs(wnd);   break;
+        case 1: CreateStandardGraphInputs(wnd); break;
+        case 2: CreateStandardGraphInputs(wnd);   break;
+        case 3: CreateScatterGraphInputs(wnd); break;
         default: return;
     }
 }
@@ -383,9 +486,9 @@ void SetupParsePaintStacks(PaintStacks* ps, Window* wnd) {
         (GUI_RECT){10,35, 80, 10},  OSCreateButton(18, RunParser, wnd)}, ps);
 
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Graph Choice",
-        (GUI_RECT){10,50, 80, 5}, OSCreateDropdown(25, NULL, wnd, graphChoices, 5)}, ps);
+        (GUI_RECT){10,50, 80, 5}, OSCreateDropdown(25, CreateGraphInputs, wnd, graphChoices, 5)}, ps);
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Analyse",
-        (GUI_RECT){10,55, 80, 10},  OSCreateButton(24, Analyse, wnd)}, ps);
+        (GUI_RECT){10,85, 80, 10},  OSCreateButton(24, Analyse, wnd)}, ps);
 }
 
 void SwitchWindowPaintStacksToParse(Window* _) {
