@@ -12,7 +12,6 @@ find_package(CURL REQUIRED)
 find_package(ZLIB REQUIRED)
 
 if (WIN32)
-    file(COPY WikiAnalyser.exe.manifest DESTINATION ${CMAKE_BINARY_DIR}/)
     set(OS_SRC
             src/WINGUI.c
     )
@@ -91,3 +90,5 @@ target_link_libraries(WikiAnalyser PRIVATE
         CURL::libcurl
         ZLIB::ZLIB
 )
+
+target_sources(WikiAnalyser PRIVATE WikiAnalyser.rc)

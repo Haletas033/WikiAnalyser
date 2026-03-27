@@ -159,8 +159,11 @@ void ClearGUI(PaintStacks* paintStacks) {
 
 void GUIStart(Window* wnd) {
     //CreateTopNFile();
-    //WelcomeGUI(wnd, MainGUIStart);
-    MainGUIStart(wnd);
+
+    if (GetINIField("UserData/data.ini", "DumpPath") == NULL)
+        WelcomeGUI(wnd, MainGUIStart);
+    else
+        MainGUIStart(wnd);
 }
 
 void GUILoop() {
