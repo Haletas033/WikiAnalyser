@@ -333,7 +333,7 @@ void NewProject (Window* _) {
     *namePrompt = (Window){10, 40, 80, 20};
     OSCreateChildWindowOnChildWindow(9, "NamePrompt", namePrompt, properties);
     DrawPermanentWindow(namePrompt, properties);
-    DrawPermanentText((GUI_TEXT){"Enter the Project Name:", 50, 5, 50}, namePrompt);
+    DrawPermanentText((GUI_TEXT){"Enter the Project Name:", 50, 5, 40}, namePrompt);
     DrawPermanentButton((GUI_BUTTON_LIKE){"Enter Project Name...", 0, 25, 100, 50, OSCreateInputBox(20, namePrompt)}, namePrompt);
     DrawPermanentButton((GUI_BUTTON_LIKE){"EXIT", 0, 75, 50, 25, OSCreateButton(21, ExitNamePrompt, namePrompt)}, namePrompt);
     DrawPermanentButton((GUI_BUTTON_LIKE){"OK", 50, 75, 50, 25, OSCreateButton(22, HandleNamePrompt, namePrompt)}, namePrompt);
@@ -460,8 +460,7 @@ void Analyse(Window* wnd) {
 
     ClearGUI(&visualiserScreen->paintStacks);
 
-    if (index != 3)
-        OSDestroyButtonById(visualiserScreen, 2);
+    OSDestroyButtonById(visualiserScreen, 2);
 
     switch (index) {
         case 0: DrawPieGraph(finalArticle, graphData, visualiserScreen);   break;
@@ -560,7 +559,7 @@ void HandleArticleChoiceChange(Window* wnd) {
         *namePrompt = (Window){10, 40, 80, 20};
         OSCreateChildWindowOnChildWindow(9, "NamePrompt", namePrompt, properties);
         DrawPermanentWindow(namePrompt, properties);
-        DrawPermanentText((GUI_TEXT){"Enter the Article name", 50, 5, 50}, namePrompt);
+        DrawPermanentText((GUI_TEXT){"Enter the Article name", 50, 5, 40}, namePrompt);
         DrawPermanentButton((GUI_BUTTON_LIKE){"Enter Name...", 0, 25, 100, 50, OSCreateInputBox(20, namePrompt)}, namePrompt);
         DrawPermanentButton((GUI_BUTTON_LIKE){"EXIT", 0, 75, 50, 25, OSCreateButton(21, ExitNamePrompt, namePrompt)}, namePrompt);
         DrawPermanentButton((GUI_BUTTON_LIKE){"OK", 50, 75, 50, 25, OSCreateButton(22, HandleArticleNamePrompt, namePrompt)}, namePrompt);

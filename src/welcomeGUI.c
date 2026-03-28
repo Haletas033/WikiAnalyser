@@ -13,7 +13,7 @@
 Window* rootWindow = NULL;
 
 void(*callback)(Window* wnd);
-
+GUI_BUTTON_LIKE* progressBar;
 GUI_TEXT* greetingText;
 const char* greetingDialogue[18] = {
     "Welcome to WikiAnalyser",
@@ -27,7 +27,7 @@ const char* greetingDialogue[18] = {
     "3. Download a custom set of articles",
     "4. Open a pre-existing .xml file on your computer",
     /*After choice */
-    "Great choice. Just running test to make sure everything is correct",
+    "Great choice. Just running a test to make sure everything is correct",
     /*After test*/
     "Test failed. Could not find Zig on your computer",
     "You have 2 options",
@@ -53,10 +53,12 @@ enum buttons {
     ZIG_OPEN
 };
 
-void performCheckText(Window* wnd, int indeterminate);
+void performCheckText(Window* wnd, const int indeterminate, void(*func)(void));
 void performCheck(Window* wnd);
 void failureOptions(Window* wnd);
 void success(Window* wnd);
+void handleProgressBarCompletion();
+void handleFullDumpCompletion();
 
 void deleteButtons(Window* wnd);
 void showButtons(Window* wnd, unsigned int shouldShow);
@@ -65,13 +67,22 @@ void destroyWelcomeGUI(Window* wnd) {
     ClearGUIFull(&wnd->paintStacks, doAfters, buttonCommands);
 }
 
+char currentDumpPath[512] = {0};
+char currentDumpFile[512] = {0};
+
 void downloadFullWikipediaDump(Window* wnd) {
     const char* path = OSGetDirectoryPath();
     if (path == NULL) return;
+
+    sprintf(currentDumpPath, "%s", path);
+    sprintf(currentDumpFile, "%s\\wikiDump.bz2", path);
+
     OSCreateThreadForDownloadTo("https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles-multistream.xml.bz2", path, "/wikiDump.bz2");
     if (path[0] != '\0') {
-        SetINIField("UserData/data.ini", "DumpPath", path);
-        performCheckText(wnd, 1);
+        char dumpFilePath[512];
+        sprintf(dumpFilePath, "%s\\enwiki-latest-pages-articles-multistream.xml", currentDumpPath);
+        SetINIField("UserData/data.ini", "DumpPath", dumpFilePath);
+        performCheckText(wnd, 1, handleFullDumpCompletion);
     }
 }
 
@@ -90,7 +101,6 @@ void handleTopNWikiDump(Window* wnd) {
     const char* inputText = OSGetInputBoxTextById(wnd, 9);
     handleExitButton(wnd);
     showButtons(rootWindow, 0);
-    printf(inputText);
     const char* path = OSGetDirectoryPath();
     if (path == NULL) return;
     if (path[0] != '\0') {
@@ -100,7 +110,7 @@ void handleTopNWikiDump(Window* wnd) {
         char fullPath[512]; sprintf(fullPath, "%s/top100.xml", path);
         SetINIField("UserData/data.ini", "DumpPath", fullPath);
     }
-    performCheckText(rootWindow, 0);
+    performCheckText(rootWindow, 0, handleProgressBarCompletion);
 }
 
 void downloadTopNWikipediaDump(Window* wnd) {
@@ -123,7 +133,6 @@ void handleCustomWikiDump(Window* wnd) {
     const char* inputText = OSGetInputBoxTextById(wnd, 9);
     handleExitButton(wnd);
     showButtons(rootWindow, 0);
-    printf(inputText);
     const char* path = OSGetDirectoryPath();
     if (path == NULL) return;
     if (path[0] != '\0') {
@@ -134,7 +143,7 @@ void handleCustomWikiDump(Window* wnd) {
         CurlDownloadWithSpecialExportTo(names, len, path, "/top100.xml");
         SetINIField("UserData/data.ini", "DumpPath", path);
     }
-    performCheckText(rootWindow, 0);
+    performCheckText(rootWindow, 0, handleProgressBarCompletion);
 }
 
 void downloadCustomWikipediaDump(Window* wnd) {
@@ -156,12 +165,44 @@ void openWikipediaDump(Window* wnd) {
     const char* path = OSGetFilePath();
     if (path[0] != '\0') {
         SetINIField("UserData/data.ini", "DumpPath", path);
-        performCheckText(wnd, -1);
+        performCheckText(wnd, -1, handleProgressBarCompletion);
     }
 }
 
+void zigDownloadSuccess() {
+    handleProgressBarCompletion();
+    success(rootWindow);
+}
+
+void handleZigDownloadCompletion() {
+    progressBar = NULL;
+    OSDestroyButtonById(rootWindow, 29);
+    char exeDir[512]; OSGetEXEDir(exeDir, 512);
+    char zigInstallPath[512];
+    char zigZipPath[512];
+    char zigExePath[512];
+
+    sprintf(zigInstallPath, "%s\\UserData\\zig", exeDir);
+    sprintf(zigZipPath, "%s\\zig.zip", zigInstallPath);
+
+    char extractCmd[1024];
+    sprintf(extractCmd, "powershell -Command \"Expand-Archive -Path '%s' -DestinationPath '%s' -Force\"", zigZipPath, zigInstallPath);
+    OSCreateThreadForSystemCall(extractCmd, handleProgressBarCompletion);
+
+    sprintf(zigExePath, "%s\\zig-windows-x86_64-0.14.0\\zig.exe", zigInstallPath);
+    SetINIField("UserData/data.ini", "ZigPath", zigExePath);
+
+    greetingText->text = "Extracting... (This may take a while)";
+}
+
 void downloadZig(Window* wnd) {
-    success(wnd);
+    char exeDir[512]; OSGetEXEDir(exeDir, 512);
+    char zigPath[512];
+    sprintf(zigPath, "%s\\UserData\\zig", exeDir);
+
+    OSCreateDirectory(zigPath);
+    OSCreateThreadForDownloadTo("https://ziglang.org/download/0.14.0/zig-windows-x86_64-0.14.0.zip", zigPath, "/zig.zip");
+    performCheckText(wnd, 1, handleZigDownloadCompletion);
 }
 
 void openZig(Window* wnd) {
@@ -240,7 +281,6 @@ void changeGreetingText(Window* wnd) {
 void performCheck(Window* wnd) {
     char cmd[512];
     sprintf(cmd, "\"%s\" version > nul 2>&1", GetINIField("UserData/data.ini", "ZigPath"));
-    printf(cmd);
     if (system("zig version > nul 2>&1") == 1 || system(cmd) == 0)
         success(wnd);
     else
@@ -306,8 +346,6 @@ void success(Window* wnd) {
     changeSuccessText(wnd);
 }
 
-GUI_BUTTON_LIKE* progressBar;
-
 void handleProgressBarCompletion() {
     progressBar = NULL;
     OSDestroyButtonById(rootWindow, 29);
@@ -315,11 +353,19 @@ void handleProgressBarCompletion() {
     changePerformCheckText(rootWindow);
 }
 
-void performCheckText(Window* wnd, const int indeterminate) {
+void handleFullDumpCompletion() {
+    progressBar = NULL;
+    OSDestroyButtonById(rootWindow, 29);
+    char extractCmd[1024];
+    sprintf(extractCmd, "tar -xjf \"%s\" -C \"%s\"", currentDumpFile, currentDumpPath);
+    OSCreateThreadForSystemCall(extractCmd, handleProgressBarCompletion);
+}
+
+void performCheckText(Window* wnd, const int indeterminate, void(*func)(void)) {
     animDone = 1;
     deleteButtons(wnd);
     if (indeterminate != -1)
-        progressBar = DrawPermanentButton((GUI_BUTTON_LIKE){"Download Progress", 10, 40, 80, 20, OSCreateProgressBar(29, handleProgressBarCompletion, wnd, indeterminate)}, wnd);
+        progressBar = DrawPermanentButton((GUI_BUTTON_LIKE){"Download Progress", 10, 40, 80, 20, OSCreateProgressBar(29, func, wnd, indeterminate)}, wnd);
     else {
         changeTextFunc = changePerformCheckText;
         changePerformCheckText(rootWindow);

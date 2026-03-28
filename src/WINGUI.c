@@ -328,6 +328,7 @@ void* OSCreateProgressBar(const unsigned int id, void(*progressFunc)(void), Wind
 }
 
 void OSUpdateProgress() {
+
     if (!indeterminate) {
         SendMessage(progressBarHwnd, PBM_SETRANGE32, 0, maxProgress);
         SendMessage(progressBarHwnd, PBM_SETPOS, progress, 0);
@@ -709,6 +710,14 @@ DWORD WINAPI ParseThread(LPVOID param) {
     return 0;
 }
 
+DWORD WINAPI SystemThread(LPVOID param) {
+    SystemStruct* systemStruct = param;
+    system(systemStruct->cmd);
+    systemStruct->func();
+    free(systemStruct);
+    return 0;
+}
+
 void OSCreateThreadForFunction(const LPTHREAD_START_ROUTINE function, const LPVOID funcStruct) {
     CreateThread(
         NULL,
@@ -737,6 +746,13 @@ void OSCreateThreadForParse(PCSTRFILEPATH szFilePath, Article **articles, Articl
     ParseStruct* parseStruct = malloc(sizeof(ParseStruct));
     parseStruct->szFilePath = szFilePath; parseStruct->articles = articles; parseStruct->baseArticle = baseArticle; parseStruct->articleCount = articleCount;
     OSCreateThreadForFunction(ParseThread, parseStruct);
+}
+
+void OSCreateThreadForSystemCall(const char* cmd, void(*func)(void)) {
+    SystemStruct* systemStruct = malloc(sizeof(SystemStruct));
+    systemStruct->cmd = cmd;
+    systemStruct->func = func;
+    OSCreateThreadForFunction(SystemThread, systemStruct);
 }
 
 int OSGetDropdownCurrentlySelected(const unsigned int id, Window* wnd) {

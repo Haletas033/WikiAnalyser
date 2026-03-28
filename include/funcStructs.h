@@ -26,4 +26,9 @@ typedef struct ParseStruct {
     unsigned int *articleCount;
 } ParseStruct;
 
+typedef struct SystemStruct {
+    const char* cmd;
+    void(*func)(void);
+} SystemStruct;
+
 #endif //FUNCSTRUCTS_H
