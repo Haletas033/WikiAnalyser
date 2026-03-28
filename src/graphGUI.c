@@ -9,7 +9,7 @@
 #include "../include/mainGUI.h"
 #include "../include/WINGUI.h"
 
-void DrawPieGraph(GraphData graphData, Window* wnd) {
+void DrawPieGraph(Article finalArticle, GraphData graphData, Window* wnd) {
     //testing values
     const int numberCount = graphData.intFieldsCount + graphData.floatFieldsCount;
     float values[numberCount];
@@ -22,9 +22,9 @@ void DrawPieGraph(GraphData graphData, Window* wnd) {
 
     int i;
     for (i = 0; i < graphData.intFieldsCount; i++)
-        values[i] = articles[0].intFields[graphData.intFieldIndices[i]];
+        values[i] = finalArticle.intFields[graphData.intFieldIndices[i]];
     for (; i < numberCount; i++)
-        values[i] = articles[0].floatFields[graphData.floatFieldIndices[i - graphData.intFieldsCount]];
+        values[i] = finalArticle.floatFields[graphData.floatFieldIndices[i - graphData.intFieldsCount]];
 
     //Draw MainWheel
     for (i = 0; i < numberCount; i++)
@@ -62,12 +62,12 @@ void DrawPieGraph(GraphData graphData, Window* wnd) {
         if (graphData.stringFieldsCount == 0)
             DrawPermanentText((GUI_TEXT){fieldNames[fieldIndices[idx]], 24, i*11+14, 25}, key);
         else
-            DrawPermanentText((GUI_TEXT){articles[0].stringFields[graphData.stringFieldIndices[i]], 24, i*11+14, 25}, key);
+            DrawPermanentText((GUI_TEXT){finalArticle.stringFields[graphData.stringFieldIndices[i]], 24, i*11+14, 25}, key);
     }
 }
 
 
-void DrawPercentageBarGraph(GraphData graphData, Window* wnd) {
+void DrawPercentageBarGraph(Article finalArticle, GraphData graphData, Window* wnd) {
     //testing values
     const int numberCount = graphData.intFieldsCount+graphData.floatFieldsCount;
     float values[numberCount];
@@ -81,9 +81,9 @@ void DrawPercentageBarGraph(GraphData graphData, Window* wnd) {
     //Draw bars
     int i;
     for (i = 0; i < graphData.intFieldsCount; i++)
-        values[i] = articles[0].intFields[graphData.intFieldIndices[i]];
+        values[i] = finalArticle.intFields[graphData.intFieldIndices[i]];
     for (; i < numberCount; i++)
-        values[i] = articles[0].floatFields[graphData.floatFieldIndices[i - graphData.intFieldsCount]];
+        values[i] = finalArticle.floatFields[graphData.floatFieldIndices[i - graphData.intFieldsCount]];
 
     for (i = 0; i < numberCount; i++)
         sum += values[i];
@@ -122,7 +122,7 @@ void DrawPercentageBarGraph(GraphData graphData, Window* wnd) {
             if (graphData.stringFieldsCount == 0)
                 DrawPermanentText((GUI_TEXT){fieldNames[fieldIndices[idx]], 5+(5*i)*5+12, j*12+24, 15}, key);
             else
-                DrawPermanentText((GUI_TEXT){articles[0].stringFields[graphData.stringFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
+                DrawPermanentText((GUI_TEXT){finalArticle.stringFields[graphData.stringFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
         }
     }
 
@@ -136,20 +136,20 @@ void DrawPercentageBarGraph(GraphData graphData, Window* wnd) {
         if (graphData.stringFieldsCount == 0)
             DrawPermanentText((GUI_TEXT){fieldNames[fieldIndices[idx]], 5+(5*i)*5+12, j*12+24, 15}, key);
         else
-            DrawPermanentText((GUI_TEXT){articles[0].stringFields[graphData.stringFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
+            DrawPermanentText((GUI_TEXT){finalArticle.stringFields[graphData.stringFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
     }
 }
 
-void DrawBarGraph(GraphData graphData, Window* wnd) {
+void DrawBarGraph(Article finalArticle, GraphData graphData, Window* wnd) {
     const int numberCount = graphData.intFieldsCount + graphData.floatFieldsCount;
     float values[numberCount];
     float maxValue = MININT;
 
     int i;
     for (i = 0; i < graphData.intFieldsCount; i++)
-        values[i] = articles[0].intFields[graphData.intFieldIndices[i]];
+        values[i] = finalArticle.intFields[graphData.intFieldIndices[i]];
     for (; i < numberCount; i++)
-        values[i] = articles[0].floatFields[graphData.floatFieldIndices[i - graphData.intFieldsCount]];
+        values[i] = finalArticle.floatFields[graphData.floatFieldIndices[i - graphData.intFieldsCount]];
 
     COLOUR colours[numberCount];
     srand(time(NULL));
@@ -189,7 +189,7 @@ void DrawBarGraph(GraphData graphData, Window* wnd) {
             if (graphData.stringFieldsCount == 0)
                 DrawPermanentText((GUI_TEXT){fieldNames[fieldIndices[idx]], 5+(5*i)*5+12, j*12+24, 15}, key);
             else
-                DrawPermanentText((GUI_TEXT){articles[0].stringFields[graphData.stringFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
+                DrawPermanentText((GUI_TEXT){finalArticle.stringFields[graphData.stringFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
         }
     }
 
@@ -203,26 +203,26 @@ void DrawBarGraph(GraphData graphData, Window* wnd) {
         if (graphData.stringFieldsCount == 0)
             DrawPermanentText((GUI_TEXT){fieldNames[fieldIndices[idx]], 5+(5*i)*5+12, j*12+24, 15}, key);
         else
-            DrawPermanentText((GUI_TEXT){articles[0].stringFields[graphData.stringFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
+            DrawPermanentText((GUI_TEXT){finalArticle.stringFields[graphData.stringFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
     }
 }
 
-void DrawScatterGraph(GraphData graphData, Window* wnd) {
+void DrawScatterGraph(Article finalArticle, GraphData graphData, Window* wnd) {
     const int numberCount = graphData.intFieldsCount + graphData.floatFieldsCount;
     float XValues[numberCount];
 
     int i;
     for (i = 0; i < graphData.intFieldsCount; i++)
-        XValues[i] = articles[0].intFields[graphData.intFieldIndices[i]];
+        XValues[i] = finalArticle.intFields[graphData.intFieldIndices[i]];
     for (; i < numberCount; i++)
-        XValues[i] = articles[0].floatFields[graphData.floatFieldIndices[i - graphData.intFieldsCount]];
+        XValues[i] = finalArticle.floatFields[graphData.floatFieldIndices[i - graphData.intFieldsCount]];
 
 
     float YValues[numberCount];
     for (i = 0; i < graphData.intFieldsCount; i++)
-        YValues[i] = articles[0].intFields[graphData.YIntFieldIndices[i]];
+        YValues[i] = finalArticle.intFields[graphData.YIntFieldIndices[i]];
     for (; i < numberCount; i++)
-        YValues[i] = articles[0].floatFields[graphData.YFloatFieldIndices[i - graphData.YIntFieldsCount]];
+        YValues[i] = finalArticle.floatFields[graphData.YFloatFieldIndices[i - graphData.YIntFieldsCount]];
 
 
     float maxXValue = INT_MIN;

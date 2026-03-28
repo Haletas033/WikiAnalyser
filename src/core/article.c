@@ -1,5 +1,7 @@
 #include "../include/core/article.h"
 
+#include <stdio.h>
+
 void AddName(Article *article, enum Type type, const char* name) {
     char*** fieldNameType = NULL;
     unsigned int* fieldSize = 0;
@@ -94,5 +96,38 @@ void CopyFields(const Article *article, Article *newArticle) {
     for (i = 0; i < article->floatFieldsSize; i++) AddField(newArticle, FIELD_FLOAT, article->floatFieldNames[i]);
     for (i = 0; i < article->boolFieldsSize; i++) AddField(newArticle, FIELD_BOOL, article->boolFieldNames[i]);
     for (i = 0; i < article->stringFieldsSize; i++) AddField(newArticle, FIELD_STRING, article->stringFieldNames[i]);
+}
+
+Article FindArticleByName(const char* name, const Article* articles, const unsigned int articleCount) {
+    int i;
+    printf("i%s\n", name);
+    for (i = 0; i < articleCount; i++) {
+        printf("ii%s\n", articles[i].title);
+        if (strcmp(articles[i].title, name) == 0) return articles[i];
+    }
+    return (Article){0};
+}
+
+Article SumArticles(const Article baseArticle, const Article* articles, const unsigned int articleCount) {
+    Article article = baseArticle;
+    int i;
+    for (i = 0; i < articleCount; i++) {
+        int j;
+        for (j = 0; j < baseArticle.intFieldsSize; j++)
+            article.intFields[j] += articles[i].intFields[j];
+        for (j = 0; j < baseArticle.floatFieldsSize; j++)
+            article.floatFields[j] += articles[i].floatFields[j];
+    }
+    return article;
+}
+
+Article AverageArticles(const Article baseArticle, const Article* articles, const unsigned int articleCount) {
+    Article article = SumArticles(baseArticle, articles, articleCount);
+    int j;
+    for (j = 0; j < baseArticle.intFieldsSize; j++)
+        article.intFields[j] /= articleCount;
+    for (j = 0; j < baseArticle.floatFieldsSize; j++)
+        article.floatFields[j] /= articleCount;
+    return article;
 }
 

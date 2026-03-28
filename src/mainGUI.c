@@ -125,10 +125,11 @@ void HideParseButtons() {
     OSShowButtonById(properties, 16, 0);
     OSShowButtonById(properties, 17, 0);
     OSShowButtonById(properties, 18, 0);
-    OSShowButtonById(properties, 25, 0);
-    OSShowButtonById(properties, 24, 0);
+    OSShowButtonById(properties, 19, 0);
     OSShowButtonById(properties, 22, 0);
     OSShowButtonById(properties, 23, 0);
+    OSShowButtonById(properties, 24, 0);
+    OSShowButtonById(properties, 25, 0);
 }
 
 void SwitchWindowPaintStacksToCleanup(Window* _) {
@@ -412,7 +413,20 @@ void CreateKeyData(Window* wnd, const unsigned int id, const unsigned int keySiz
     }
 }
 
+char* articleName;
 void Analyse(Window* wnd) {
+    const int articleChoiceIndex = OSGetDropdownCurrentlySelected(19, wnd);
+    Article finalArticle;
+
+    switch (articleChoiceIndex) {
+        case 0: finalArticle = FindArticleByName(articleName, articles, articleCount); break;
+        case 1: finalArticle = AverageArticles(article, articles, articleCount); break;
+        case 2: finalArticle = SumArticles(article, articles, articleCount);   break;
+        default: return;
+    }
+
+    if (finalArticle.title == NULL) return;
+
     free(graphData.intFieldIndices);
     free(graphData.floatFieldIndices);
     free(graphData.boolFieldIndices);
@@ -436,10 +450,10 @@ void Analyse(Window* wnd) {
         OSDestroyButtonById(visualiserScreen, 2);
 
     switch (index) {
-        case 0: DrawPieGraph(graphData, visualiserScreen);   break;
-        case 1: DrawPercentageBarGraph(graphData, visualiserScreen); break;
-        case 2: DrawBarGraph(graphData, visualiserScreen);   break;
-        case 3: DrawScatterGraph(graphData, visualiserScreen); break;
+        case 0: DrawPieGraph(finalArticle, graphData, visualiserScreen);   break;
+        case 1: DrawPercentageBarGraph(finalArticle, graphData, visualiserScreen); break;
+        case 2: DrawBarGraph(finalArticle, graphData, visualiserScreen);   break;
+        case 3: DrawScatterGraph(finalArticle, graphData, visualiserScreen); break;
         default: return;
     }
 }
@@ -513,6 +527,33 @@ void CreateGraphInputs(Window* wnd) {
     }
 }
 
+void HandleArticleNamePrompt(Window* wnd) {
+    const char* name = OSGetInputBoxTextById(wnd, 20);
+    if (name[0] == '\0') return;
+    articleName = strdup(name);
+    ExitNamePrompt(wnd);
+}
+
+void HandleArticleChoiceChange(Window* wnd) {
+    const int index = OSGetDropdownCurrentlySelected(19, wnd);
+
+    if (index == 0) {
+        //Name prompt
+        properties->paintStacks = (PaintStacks){0};
+        HideParseButtons();
+
+        Window* namePrompt = malloc(sizeof(Window));
+        *namePrompt = (Window){10, 40, 80, 20};
+        OSCreateChildWindowOnChildWindow(9, "NamePrompt", namePrompt, properties);
+        DrawPermanentWindow(namePrompt, properties);
+        DrawPermanentText((GUI_TEXT){"Enter the Article name", 50, 5, 50}, namePrompt);
+        DrawPermanentButton((GUI_BUTTON_LIKE){"Enter Name...", 0, 25, 100, 50, OSCreateInputBox(20, namePrompt)}, namePrompt);
+        DrawPermanentButton((GUI_BUTTON_LIKE){"EXIT", 0, 75, 50, 25, OSCreateButton(21, ExitNamePrompt, namePrompt)}, namePrompt);
+        DrawPermanentButton((GUI_BUTTON_LIKE){"OK", 50, 75, 50, 25, OSCreateButton(22, HandleArticleNamePrompt, namePrompt)}, namePrompt);
+    }
+}
+
+const char* articleChoices[3] = {"By Name", "All Averaged", "All Summed"};
 const char* graphChoices[5] = {"Pie Graph", "Percentage Bar", "Bar Graph", "Scatter Plot", "Text"};
 void SetupParsePaintStacks(PaintStacks* ps, Window* wnd) {
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"New Project",
@@ -524,6 +565,8 @@ void SetupParsePaintStacks(PaintStacks* ps, Window* wnd) {
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Parse",
         (GUI_RECT){10,35, 80, 10},  OSCreateButton(18, RunParser, wnd)}, ps);
 
+    DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Article Choice",
+        (GUI_RECT){10,47, 80, 5}, OSCreateDropdown(19, HandleArticleChoiceChange, wnd, articleChoices, 3)}, ps);
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Graph Choice",
         (GUI_RECT){10,50, 80, 5}, OSCreateDropdown(25, CreateGraphInputs, wnd, graphChoices, 5)}, ps);
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Analyse",

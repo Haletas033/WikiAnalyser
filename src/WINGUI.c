@@ -45,10 +45,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             GetClassName(control, className, 32);
 
             if (strcmp(className, "ComboBox") == 0 && notification == CBN_SELCHANGE) {
-                dropdownCommands[id-1].buttonCommand(dropdownCommands[id-1].wnd);
+                if (dropdownCommands[id-1].buttonCommand != NULL)
+                    dropdownCommands[id-1].buttonCommand(dropdownCommands[id-1].wnd);
             } else if (strcmp(className, "Button") == 0 && notification == BN_CLICKED) {
                 currentButtonId = id;
-                buttonCommands[id-1].buttonCommand(buttonCommands[id-1].wnd);
+                if (buttonCommands[id-1].buttonCommand != NULL)
+                    buttonCommands[id-1].buttonCommand(buttonCommands[id-1].wnd);
             }
             return 0;
         }

@@ -52,6 +52,9 @@ typedef struct Article {
 void AddName(Article *article, enum Type type, const char* name);
 void AddField(Article *article, enum Type type, const char* name);
 void CopyFields(const Article *article, Article *newArticle);
+Article FindArticleByName(const char* name, const Article* articles, unsigned int articleCount);
+Article SumArticles(Article baseArticle, const Article* articles, unsigned int articleCount);
+Article AverageArticles(Article baseArticle, const Article* articles, unsigned int articleCount);
 
 //Zig functions ahead
 void zigPrintTest(Article *article);

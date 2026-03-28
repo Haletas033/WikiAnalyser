@@ -27,9 +27,9 @@ typedef struct GraphData {
 } GraphData;
 
 void DrawTextValue(GraphData graphData, Window* wnd);
-void DrawPieGraph(GraphData graphData, Window* wnd);
-void DrawBarGraph(GraphData graphData, Window* wnd);
-void DrawPercentageBarGraph(GraphData graphData, Window* wnd);
-void DrawScatterGraph(GraphData graphData, Window* wnd);
+void DrawPieGraph(Article finalArticle, GraphData graphData, Window* wnd);
+void DrawBarGraph(Article finalArticle, GraphData graphData, Window* wnd);
+void DrawPercentageBarGraph(Article finalArticle, GraphData graphData, Window* wnd);
+void DrawScatterGraph(Article finalArticle, GraphData graphData, Window* wnd);
 
 #endif //GRAPHGUI_H
