@@ -344,6 +344,12 @@ void OpenProject(Window* _) {
     OSOpenAs(currentProjectPath, "src\\main.zig");
 }
 
+GUI_BUTTON_LIKE* parseProgressBar;
+void RemoveProgressBar(Window* wnd) {
+    parseProgressBar = NULL;
+    OSDestroyButtonById(visualiserScreen, 29);
+}
+
 void BuildProject(Window* _) {
     char exeDir[512]; OSGetEXEDir(exeDir, 512);
     char fullCommand[2048];
@@ -351,8 +357,13 @@ void BuildProject(Window* _) {
     sprintf(userDataPath, "%s\\UserData", exeDir);
 
     //Build to temp
-    sprintf(fullCommand, "zig build-lib %s\\src\\main.zig -dynamic -O ReleaseSmall -femit-h -femit-bin=%s\\main_temp.dll",
-        currentProjectPath, userDataPath);
+    if (GetINIField("UserData/data.ini", "ZigPath") != 0) {
+        sprintf(fullCommand, "%s build-lib %s\\src\\main.zig -dynamic -O ReleaseSmall -femit-h -femit-bin=%s\\main_temp.dll",
+            GetINIField("UserData/data.ini", "ZigPath"), currentProjectPath, userDataPath);
+    } else {
+        sprintf(fullCommand, "zig build-lib %s\\src\\main.zig -dynamic -O ReleaseSmall -femit-h -femit-bin=%s\\main_temp.dll",
+            GetINIField("UserData/data.ini", "ZigPath"), currentProjectPath, userDataPath);
+    }
 
     if (OSShellExecute(userDataPath, fullCommand) != 0) return;
 
@@ -371,6 +382,9 @@ void BuildProject(Window* _) {
 
 void RunParser(Window* _) {
     OSCreateThreadForParse(GetINIField("UserData/data.ini", "DumpPath"), &articles, &article, &articleCount);
+    visualiserScreen->paintStacks = (PaintStacks){0};
+    parseProgressBar = OSCreateProgressBar(29, RemoveProgressBar, visualiserScreen, 1);
+    DrawPermanentButton((GUI_BUTTON_LIKE){"Parsing...", 10, 40, 80, 20, parseProgressBar}, visualiserScreen);
 }
 
 GraphData graphData = {0};

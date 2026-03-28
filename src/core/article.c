@@ -118,6 +118,7 @@ Article SumArticles(const Article baseArticle, const Article* articles, const un
         for (j = 0; j < baseArticle.floatFieldsSize; j++)
             article.floatFields[j] += articles[i].floatFields[j];
     }
+    article.title = "Summed Articles";
     return article;
 }
 
@@ -128,6 +129,7 @@ Article AverageArticles(const Article baseArticle, const Article* articles, cons
         article.intFields[j] /= articleCount;
     for (j = 0; j < baseArticle.floatFieldsSize; j++)
         article.floatFields[j] /= articleCount;
+    article.title = "Averaged Articles";
     return article;
 }
 

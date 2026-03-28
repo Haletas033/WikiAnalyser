@@ -321,7 +321,7 @@ void* OSCreateProgressBar(const unsigned int id, void(*progressFunc)(void), Wind
     progressBarHwnd = progressBar;
 
     if (indeterminate) {
-        SendMessage(progressBarHwnd, PBM_SETMARQUEE, 1, 50);
+        SendMessage(progressBarHwnd, PBM_SETMARQUEE, 1, 10);
     }
 
     return progressBar;
