@@ -11,32 +11,35 @@
 
 void DrawPieGraph(GraphData graphData, Window* wnd) {
     //testing values
-    int values[graphData.intFieldsCount];
-    COLOUR colours[graphData.intFieldsCount];
+    const int numberCount = graphData.intFieldsCount + graphData.floatFieldsCount;
+    float values[numberCount];
+    COLOUR colours[numberCount];
     srand(time(NULL));
 
     int lastEndDeg = 0;
-    int sum = 0;
-    int cumulativeSum = 0;
+    float sum = 0;
+    float cumulativeSum = 0;
 
     int i;
     for (i = 0; i < graphData.intFieldsCount; i++)
         values[i] = articles[0].intFields[graphData.intFieldIndices[i]];
+    for (; i < numberCount; i++)
+        values[i] = articles[0].floatFields[graphData.floatFieldIndices[i - graphData.intFieldsCount]];
 
     //Draw MainWheel
-    for (i = 0; i < graphData.intFieldsCount; i++)
+    for (i = 0; i < numberCount; i++)
         sum += values[i];
 
-    for (i = 0; i < graphData.intFieldsCount; i++) {
+    for (i = 0; i < numberCount; i++) {
         colours[i].r = rand() % 255;
         colours[i].g = rand() % 255;
         colours[i].b = rand() % 255;
     }
 
-    for (i = 0; i < graphData.intFieldsCount; i++) {
+    for (i = 0; i < numberCount; i++) {
 
         cumulativeSum += values[i];
-        int endDeg = ((float)cumulativeSum / sum) * 360;
+        int endDeg = cumulativeSum / sum * 360;
         DrawPermanentPieSlice((COLOUR_PIE_SLICE){50, 50, 50, lastEndDeg, endDeg, colours[i]}, wnd);
         lastEndDeg = endDeg;
     }
@@ -49,10 +52,15 @@ void DrawPieGraph(GraphData graphData, Window* wnd) {
     DrawPermanentText((GUI_TEXT){"Key:", 12, 5, 35}, key);
 
     //Draw key
-    for (i = 0; i < graphData.intFieldsCount; i++) {
+    for (i = 0; i < numberCount; i++) {
         DrawPermanentRect((COLOUR_RECT){5, i*11+10, 15, i*11+20, colours[i]}, key);
+
+        const int idx = i < graphData.intFieldsCount ? i : i - graphData.intFieldsCount;
+        char** fieldNames = i<graphData.intFieldsCount ? article.intFieldNames : article.floatFieldNames;
+        const int* fieldIndices = i<graphData.intFieldsCount ? graphData.intFieldIndices : graphData.floatFieldIndices;
+
         if (graphData.stringFieldsCount == 0)
-            DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i]], 24, i*11+14, 25}, key);
+            DrawPermanentText((GUI_TEXT){fieldNames[fieldIndices[idx]], 24, i*11+14, 25}, key);
         else
             DrawPermanentText((GUI_TEXT){articles[0].stringFields[graphData.stringFieldIndices[i]], 24, i*11+14, 25}, key);
     }
@@ -61,32 +69,35 @@ void DrawPieGraph(GraphData graphData, Window* wnd) {
 
 void DrawPercentageBarGraph(GraphData graphData, Window* wnd) {
     //testing values
-    int values[graphData.intFieldsCount];
-    COLOUR colours[graphData.intFieldsCount];
+    const int numberCount = graphData.intFieldsCount+graphData.floatFieldsCount;
+    float values[numberCount];
+    COLOUR colours[numberCount];
     srand(time(NULL));
 
     int lastEndPos = 0;
-    int sum = 0;
-    int cumulativeSum = 0;
+    float sum = 0;
+    float cumulativeSum = 0;
 
     //Draw bars
     int i;
     for (i = 0; i < graphData.intFieldsCount; i++)
         values[i] = articles[0].intFields[graphData.intFieldIndices[i]];
+    for (; i < numberCount; i++)
+        values[i] = articles[0].floatFields[graphData.floatFieldIndices[i - graphData.intFieldsCount]];
 
-    for (i = 0; i < graphData.intFieldsCount; i++)
+    for (i = 0; i < numberCount; i++)
         sum += values[i];
 
-    for (i = 0; i < graphData.intFieldsCount; i++) {
+    for (i = 0; i < numberCount; i++) {
         colours[i].r = rand() % 255;
         colours[i].g = rand() % 255;
         colours[i].b = rand() % 255;
     }
 
-    for (i = 0; i < graphData.intFieldsCount; i++) {
+    for (i = 0; i < numberCount; i++) {
 
         cumulativeSum += values[i];
-        int endPos = ((float)cumulativeSum / sum) * 80;
+        int endPos = cumulativeSum / sum * 80.0f;
         DrawPermanentRect((COLOUR_RECT){10+lastEndPos, 40, 10+endPos, 60, colours[i]}, wnd);
         lastEndPos = endPos;
     }
@@ -100,50 +111,63 @@ void DrawPercentageBarGraph(GraphData graphData, Window* wnd) {
 
     //Draw key
     int j;
-    for (i = 0; i < graphData.intFieldsCount/5; i++) {
+    for (i = 0; i < numberCount/5; i++) {
         for (j = 0; j < 5; j++) {
             DrawPermanentRect((COLOUR_RECT){5+(5*i)*5, j*12+20, (5*i)*5+10, j*12+30, colours[i*5+j]}, key);
+
+            const int idx = i*5+j < graphData.intFieldsCount ? i*5+j : i*5+j - graphData.intFieldsCount;
+            char** fieldNames = i*5+j<graphData.intFieldsCount ? article.intFieldNames : article.floatFieldNames;
+            const int* fieldIndices = i*5+j<graphData.intFieldsCount ? graphData.intFieldIndices : graphData.floatFieldIndices;
+
             if (graphData.stringFieldsCount == 0)
-                DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
+                DrawPermanentText((GUI_TEXT){fieldNames[fieldIndices[idx]], 5+(5*i)*5+12, j*12+24, 15}, key);
             else
                 DrawPermanentText((GUI_TEXT){articles[0].stringFields[graphData.stringFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
         }
     }
 
-    for (j = 0; j < graphData.intFieldsCount%5; j++) {
+    for (j = 0; j < numberCount%5; j++) {
         DrawPermanentRect((COLOUR_RECT){5+(5*i)*5, j*12+20, (5*i)*5+10, j*12+30, colours[i*5+j]}, key);
+
+        const int idx = i*5+j < graphData.intFieldsCount ? i*5+j : i*5+j - graphData.intFieldsCount;
+        char** fieldNames = i*5+j<graphData.intFieldsCount ? article.intFieldNames : article.floatFieldNames;
+        const int* fieldIndices = i*5+j<graphData.intFieldsCount ? graphData.intFieldIndices : graphData.floatFieldIndices;
+
         if (graphData.stringFieldsCount == 0)
-            DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
+            DrawPermanentText((GUI_TEXT){fieldNames[fieldIndices[idx]], 5+(5*i)*5+12, j*12+24, 15}, key);
         else
             DrawPermanentText((GUI_TEXT){articles[0].stringFields[graphData.stringFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
     }
 }
 
 void DrawBarGraph(GraphData graphData, Window* wnd) {
-    int values[graphData.intFieldsCount];
-    int maxValue = MININT;
+    const int numberCount = graphData.intFieldsCount + graphData.floatFieldsCount;
+    float values[numberCount];
+    float maxValue = MININT;
 
     int i;
     for (i = 0; i < graphData.intFieldsCount; i++)
         values[i] = articles[0].intFields[graphData.intFieldIndices[i]];
+    for (; i < numberCount; i++)
+        values[i] = articles[0].floatFields[graphData.floatFieldIndices[i - graphData.intFieldsCount]];
 
-    COLOUR colours[graphData.intFieldsCount];
+    COLOUR colours[numberCount];
     srand(time(NULL));
 
-    for (i = 0; i < graphData.intFieldsCount; i++) {
+    for (i = 0; i < numberCount; i++) {
         maxValue = values[i] > maxValue ? values[i] : maxValue;
     }
 
-    for (i = 0; i < graphData.intFieldsCount; i++) {
+    for (i = 0; i < numberCount; i++) {
         colours[i].r = rand() % 255;
         colours[i].g = rand() % 255;
         colours[i].b = rand() % 255;
     }
 
-    int baseWidth = 80/graphData.intFieldsCount;
+    int baseWidth = 80/numberCount;
     int gap = baseWidth / 10;
-    for (i = 0; i < graphData.intFieldsCount; i++)
-        DrawPermanentRect((COLOUR_RECT){i*baseWidth+10, 50 -((float)values[i] / maxValue) * 40, i*baseWidth+baseWidth+10-gap, 60, colours[i]}, wnd);
+    for (i = 0; i < numberCount; i++)
+        DrawPermanentRect((COLOUR_RECT){i*baseWidth+10, 50 -values[i] / maxValue * 40, i*baseWidth+baseWidth+10-gap, 60, colours[i]}, wnd);
 
     //Draw key window
     Window* key = malloc(sizeof(Window));
@@ -154,48 +178,63 @@ void DrawBarGraph(GraphData graphData, Window* wnd) {
 
     //Draw key
     int j;
-    for (i = 0; i < graphData.intFieldsCount/5; i++) {
+    for (i = 0; i < numberCount/5; i++) {
         for (j = 0; j < 5; j++) {
             DrawPermanentRect((COLOUR_RECT){5+(5*i)*5, j*12+20, (5*i)*5+10, j*12+30, colours[i*5+j]}, key);
+
+            const int idx = i*5+j < graphData.intFieldsCount ? i*5+j : i*5+j - graphData.intFieldsCount;
+            char** fieldNames = i*5+j<graphData.intFieldsCount ? article.intFieldNames : article.floatFieldNames;
+            const int* fieldIndices = i*5+j<graphData.intFieldsCount ? graphData.intFieldIndices : graphData.floatFieldIndices;
+
             if (graphData.stringFieldsCount == 0)
-                DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
+                DrawPermanentText((GUI_TEXT){fieldNames[fieldIndices[idx]], 5+(5*i)*5+12, j*12+24, 15}, key);
             else
                 DrawPermanentText((GUI_TEXT){articles[0].stringFields[graphData.stringFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
         }
     }
 
-    for (j = 0; j < graphData.intFieldsCount%5; j++) {
+    for (j = 0; j < numberCount%5; j++) {
         DrawPermanentRect((COLOUR_RECT){5+(5*i)*5, j*12+20, (5*i)*5+10, j*12+30, colours[i*5+j]}, key);
+
+        const int idx = i*5+j < graphData.intFieldsCount ? i*5+j : i*5+j - graphData.intFieldsCount;
+        char** fieldNames = i*5+j<graphData.intFieldsCount ? article.intFieldNames : article.floatFieldNames;
+        const int* fieldIndices = i*5+j<graphData.intFieldsCount ? graphData.intFieldIndices : graphData.floatFieldIndices;
+
         if (graphData.stringFieldsCount == 0)
-            DrawPermanentText((GUI_TEXT){article.intFieldNames[graphData.intFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
+            DrawPermanentText((GUI_TEXT){fieldNames[fieldIndices[idx]], 5+(5*i)*5+12, j*12+24, 15}, key);
         else
             DrawPermanentText((GUI_TEXT){articles[0].stringFields[graphData.stringFieldIndices[i*5+j]], 5+(5*i)*5+12, j*12+24, 15}, key);
     }
 }
 
 void DrawScatterGraph(GraphData graphData, Window* wnd) {
-    int XValues[graphData.intFieldsCount];
+    const int numberCount = graphData.intFieldsCount + graphData.floatFieldsCount;
+    float XValues[numberCount];
 
     int i;
     for (i = 0; i < graphData.intFieldsCount; i++)
         XValues[i] = articles[0].intFields[graphData.intFieldIndices[i]];
+    for (; i < numberCount; i++)
+        XValues[i] = articles[0].floatFields[graphData.floatFieldIndices[i - graphData.intFieldsCount]];
 
 
-    int YValues[graphData.intFieldsCount];
+    float YValues[numberCount];
     for (i = 0; i < graphData.intFieldsCount; i++)
         YValues[i] = articles[0].intFields[graphData.YIntFieldIndices[i]];
+    for (; i < numberCount; i++)
+        YValues[i] = articles[0].floatFields[graphData.YFloatFieldIndices[i - graphData.YIntFieldsCount]];
 
 
-    int maxXValue = INT_MIN;
-    int maxYValue = INT_MIN;
+    float maxXValue = INT_MIN;
+    float maxYValue = INT_MIN;
 
-    for (i = 0; i < graphData.intFieldsCount; i++) {
+    for (i = 0; i < numberCount; i++) {
         maxXValue = XValues[i] > maxXValue ? XValues[i] : maxXValue;
         maxYValue = YValues[i] > maxYValue ? YValues[i] : maxYValue;
     }
 
-    for (i = 0; i < graphData.intFieldsCount; i++)
-        DrawPermanentPoint((COLOUR_POINT){20+((float)XValues[i] / maxXValue)*65, 80-((float)YValues[i] / maxYValue)*65, 5, 255, 122, 0}, wnd);
+    for (i = 0; i < numberCount; i++)
+        DrawPermanentPoint((COLOUR_POINT){20+XValues[i] / maxXValue*65, 80-YValues[i] / maxYValue*65, 5, 255, 122, 0}, wnd);
 
     //Draw bounding box
     GUI_POINT boundingBox[5] = {{10,10}, {90, 10}, {90, 90}, {10, 90}, {10, 10}};

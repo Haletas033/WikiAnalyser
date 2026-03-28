@@ -349,16 +349,16 @@ void BuildProject(Window* _) {
     char userDataPath[512];
     sprintf(userDataPath, "%s\\UserData", exeDir);
 
-    // Build to temp
+    //Build to temp
     sprintf(fullCommand, "zig build-lib %s\\src\\main.zig -dynamic -O ReleaseSmall -femit-h -femit-bin=%s\\main_temp.dll",
         currentProjectPath, userDataPath);
 
     if (OSShellExecute(userDataPath, fullCommand) != 0) return;
 
-    // Free old
+    //Free old
     OSFreeLibrary();
 
-    // Replace
+    //Replace
     char oldPath[512]; sprintf(oldPath, "%s\\main.dll", userDataPath);
     char tempPath[512]; sprintf(tempPath, "%s\\main_temp.dll", userDataPath);
     DeleteFile(oldPath);
