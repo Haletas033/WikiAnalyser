@@ -9,7 +9,7 @@ The main exe is less than 400kb though it does auto-download Zig ~160mb, TopN fi
 ### Setup Festures:
 * Automatically download an XML file from four options (Full, TopN, Custom, or open) (unzipping is bugged for Full TopN with 10,000 is probably best)
 * Builds topN.topn (a lost of every srticle and it's views for topN)
-* Checks for Zig and provides an easy way to open it or download it (unzipping is bugged for download) 
+* Checks for Zig and provides an easy way to open a path to it if unfound **(A Download option exists but unzipping is bugged for download DO NOT USE FOR NOW please install manually I'm sorry for the inconvience but removing the button will break things and I don't have enough time left to fix them)**
 
 ### Cleanup Features:
 * Set what containers, strings, and characters you want removed
