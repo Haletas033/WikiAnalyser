@@ -31,7 +31,7 @@ pub fn Title(article: *Article) [*]c_char{
 }
 
 //Get a field by name and type
-pub fn Field(comptime T: type, name: [*:0]const u8, article: *Article) *T {
+pub fn Field(comptime T: type, name: [*:0]const u8, article: *Article) ?*T {
 
     var names: [*][*]c_char = undefined;
     var size: c_int = undefined;
@@ -54,7 +54,8 @@ pub fn Field(comptime T: type, name: [*:0]const u8, article: *Article) *T {
         size = article.stringFieldsSize;
         fields = @alignCast(@ptrCast(article.stringFields));
     } else {
-        @panic("Unsupported type. Supported types are: c_int, f32, u8, [*]c_char");
+        std.debug.print("{s}: {s}\n", .{"Unsupported type. Supported types are: c_int, f32, u8, [*]c_char. You have", @typeName(T)});
+        return null;
     }
 
     const nameSlice: []const u8 = std.mem.span(name);
@@ -64,5 +65,6 @@ pub fn Field(comptime T: type, name: [*:0]const u8, article: *Article) *T {
         if (std.mem.eql(u8, currentSlice, nameSlice)) return @ptrCast(&fields[i]);
     }
 
-    @panic("Couldn't find field");
+    std.debug.print("{s}: {s}\n", .{"Couldn't find field", name});
+    return null;
 }

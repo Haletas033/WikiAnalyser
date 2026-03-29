@@ -375,6 +375,7 @@ void handleProgressBarCompletion() {
     progressBar = NULL;
     OSDestroyButtonById(rootWindow, 29);
     changeTextFunc = changePerformCheckText;
+    animDone =1;
     changePerformCheckText(rootWindow);
 }
 

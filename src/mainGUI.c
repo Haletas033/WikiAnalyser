@@ -378,7 +378,7 @@ void BuildProject(Window* _) {
             GetINIField("UserData/data.ini", "ZigPath"), currentProjectPath, userDataPath);
     } else {
         sprintf(fullCommand, "zig build-lib %s\\src\\main.zig -dynamic -O ReleaseSmall -femit-h -femit-bin=%s\\main_temp.dll",
-            GetINIField("UserData/data.ini", "ZigPath"), currentProjectPath, userDataPath);
+            currentProjectPath, userDataPath);
     }
 
     if (OSShellExecute(userDataPath, fullCommand) != 0) return;
