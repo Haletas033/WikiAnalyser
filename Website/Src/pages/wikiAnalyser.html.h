@@ -44,11 +44,9 @@ inline void wikiAnalyser() {
 
     Tag getStartedLinksDiv("div");
     getStartedLinksDiv
-        .put(Tag ("a").addAttr("href", "#").text("Download Latest"))
+        .put(Tag ("a").addAttr("href", "https://github.com/Haletas033/WikiAnalyser/releases/download/release/WikiAnalyser.zip").text("Download Latest"))
         .put(Tag ("span").text("|"))
-        .put(Tag ("a").addAttr("href", "https://github.com/Haletas033/HaletasWeb").text("Visit Repo"))
-        .put(Tag ("span").text("|"))
-        .put(Tag ("a").addAttr("href", "#").text("Read the Docs"));
+        .put(Tag ("a").addAttr("href", "https://github.com/Haletas033/HaletasWeb").text("Visit Repo"));
     getStarted.put(getStartedLinksDiv);
     main.put(getStarted);
 

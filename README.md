@@ -22,6 +22,7 @@ The main exe is less than 400kb though it does auto-download Zig ~160mb, TopN fi
 * Console shows nothing (the app opens an instance of cmd which you can use for now)
 * With many fields some may go of screen (no current fix will work when scrollbars are added)
 * Dropdowns sometimes clip into each other on small resolutions
+* Download Zig currently fails to unzip sometimes (please manually download for now)
 
 ### Upcoming Features:
 * Console and scrollbar support
