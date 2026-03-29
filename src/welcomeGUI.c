@@ -15,12 +15,13 @@ Window* rootWindow = NULL;
 void(*callback)(Window* wnd);
 GUI_BUTTON_LIKE* progressBar;
 GUI_TEXT* greetingText;
-const char* greetingDialogue[18] = {
+const char* greetingDialogue[19] = {
     "Welcome to WikiAnalyser",
     "It seems it is your first time here",
     "Or your data is missing...",
     "Anyways, to begin you are going to have to download a wikipedia dump",
     "Well, I guess any .xml that has the same layout as the Wikipedia ones",
+    "But first, I need to create the topN file",
     "For this you have a few options. Here they are",
     "1. Download all of Wikipedia ~100gb",
     "2. Download the top n articles",
@@ -53,6 +54,9 @@ enum buttons {
     ZIG_OPEN
 };
 
+void changeGreetingText(Window* wnd);
+void(*changeTextFunc)(Window* wnd) = changeGreetingText;
+void finishGreetingText(Window* wnd);
 void performCheckText(Window* wnd, const int indeterminate, void(*func)(void));
 void performCheck(Window* wnd);
 void failureOptions(Window* wnd);
@@ -218,8 +222,20 @@ void openMainGUI(Window* wnd) {
     callback(wnd);
 }
 
+void handleTopNProgressBarComplete() {
+    animDone =1;
+    changeTextFunc = finishGreetingText;
+    finishGreetingText(rootWindow);
+}
+
+void handleTopNCreation() {
+    OSCreateThreadForCreateTopnFile(handleTopNProgressBarComplete);
+    greetingText->text = "Gathering Data...";
+}
+
 void createButtons(Window* wnd) {
     switch (dialoguePos) {
+        case WIKI_OPTION(-1): handleTopNCreation(); break;//For creating the topN file
         case WIKI_OPTION(WIKI_FULL): DrawPermanentButton((GUI_BUTTON_LIKE){"Full", GetButtonPos(4,
             (GUI_POINT){50, 60} ,DEFAULT_BUTTON_SIZE, 1), OSCreateButton(1, downloadFullWikipediaDump, wnd)}, wnd);
             break;
@@ -246,10 +262,6 @@ void createButtons(Window* wnd) {
     }
 }
 
-void changeGreetingText(Window* wnd);
-
-void(*changeTextFunc)(Window* wnd) = changeGreetingText;
-
 void animateText(Window* wnd) {
     static int subStrPos = 1;
     memcpy(subStr, greetingDialogue[dialoguePos], subStrPos);
@@ -267,6 +279,19 @@ void animateText(Window* wnd) {
 }
 
 void changeGreetingText(Window* wnd) {
+    if (animDone) {
+        animDone = 0;
+        createButtons(wnd);
+        if (dialoguePos < WELCOME_TEXT_END-5)
+            OSDoAfterMillis(wnd, IDT_DO_AFTER_2, TYPING_SPEED, animateText);
+
+        OSKillTimer(wnd, IDT_DO_AFTER);
+
+    }
+}
+
+void finishGreetingText(Window* wnd) {
+    printf("eee");
     if (animDone) {
         animDone = 0;
         createButtons(wnd);

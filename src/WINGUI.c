@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 #include "../include/curl.h"
+#include "../include/topN.h"
 
 const wchar_t CLASS_NAME[] = L"WINDOW CLASS";
 WNDCLASS wc = {};
@@ -716,6 +717,14 @@ DWORD WINAPI SystemThread(LPVOID param) {
     return 0;
 }
 
+DWORD WINAPI CreateTopNFileThread(LPVOID param) {
+    TopNStruct* topNstruct = param;
+    CreateTopNFile();
+    topNstruct->func();
+    free(topNstruct);
+    return 0;
+}
+
 void OSCreateThreadForFunction(const LPTHREAD_START_ROUTINE function, const LPVOID funcStruct) {
     CreateThread(
         NULL,
@@ -751,6 +760,12 @@ void OSCreateThreadForSystemCall(const char* cmd, void(*func)(void)) {
     systemStruct->cmd = cmd;
     systemStruct->func = func;
     OSCreateThreadForFunction(SystemThread, systemStruct);
+}
+
+void OSCreateThreadForCreateTopnFile(void(*func)(void)) {
+    TopNStruct* topNStruct = malloc(sizeof(SystemStruct));
+    topNStruct->func = func;
+    OSCreateThreadForFunction(CreateTopNFileThread, topNStruct);
 }
 
 int OSGetDropdownCurrentlySelected(const unsigned int id, Window* wnd) {

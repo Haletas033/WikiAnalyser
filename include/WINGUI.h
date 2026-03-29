@@ -70,6 +70,7 @@ void OSCreateThreadForDownloadTo(const char* url, const char* filePath, const ch
 void OSCreateThreadForDownloadSpecialExportTo(const char** name, unsigned int count, const char* filePath, const char* fileName);
 void OSCreateThreadForParse(PCSTRFILEPATH szFilePath, Article **articles, Article *baseArticle, unsigned int *articleCount);
 void OSCreateThreadForSystemCall(const char* cmd, void(*func)(void));
+void OSCreateThreadForCreateTopnFile(void(*func)(void));
 int OSGetDropdownCurrentlySelected(unsigned int id, Window* wnd);
 int OSGetDropdownMultiSelectCurrentlySelected(unsigned int id, Window* wnd, int* buffer, int bufferSize);
 int GetRefreshRate();

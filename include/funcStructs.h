@@ -31,4 +31,8 @@ typedef struct SystemStruct {
     void(*func)(void);
 } SystemStruct;
 
+typedef struct TopNStruct {
+    void(*func)(void);
+} TopNStruct;
+
 #endif //FUNCSTRUCTS_H
