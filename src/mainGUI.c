@@ -257,7 +257,23 @@ void ApplyFieldType(Window* wnd, Field field, int offset, enum Type type) {
     }
 }
 
+void ClearArticle() {
+    free(article.intFieldNames);
+    free(article.floatFieldNames);
+    free(article.boolFieldNames);
+    free(article.stringFieldNames);
+
+    free(article.intFields);
+    free(article.floatFields);
+    free(article.boolFields);
+    free(article.stringFields);
+
+    article = (Article){0};
+}
+
 void ApplyFieldInput(Window* wnd) {
+    ClearArticle();
+
     ApplyFieldType(wnd, intFields, 1, FIELD_INT);
     ApplyFieldType(wnd, floatFields, 2, FIELD_FLOAT);
     ApplyFieldType(wnd, boolFields, 3, FIELD_BOOL);

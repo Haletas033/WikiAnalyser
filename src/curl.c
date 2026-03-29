@@ -63,7 +63,7 @@ void CurlDownloadTo(const char* url, const char* filePath, const char* fileName)
 }
 
 void CurlDownloadWithSpecialExportTo(const char** name, unsigned int count, const char* filePath, const char* fileName) {
-    maxProgress = count;
+    maxProgress = count-10;
 
     CURL* handle = curl_easy_init();
     if (handle == NULL)

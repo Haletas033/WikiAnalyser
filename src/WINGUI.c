@@ -351,8 +351,6 @@ void OSUpdateProgress() {
             progressDoneFunc = NULL;
         }
     }
-
-
 }
 
 void* OSCreateImage(const char* imgPath) {
