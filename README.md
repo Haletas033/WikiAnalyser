@@ -6,6 +6,11 @@ WikiAnalyser is an all in solution to download wikipedia dumps, clean them up, c
 The main exe is less than 400kb though it does auto-download Zig ~160mb, TopN file ~700mb and a Wikipedia dump up to 100gb
 
 ## Current Features:
+### Setup Festures:
+* Automatically download an XML file from four options (Full, TopN, Custom, or open) (unzipping is bugged for Full TopN with 10,000 is probably best)
+* Builds topN.topn (a lost of every srticle and it's views for topN)
+* Checks for Zig and provides an easy way to open it or download it (unzipping is bugged for download) 
+
 ### Cleanup Features:
 * Set what containers, strings, and characters you want removed
 * Single-pass efficient clean up algorithm for large files
