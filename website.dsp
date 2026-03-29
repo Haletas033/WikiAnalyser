@@ -6,6 +6,6 @@ docsTitle:;
 docsDescription:;
 
 #Needed files
-build: Website/Src/pages/wikiAnalyser.html.h;
+build: Website/Src/pages/wikiAnalyser.html.h, Website/Src/styles/wikiAnalyser.css.h;
 resources: Website/imgs;
-styles: Website/Src/styles/wikiAnalyser.css.h;
+styles:;

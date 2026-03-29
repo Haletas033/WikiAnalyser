@@ -5,9 +5,9 @@
 #ifndef WIKIANALYSER_HTML_H
 #define WIKIANALYSER_HTML_H
 
-#include "../Tag.h"
-#include "../utils/misc/misc.h"
-#include "../utils/nav/nav.h"
+#include "Tag.h"
+#include "utils/misc/misc.h"
+#include "utils/nav/nav.h"
 
 inline void wikiAnalyser() {
     Tag header("header");
