@@ -399,6 +399,7 @@ void BuildProject(Window* _) {
 void RunParser(Window* _) {
     OSCreateThreadForParse(GetINIField("UserData/data.ini", "DumpPath"), &articles, &article, &articleCount);
     visualiserScreen->paintStacks = (PaintStacks){0};
+    progress = 0; maxProgress = 100;
     parseProgressBar = OSCreateProgressBar(29, RemoveProgressBar, visualiserScreen, 1);
     DrawPermanentButton((GUI_BUTTON_LIKE){"Parsing...", 10, 40, 80, 20, parseProgressBar}, visualiserScreen);
 }

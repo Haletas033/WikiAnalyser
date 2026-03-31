@@ -190,7 +190,7 @@ void handleZigDownloadCompletion() {
     sprintf(zigZipPath, "%s\\zig.zip", zigInstallPath);
 
     char extractCmd[1024];
-    sprintf(extractCmd, "powershell -Command \"Expand-Archive -Path '%s' -DestinationPath '%s' -Force\"", zigZipPath, zigInstallPath);
+    sprintf(extractCmd, "powershell -Command \"Expand-Archive -Path \'%s\' -DestinationPath \'%s\' -Force\"", zigZipPath, zigInstallPath);
     OSCreateThreadForSystemCall(extractCmd, handleProgressBarCompletion);
 
     sprintf(zigExePath, "%s\\zig-windows-x86_64-0.14.0\\zig.exe", zigInstallPath);
@@ -223,6 +223,8 @@ void openMainGUI(Window* wnd) {
 }
 
 void handleTopNProgressBarComplete() {
+    progressBar = NULL;
+    OSDestroyButtonById(rootWindow, 29);
     animDone =1;
     changeTextFunc = finishGreetingText;
     finishGreetingText(rootWindow);
@@ -230,7 +232,7 @@ void handleTopNProgressBarComplete() {
 
 void handleTopNCreation() {
     OSCreateThreadForCreateTopnFile(handleTopNProgressBarComplete);
-    greetingText->text = "Gathering Data...";
+    greetingText->text = "Gathering Data... (This takes a while)";
 }
 
 void createButtons(Window* wnd) {
@@ -291,7 +293,6 @@ void changeGreetingText(Window* wnd) {
 }
 
 void finishGreetingText(Window* wnd) {
-    printf("eee");
     if (animDone) {
         animDone = 0;
         createButtons(wnd);
@@ -306,7 +307,7 @@ void finishGreetingText(Window* wnd) {
 void performCheck(Window* wnd) {
     char cmd[512];
     sprintf(cmd, "\"%s\" version > nul 2>&1", GetINIField("UserData/data.ini", "ZigPath"));
-    if (system("zig version > nul 2>&1") == 0 || system(cmd) == 0)
+    if (system("zig version > nul 2>&1") == 1 || system(cmd) == 0)
         success(wnd);
     else
         failureOptions(wnd);
