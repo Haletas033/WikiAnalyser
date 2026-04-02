@@ -584,7 +584,7 @@ void HandleArticleChoiceChange(Window* wnd) {
 }
 
 const char* articleChoices[3] = {"By Name", "All Averaged", "All Summed"};
-const char* graphChoices[5] = {"Pie Graph", "Percentage Bar", "Bar Graph", "Scatter Plot", "Text"};
+const char* graphChoices[4] = {"Pie Graph", "Percentage Bar", "Bar Graph", "Scatter Plot"};
 void SetupParsePaintStacks(PaintStacks* ps, Window* wnd) {
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"New Project",
         (GUI_RECT){10,5, 80, 10},  OSCreateButton(15, NewProject, wnd)}, ps);
@@ -598,7 +598,7 @@ void SetupParsePaintStacks(PaintStacks* ps, Window* wnd) {
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Article Choice",
         (GUI_RECT){10,47, 80, 5}, OSCreateDropdown(19, HandleArticleChoiceChange, wnd, articleChoices, 3)}, ps);
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Graph Choice",
-        (GUI_RECT){10,50, 80, 5}, OSCreateDropdown(25, CreateGraphInputs, wnd, graphChoices, 5)}, ps);
+        (GUI_RECT){10,50, 80, 5}, OSCreateDropdown(25, CreateGraphInputs, wnd, graphChoices, 4)}, ps);
     DrawPermanentButtonToPaintStacks((GUI_BUTTON_LIKE){"Analyse",
         (GUI_RECT){10,85, 80, 10},  OSCreateButton(24, Analyse, wnd)}, ps);
 }
