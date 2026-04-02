@@ -307,7 +307,7 @@ void finishGreetingText(Window* wnd) {
 void performCheck(Window* wnd) {
     char cmd[512];
     sprintf(cmd, "\"%s\" version > nul 2>&1", GetINIField("UserData/data.ini", "ZigPath"));
-    if (system("zig version > nul 2>&1") == 1 || system(cmd) == 0)
+    if (system("zig version > nul 2>&1") == 0 || system(cmd) == 0)
         success(wnd);
     else
         failureOptions(wnd);
